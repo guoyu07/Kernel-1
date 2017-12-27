@@ -1,0 +1,3 @@
+[submodule "Plugins/nikic/FastRoute"]
+	path = Plugins/nikic/FastRoute
+	url = https://github.com/nikic/FastRoute.git
