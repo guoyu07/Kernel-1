@@ -1,0 +1,51 @@
+[submodule "Library/php-fig/log"]
+	path = Library/php-fig/log
+	url = https://github.com/php-fig/log.git
+[submodule "Library/php-fig/http-message-util"]
+	path = Library/php-fig/http-message-util
+	url = https://github.com/php-fig/http-message-util.git
+[submodule "Library/php-fig/http-message"]
+	path = Library/php-fig/http-message
+	url = https://github.com/php-fig/http-message.git
+[submodule "Library/php-fig/link-util"]
+	path = Library/php-fig/link-util
+	url = https://github.com/php-fig/link-util.git
+[submodule "Library/php-fig/container"]
+	path = Library/php-fig/container
+	url = https://github.com/php-fig/container.git
+[submodule "Library/php-fig/cache-util"]
+	path = Library/php-fig/cache-util
+	url = https://github.com/php-fig/cache-util.git
+[submodule "Library/php-fig/link"]
+	path = Library/php-fig/link
+	url = https://github.com/php-fig/link.git
+[submodule "Library/php-fig/cache"]
+	path = Library/php-fig/cache
+	url = https://github.com/php-fig/cache.git
+[submodule "Library/nikic/FastRoute"]
+	path = Library/nikic/FastRoute
+	url = https://github.com/nikic/FastRoute.git
+[submodule "Library/Seldaek/monolog"]
+	path = Library/Seldaek/monolog
+	url = https://github.com/Seldaek/monolog.git
+[submodule "Library/hassankhan/config"]
+	path = Library/hassankhan/config
+	url = https://github.com/hassankhan/config.git
+[submodule "Library/mongodb/mongo-php-library"]
+	path = Library/mongodb/mongo-php-library
+	url = https://github.com/mongodb/mongo-php-library.git
+[submodule "Library/php-curl-class/php-curl-class"]
+	path = Library/php-curl-class/php-curl-class
+	url = https://github.com/php-curl-class/php-curl-class.git
+[submodule "Library/guzzle/RingPHP"]
+	path = Library/guzzle/RingPHP
+	url = https://github.com/guzzle/RingPHP.git
+[submodule "Library/guzzle/streams"]
+	path = Library/guzzle/streams
+	url = https://github.com/guzzle/streams.git
+[submodule "Library/reactphp/promise"]
+	path = Library/reactphp/promise
+	url = https://github.com/reactphp/promise.git
+[submodule "Library/elastic/elasticsearch-php"]
+	path = Library/elastic/elasticsearch-php
+	url = https://github.com/elastic/elasticsearch-php.git
