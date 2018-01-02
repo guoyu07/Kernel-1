@@ -8,7 +8,7 @@ namespace Kernel\Store\MySQL\Pdo;
 
 use Kernel\Utilities\Arr;
 
-class Pdo
+class PdoProxy
 {
     /**
      * 绑定参数
@@ -28,7 +28,7 @@ class Pdo
     /**
      * @var array
      */
-    protected $conf; // 配置
+    protected $link; // 配置
 
     /**
      * 数据库连接串
@@ -37,35 +37,11 @@ class Pdo
      */
     public function __construct($conf)
     {
-        $this->conf = $conf;
+        $config = $conf['config'];
+        unset($conf);
+        $this->link = $this->connect($config);
     }
 
-    /**
-     * 魔术方法 自动获取相应 db 实例
-     *
-     * @param string $db 要连接的数据库类型
-     *
-     * @return resource  连接标识
-     */
-    public function __get($db)
-    {
-        $config = $this->conf['config'];
-        if ($db=='rlink') {
-            //在Swoole中如果在父进程内调用了mt_rand，不同的子进程内再调用mt_rand返回的结果会是相同的。所以必须在每个子进程内调用mt_srand重新播种。
-            mt_srand();
-            $n = mt_rand(0, count($config['slave']) - 1);
-            $conf = $config['slave'][$n];
-            $this->rlink = $this->connect($conf);
-            unset($config, $conf, $n, $db);
-            return $this->rlink;
-        } else {
-            $conf = $config['master'];
-            $this->wlink = $this->connect($conf);
-            unset($config, $conf, $db);
-            return $this->wlink;
-        }
-        return false;
-    }
 
     /**
      * 数据库链接
@@ -76,9 +52,9 @@ class Pdo
     {
         $link = '';
         try {
-            $link = new \PDO($conf['data_source'], $conf['username'], $conf['pwd'], $conf['options']);
+            $link = new \pdoProxy($conf);
         } catch (Exception $e) {
-            throw new \Exception('PDO Connect Error! Code:'.$e->getCode().',ErrorInfo!:'.$e->getMessage().'<br />');
+            throw new \Exception('pdoProxy Connect Error! Code:'.$e->getCode().',ErrorInfo!:'.$e->getMessage().'<br />');
         }
         unset($conf);
         return $link;
@@ -227,7 +203,7 @@ class Pdo
      */
     public function getTables($dbname)
     {
-        $stmt = $this->prepare('SHOW TABLE STATUS FROM '.$dbname, $this->rlink);
+        $stmt = $this->prepare('SHOW TABLE STATUS FROM '.$dbname, $this->link);
         $this->execute($stmt);
         $result = $stmt->fetchAll();
         unset($dbname);
@@ -243,7 +219,7 @@ class Pdo
      */
     private function getFields($table)
     {
-        $stmt = $this->prepare('SHOW COLUMNS FROM '.$table, $this->rlink);
+        $stmt = $this->prepare('SHOW COLUMNS FROM '.$table, $this->link);
         $this->execute($stmt);
         $result = $stmt->fetchAll();
         unset($table);
@@ -258,7 +234,7 @@ class Pdo
      */
     private function beginTransaction()
     {
-        return $this->wlink->beginTransaction();
+        return $this->link->beginTransaction();
     }
 
     /**
@@ -268,7 +244,7 @@ class Pdo
      */
     private function commit()
     {
-        return $this->wlink->commit();
+        return $this->link->commit();
     }
 
     /**
@@ -277,7 +253,7 @@ class Pdo
      */
     private function inTransaction()
     {
-        return $this->wlink->inTransaction();
+        return $this->link->inTransaction();
     }
 
     /**
@@ -289,7 +265,7 @@ class Pdo
      */
     private function rollBack()
     {
-        return $this->wlink->rollBack();
+        return $this->link->rollBack();
     }
 
     /**
@@ -299,7 +275,7 @@ class Pdo
      */
     private function lastInsertId()
     {
-        return $this->wlink->lastInsertId();
+        return $this->link->lastInsertId();
     }
 
 
@@ -410,12 +386,12 @@ class Pdo
      */
     private function getAll()
     {
-        $stmt = $this->prepare($this->sql, $this->rlink);
+        $stmt = $this->prepare($this->sql, $this->link);
         $this->execute($stmt, $this->param);
         $return = $stmt->fetchAll();
         $this->sql = null;
         $this->param = array();
-        unset($this->rlink, $this->sql, $this->param, $stmt);
+        unset($this->sql, $this->param, $stmt);
         if (empty($return)) {
             return false;
         }
@@ -427,12 +403,12 @@ class Pdo
      */
     private function getOne()
     {
-        $stmt = $this->prepare($this->sql, $this->rlink);
+        $stmt = $this->prepare($this->sql, $this->link);
         $this->execute($stmt, $this->param);
         $return = $stmt->fetch();
         $this->sql = null;
         $this->param = array();
-        unset($this->rlink, $this->sql, $this->param, $stmt);
+        unset($this->sql, $this->param, $stmt);
         if (empty($return)) {
             return false;
         }
@@ -447,13 +423,13 @@ class Pdo
      */
     private function getValue()
     {
-        $stmt = $this->prepare($this->sql, $this->rlink);
+        $stmt = $this->prepare($this->sql, $this->link);
 
         $this->execute($stmt, $this->param);
         $return = $stmt->fetchColumn();
         $this->sql = null;
         $this->param = array();
-        unset($this->rlink, $this->sql, $this->param, $stmt);
+        unset($this->sql, $this->param, $stmt);
         return $return;
     }
 
@@ -463,16 +439,16 @@ class Pdo
      */
     private function exec()
     {
-        $stmt = $this->prepare($this->sql, $this->wlink);
+        $stmt = $this->prepare($this->sql, $this->link);
         $this->execute($stmt, $this->param);
         $this->sql = null;
         $this->param = array();
-        unset($this->wlink, $this->sql, $this->param);
+        unset($this->link, $this->sql, $this->param);
         return  $stmt->rowCount();
     }
 
     private function release()
     {
-        return true;
+        return $this->link->release();
     }
 }

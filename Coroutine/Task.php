@@ -1,0 +1,144 @@
+<?php
+
+namespace Kernel\Coroutine;
+
+class Task
+{
+    public $container;
+
+    protected $taskId;
+
+    protected $coStack;
+
+    protected $coroutine;
+
+    protected $exception = null;
+
+    protected $sendValue = null;
+
+    /**
+     * @param int $taskId
+     * @param obj $container
+     * @param obj Generator $coroutine
+     */
+    public function __construct($taskId, $container, \Generator $coroutine)
+    {
+        $this->taskId = $taskId;
+        $this->container = $container;
+        $this->coroutine = $coroutine;
+        $this->coStack = new \SplStack();
+    }
+
+    public function setContainer($container)
+    {
+        $this->container = $container;
+    }
+
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * 获取task id
+     * @return int
+     */
+    public function getTaskId()
+    {
+        return $this->taskId;
+    }
+
+    /**
+     * setException  设置异常处理
+     * @param $exception
+     */
+    public function setException($exception)
+    {
+        $this->exception = $exception;
+    }
+
+    /**
+     * 协程调度
+     */
+    public function run()
+    {
+        while (true) {
+            try {
+                if ($this->exception) {
+                    $this->coroutine->throw($this->exception);
+                    $this->exception = null;
+                    continue;
+                }
+
+                $value = $this->coroutine->current();
+
+                //如果是coroutine，入栈
+                if ($value instanceof \Generator) {
+                    $this->coStack->push($this->coroutine);
+                    $this->coroutine = $value;
+                    continue;
+                }
+
+                //如果为null，而且栈不为空，出栈
+                if (is_null($value) && !$this->coStack->isEmpty()) {
+                    $this->coroutine = $this->coStack->pop();
+                    $this->coroutine->send($this->sendValue);
+                    continue;
+                }
+
+                //如果是系统调用
+                if ($value instanceof SysCall || is_subclass_of($value, SysCall::class)) {
+                    call_user_func($value, $this);
+                    return;
+                }
+
+                if ($this->coStack->isEmpty()) {
+                    return;
+                }
+
+                $this->coroutine = $this->coStack->pop();
+                $this->coroutine->send($value);
+            } catch (\Exception $e) {
+                if ($this->coStack->isEmpty()) {
+                    throw $e;
+                }
+                $this->coroutine = $this->coStack->pop();
+                $this->exception = $e;
+            }
+        }
+    }
+
+    /**
+     * callback
+     * @param  $response
+     * @param  $error
+     * @param  integer $calltime
+     */
+    public function callback($response, $error = null, $calltime = 0)
+    {
+        $this->coroutine = $this->coStack->pop();
+        $callbackData = array('response' => $response, 'error' => $error, 'calltime' => $calltime);
+        $this->send($callbackData);
+        $this->run();
+    }
+
+    public function send($sendValue)
+    {
+        $this->sendValue = $sendValue;
+        return $this->coroutine->send($sendValue);
+    }
+
+    public function isFinished()
+    {
+        return !$this->coroutine->valid();
+    }
+
+    /**
+     * 当前的Generator
+     * @return Generator
+     */
+    public function getCoroutine()
+    {
+        return $this->coroutine;
+    }
+}
