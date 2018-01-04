@@ -4,141 +4,211 @@ namespace Kernel\Coroutine;
 
 class Task
 {
-    public $container;
-
-    protected $taskId;
-
-    protected $coStack;
-
-    protected $coroutine;
-
-    protected $exception = null;
+    protected $taskId = 0;
+    protected $parentTask;
+    protected $coroutine = null;
+    protected $context = null;
 
     protected $sendValue = null;
+    protected $scheduler = null;
+    protected $status = 0;
 
-    /**
-     * @param int $taskId
-     * @param obj $container
-     * @param obj Generator $coroutine
-     */
-    public function __construct($taskId, $container, \Generator $coroutine)
+    public static function execute($coroutine, Context $context = null, $taskId = 0, Task $parentTask = null)
     {
-        $this->taskId = $taskId;
-        $this->container = $container;
-        $this->coroutine = $coroutine;
-        $this->coStack = new \SplStack();
+        if (is_callable($coroutine)) {
+            return static::execute($coroutine(), $context, $taskId, $parentTask);
+        }
+
+        if ($coroutine instanceof \Generator) {
+            $task = new Task($coroutine, $context, $taskId, $parentTask);
+            // 这里应该使用defer方式运行!!!, 这样才有机会先绑定task事件,才开始迭代, swoole_event_defer()有问题
+            // master 不能使用定时器
+            if (swoole_timer_after(1, function () use ($task) {
+                $task->run();
+            }) === false) {
+                $task->run();
+            }
+            return $task;
+        }
+
+        return $coroutine;
     }
 
-    public function setContainer($container)
+    public function __construct(\Generator $coroutine, Context $context = null, $taskId = 0, Task $parentTask = null)
     {
-        $this->container = $container;
+        $this->coroutine = $this->caughtCoroutine($coroutine);
+        $this->taskId = $taskId ? $taskId : TaskId::create();
+        $this->parentTask = $parentTask;
+
+        if ($context) {
+            $this->context = $context;
+        } else {
+            $this->context = new Context();
+        }
+
+        $this->scheduler = new Scheduler($this);
     }
 
-    public function getContainer()
+    public function run()
     {
-        return $this->container;
+        while (true) {
+            try {
+                if ($this->status === Signal::TASK_KILLED) {
+                    $this->fireTaskDoneEvent();
+                    $this->status = Signal::TASK_DONE;
+                    break;
+                }
+                $this->status = $this->scheduler->schedule();
+                switch ($this->status) {
+                    case Signal::TASK_KILLED:
+                        return null;
+                    case Signal::TASK_SLEEP:
+                        return null;
+                    case Signal::TASK_WAIT:
+                        return null;
+                    case Signal::TASK_DONE:
+                        $this->fireTaskDoneEvent();
+                        return null;
+                    default:
+                        continue;
+                }
+            } catch (\Throwable $t) {
+                $this->scheduler->throwException($t);
+            } catch (\Exception $e) {
+                $this->scheduler->throwException($e);
+            }
+        }
     }
 
-    /**
-     * 获取task id
-     * @return int
-     */
+    public function sendException($e)
+    {
+        $this->scheduler->throwException($e);
+    }
+
+    public function send($value)
+    {
+        try {
+            $this->sendValue = $value;
+            return $this->coroutine->send($value);
+        } catch (\Throwable $t) {
+            $this->sendException($t);
+        } catch (\Exception $e) {
+            $this->sendException($e);
+        }
+    }
+
     public function getTaskId()
     {
         return $this->taskId;
     }
 
-    /**
-     * setException  设置异常处理
-     * @param $exception
-     */
-    public function setException($exception)
+    public function getContext()
     {
-        $this->exception = $exception;
+        return $this->context;
     }
 
-    /**
-     * 协程调度
-     */
-    public function run()
+    public function getContextArray()
     {
-        while (true) {
-            try {
-                if ($this->exception) {
-                    $this->coroutine->throw($this->exception);
-                    $this->exception = null;
-                    continue;
-                }
-
-                $value = $this->coroutine->current();
-
-                //如果是coroutine，入栈
-                if ($value instanceof \Generator) {
-                    $this->coStack->push($this->coroutine);
-                    $this->coroutine = $value;
-                    continue;
-                }
-
-                //如果为null，而且栈不为空，出栈
-                if (is_null($value) && !$this->coStack->isEmpty()) {
-                    $this->coroutine = $this->coStack->pop();
-                    $this->coroutine->send($this->sendValue);
-                    continue;
-                }
-
-                //如果是系统调用
-                if ($value instanceof SysCall || is_subclass_of($value, SysCall::class)) {
-                    call_user_func($value, $this);
-                    return;
-                }
-
-                if ($this->coStack->isEmpty()) {
-                    return;
-                }
-
-                $this->coroutine = $this->coStack->pop();
-                $this->coroutine->send($value);
-            } catch (\Exception $e) {
-                if ($this->coStack->isEmpty()) {
-                    throw $e;
-                }
-                $this->coroutine = $this->coStack->pop();
-                $this->exception = $e;
-            }
-        }
+        return $this->context->getAll();
     }
 
-    /**
-     * callback
-     * @param  $response
-     * @param  $error
-     * @param  integer $calltime
-     */
-    public function callback($response, $error = null, $calltime = 0)
+    public function getSendValue()
     {
-        $this->coroutine = $this->coStack->pop();
-        $callbackData = array('response' => $response, 'error' => $error, 'calltime' => $calltime);
-        $this->send($callbackData);
-        $this->run();
+        return $this->sendValue;
     }
 
-    public function send($sendValue)
+    public function getResult()
     {
-        $this->sendValue = $sendValue;
-        return $this->coroutine->send($sendValue);
+        return $this->sendValue;
     }
 
-    public function isFinished()
+    public function getStatus()
     {
-        return !$this->coroutine->valid();
+        return $this->status;
     }
 
-    /**
-     * 当前的Generator
-     * @return Generator
-     */
+    public function setStatus($signal)
+    {
+        $this->status = $signal;
+    }
+
     public function getCoroutine()
     {
         return $this->coroutine;
+    }
+
+    public function setCoroutine(\Generator $coroutine)
+    {
+        $this->coroutine = $coroutine;
+    }
+
+    public function getParentTask()
+    {
+        return $this->parentTask;
+    }
+
+    public function bindTaskDoneEvent(callable $callback)
+    {
+        $evtName = 'task_event_' . $this->taskId;
+        $this->context->getEvent()->bind($evtName, $callback, Event::ONCE_EVENT);
+    }
+
+    public function fireTaskDoneEvent()
+    {
+        if (null === $this->context) {
+            return;
+        }
+        $evtName = 'task_event_' . $this->taskId;
+
+        // TaskDoneEvent 不能抛出异常, 否则死循环
+        try {
+            $this->context->getEvent()->fire($evtName, $this->sendValue);
+            return;
+        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+        }
+        // sys_echo("Uncaught " . get_class($e));
+        // echo_exception($e);
+    }
+
+    public function bindUncaughtExceptionEvent(callable $callback)
+    {
+        $evtName = 'task_event_ex_' . $this->taskId;
+        $this->context->getEvent()->bind($evtName, $callback, Event::ONCE_EVENT);
+    }
+
+    // taskDone 与 exception 应该使用一个回调, 但是fireEvent的参数设计有问题!!!
+    public function fireUncaughtExceptionEvent($e)
+    {
+        if (null === $this->context) {
+            return;
+        }
+
+        $doneEvtName = 'task_event_' . $this->taskId;
+        $this->context->getEvent()->unregister($doneEvtName);
+
+        $evtName = 'task_event_ex_' . $this->taskId;
+
+        try {
+            $this->context->getEvent()->fire($evtName, $e);
+            return;
+        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+        }
+        // sys_echo("In fireUncaughtExceptionEvent, Uncaught " . get_class($e));
+        // echo_exception($e);
+    }
+
+    private function caughtCoroutine(\Generator $gen)
+    {
+        try {
+            yield $gen;
+            return;
+        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+        }
+        // sys_echo("In caughtCoroutine, Uncaught " . get_class($e));
+        // echo_exception($e);
+        $this->fireUncaughtExceptionEvent($e);
     }
 }

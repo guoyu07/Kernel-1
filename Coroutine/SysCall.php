@@ -4,10 +4,9 @@ namespace Kernel\Coroutine;
 
 class SysCall
 {
+    protected $callback = null;
 
-    protected $callback;
-
-    public function __construct(callable $callback)
+    public function __construct(\Closure $callback)
     {
         $this->callback = $callback;
     }
