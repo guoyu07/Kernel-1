@@ -63,7 +63,7 @@ abstract class Server
     /**
      * 该服务的 swoole 配置信息
      */
-    public $swooleConfig;
+    public $config;
     /**
      * 区分 tcp,udp,http,WebSocket
      * @var string
@@ -482,10 +482,10 @@ abstract class Server
      * 有新的连接进入时，在worker进程中回调
      * @param  SwooleServer $swoole
      * @param  int          $fd
-     * @param  int          $from_id
+     * @param  int          $reactor_id
      * @return
      */
-    public function onSwooleConnect(SwooleServer $swoole, int $fd, int $from_id)
+    public function onSwooleConnect(SwooleServer $swoole, int $fd, int $reactor_id)
     {
         Terminal::drawStr(__METHOD__, 'red');
     }
