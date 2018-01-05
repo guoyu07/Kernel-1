@@ -393,7 +393,7 @@ abstract class Server
         //设置主进程名称
         $this->setProcessName($processName);
         //刷新进程文件
-        $pidList = SwoolePid::makePidList('master', $swoole->master_pid, $processName);
+        $pidList = ServerPid::makePidList('master', $swoole->master_pid, $processName);
         $this->putPidList($pidList);
         Terminal::drawStr("Create Master Process Name->".$processName, 'green');
     }
@@ -441,13 +441,13 @@ abstract class Server
             $taskId = $swoole->worker_id - $workNum;
             $taskProcessName = $processName. ":task-num-:{$taskId}";
             $this->setProcessName($taskProcessName);
-            $pidList = SwoolePid::makePidList('task', $swoole->worker_pid, $taskProcessName);
+            $pidList = ServerPid::makePidList('task', $swoole->worker_pid, $taskProcessName);
             Terminal::drawStr("Create Task Process Name->".$processName. "-task-num:{$taskId}", 'green');
         } else {
             //启动 worker 进程
             $workerProcessName = $processName. ":work-num-:{$swoole->worker_id}";
             $this->setProcessName($workerProcessName);
-            $pidList = SwoolePid::makePidList('work', $swoole->worker_pid, $workerProcessName);
+            $pidList = ServerPid::makePidList('work', $swoole->worker_pid, $workerProcessName);
             Terminal::drawStr("Create Work Process Name->".$processName. "work-num-:{$swoole->worker_id}", 'green');
         }
 
@@ -466,7 +466,7 @@ abstract class Server
         $type = !empty($swoole->taskworker)?'task':'work';
         Terminal::drawStr(__METHOD__.'===='.$type.'=='.$swoole->worker_pid, 'red');
         //删除进程存储中的 pid
-        // SwoolePid::delPidList($type, $swoole->worker_pid);
+        // ServerPid::delPidList($type, $swoole->worker_pid);
     }
     /**
      * 定时器触发
@@ -533,8 +533,7 @@ abstract class Server
      */
     public function onSwooleTask(SwooleServer $swoole, int $task_id, int $src_worker_id, $data)
     {
-        $timeZone = Config::get('php.timezone', 'Asia/Shanghai');
-        \date_default_timezone_set($timeZone);
+        $this->setTimezone();
         Terminal::drawStr(__METHOD__, 'red');
     }
     /**
@@ -571,11 +570,10 @@ abstract class Server
      */
     public function onSwooleWorkerError(SwooleServer $swoole, int $worker_id, int $worker_pid, int $exit_code, int $signal)
     {
-        $key = $this->config_key.'.swoole.worker_num';
-        $num = Config::get('swoole.worker_num');
-        $workNum = Config::get($key, $num);
+        $key = $this->config.'.set.worker_num';
+        $workNum = Config::get($key);
         $type = $worker_pid>=$workNum?'task':'work';
-        // SwoolePid::delPidList($type, $swoole->worker_pid);
+        // ServerPid::delPidList($type, $swoole->worker_pid);
 
         $data = [
             'worker_id' => $worker_id,
@@ -593,13 +591,12 @@ abstract class Server
      */
     public function onSwooleManagerStart(SwooleServer $swoole)
     {
-        $timeZone = Config::get('php.timezone', 'Asia/Shanghai');
-        \date_default_timezone_set($timeZone);
+        $this->setTimezone();
         //创建管理进程
         Terminal::drawStr(__METHOD__, 'red');
         $processName = $this->serviceName .':manager';
         $this->setProcessName($processName);
-        $pidList = SwoolePid::makePidList('manager', $swoole->manager_pid, $processName);
+        $pidList = ServerPid::makePidList('manager', $swoole->manager_pid, $processName);
         $this->putPidList($pidList);
 
         Terminal::drawStr("Create Manage Process Name->".$processName, 'green');
@@ -685,6 +682,6 @@ abstract class Server
     public function putPidList($pidList)
     {
         $pidList = empty($pidList)?[]:$pidList;
-        SwoolePid::putPidList($pidList);
+        ServerPid::putPidList($pidList);
     }
 }
