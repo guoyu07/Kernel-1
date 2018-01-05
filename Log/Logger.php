@@ -27,6 +27,7 @@ class Logger
      */
     public static function init()
     {
+
         //构建日志监听频道
         $logHandle = new \Monolog\Logger(Config::get('logger.channel'));
         $logHandle->setTimezone(new \DateTimeZone(Config::get('common.timezone')));
@@ -73,7 +74,6 @@ class Logger
      */
     public function log($type, $message, $context = null)
     {
-
 
         $type = strtolower($type);
         $level = '';

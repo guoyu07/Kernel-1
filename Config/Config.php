@@ -13,7 +13,7 @@ class Config
     public static function init()
     {
         $configDir = CONFIG_PATH.DS.ENV;
-        static::$_config = new \Noodlehaus\Config::load($configDir);
+        static::$_config = new \Noodlehaus\Config($configDir);
     }
 
     public static function get($key, $default = null)

@@ -9,6 +9,12 @@ use Kernel\Config\Config;
 use Kernel\Log\Logger;
 use Kernel\Utilities\Terminal;
 
+use \Swoole\Server as SwooleServer;
+use \Swoole\Http\Request as SwooleHttpRequest;
+use \Swoole\Http\Response as SwooleHttpResponse;
+use \Swoole\Websocket\Server as SwooleWebsocketServer;
+use \Swoole\Websocket\Frame as SwooleWebsocketFrame;
+
 abstract class Server
 {
     const TYPE_TCP = 'tcp';
@@ -394,7 +400,7 @@ abstract class Server
         $this->setProcessName($processName);
         //刷新进程文件
         $pidList = ServerPid::makePidList('master', $swoole->master_pid, $processName);
-        $this->putPidList($pidList);
+        ServerPid::putPidList($pidList);
         Terminal::drawStr("Create Master Process Name->".$processName, 'green');
     }
 
@@ -434,7 +440,7 @@ abstract class Server
         Terminal::drawStr(__METHOD__, 'red');
         $processName = $this->serviceName;
 
-        $key = $this->config_key.'.swoole.worker_num';
+        $key = $this->config.'.set.worker_num';
         $workNum = Config::get($key);
         if ($swoole->taskworker) {
             //启动 task 投递任务进程
@@ -451,7 +457,7 @@ abstract class Server
             Terminal::drawStr("Create Work Process Name->".$processName. "work-num-:{$swoole->worker_id}", 'green');
         }
 
-        $this->putPidList($pidList);
+        ServerPid::putPidList($pidList);
     }
 
 
@@ -573,8 +579,6 @@ abstract class Server
         $key = $this->config.'.set.worker_num';
         $workNum = Config::get($key);
         $type = $worker_pid>=$workNum?'task':'work';
-        // ServerPid::delPidList($type, $swoole->worker_pid);
-
         $data = [
             'worker_id' => $worker_id,
             'worker_pid' => $worker_pid,
@@ -597,7 +601,7 @@ abstract class Server
         $processName = $this->serviceName .':manager';
         $this->setProcessName($processName);
         $pidList = ServerPid::makePidList('manager', $swoole->manager_pid, $processName);
-        $this->putPidList($pidList);
+        ServerPid::putPidList($pidList);
 
         Terminal::drawStr("Create Manage Process Name->".$processName, 'green');
     }
@@ -679,9 +683,9 @@ abstract class Server
      * @param  array $pidList
      * @return void
      */
-    public function putPidList($pidList)
-    {
-        $pidList = empty($pidList)?[]:$pidList;
-        ServerPid::putPidList($pidList);
-    }
+    // public function ServerPid::putPidList($pidList)
+    // {
+    //     $pidList = empty($pidList)?[]:$pidList;
+    //     ServerPid::ServerPid::putPidList($pidList);
+    // }
 }
