@@ -201,37 +201,6 @@ class Arr
 
         return $array->offsetExists($key);
     }
-    /**
-     * Determine if the given key exists in the provided array.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int  $key
-     * @return bool
-     */
-    public static function multiExists($array, $keys)
-    {
-        $bool = true;
-        foreach ($keys as $item) {
-            $bool = self::exists($array, $item);
-            if (!$bool) {
-                $bool = false;
-                break;
-            }
-        }
-        return  $bool;
-    }
-
-    public static function arrFilter($array, $keys)
-    {
-        $bool = true;
-        foreach ($keys as $item) {
-            if (!isset($array[$item])) {
-                $bool = false;
-                break;
-            }
-        }
-        return $bool;
-    }
 
     /**
      * Get an item from an array using "dot" notation.

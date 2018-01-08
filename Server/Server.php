@@ -76,6 +76,10 @@ abstract class Server
      */
     public $swooleType;
     /**
+     * @var Pool 对象池
+     */
+    public $objectPool;
+    /**
      * Server constructor.
      *
      * @throws Exception
@@ -85,6 +89,7 @@ abstract class Server
         // 检查系统配置
         $this->checkSystem();
         static::setInstance($this);
+        $this->setTimezone();
         $this->startTimeFloat = microtime(1);
         $this->startTime      = time();
         $this->pidFilePath = STORAGE_PID_PATH.DS.$this->serviceName.'.pid';
@@ -586,7 +591,7 @@ abstract class Server
             'signal'=>$signal
         ];
 
-        Log::getInstance()->log('error', 'swoole', $data);
+        Logger::getInstance()->log('error', 'swoole', $data);
     }
     /**
      * 当管理进程启动时调用它

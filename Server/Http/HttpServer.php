@@ -12,12 +12,35 @@ use Kernel\Utilities\Arr;
 use Kernel\Process\Inotify;
 use Kernel\Process\AutoReload;
 use Kernel\Utilities\Terminal;
+use FastRoute;
+
+// use Kernel\Coroutine\Context;
+// use Kernel\Coroutine\Event;
+// use Kernel\Coroutine\Signal;
+// use Kernel\Coroutine\Task;
+
+
+
+// use Kernel\Server\Http\Foundation\Cookie;
+// use Kernel\Server\Http\Foundation\Request\Request;
+// use Kernel\Server\Http\Foundation\Response\BaseResponse;
+// use Kernel\Server\Http\Foundation\Response\InternalErrorResponse;
+// use Kernel\Server\Http\Foundation\Response\JsonResponse;
+// use Kernel\Server\Http\Foundation\Response\Response;
+// use ZanPHP\Routing\Router;
+// use Kernel\Utilities\Time;
+// use Kernel\Timer\Timer;
 
 /**
  *
  */
 class HttpServer extends Server
 {
+
+
+    public $router = null;
+
+    public $dispatcher;
 
     public function __construct($key)
     {
@@ -35,9 +58,30 @@ class HttpServer extends Server
         Config::set($this->config.'.set', Arr::merge($set, $swoole_set));
         unset($set, $swoole_set);
         parent::__construct();
+
+        $this->router = $this->createRouter();
+    }
+
+    protected function createRouter()
+    {
+        return new FastRoute\RouteCollector(
+            new FastRoute\RouteParser\Std(),
+            new FastRoute\DataGenerator\GroupCountBased()
+        );
     }
 
 
+    /**
+     * @return FastRoute\Dispatcher\GroupCountBased
+     */
+    public function getDispatcher()
+    {
+        if ($this->dispatcher === null) {
+            $this->dispatcher = new FastRoute\Dispatcher\GroupCountBased($this->router->getData());
+        }
+
+        return $this->dispatcher;
+    }
     /**
      * 启动服务函数
      * @return
@@ -262,7 +306,21 @@ class HttpServer extends Server
      */
     public function onSwooleRequest(SwooleHttpRequest $swooleHttpRequest, SwooleHttpResponse $swooleHttpResponse)
     {
-        $swooleHttpResponse->status(200);
-        return $swooleHttpResponse->end('hi');
+        (new RequestHandler($this))->handle($swooleHttpRequest, $swooleHttpResponse);
+
+        // $request = Request::createFromSwooleHttpRequest($swooleHttpRequest);
+        // var_dump($request);
+    }
+
+
+
+    private function getRequestFinishJobId()
+    {
+        return spl_object_hash($this) . '_request_finish';
+    }
+
+    private function getRequestTimeoutJobId()
+    {
+        return spl_object_hash($this) . '_handle_timeout';
     }
 }
