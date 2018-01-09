@@ -6,6 +6,8 @@
 
 namespace Kernel\Pool;
 
+use Kernel\Server\Macro;
+
 /**
  * Class Pool
  * @package PG\MSF\Base
@@ -74,7 +76,7 @@ class Pool
             $obj->__useCount   = 0;
             $obj->__genTime    = time();
             $obj->__isConstruct = false;
-            $obj->__DSLevel    = 1<<0;
+            $obj->__DSLevel    = Macro::DS_PUBLIC;
             unset($reflector);
             return $obj;
         }

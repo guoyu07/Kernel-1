@@ -1,0 +1,10 @@
+<?php
+
+namespace ZanPHP\HttpFoundation\Exception;
+
+use ZanPHP\Exception\ZanException;
+
+class InvalidRouteException extends ZanException
+{
+
+}

@@ -15,6 +15,8 @@ use \Swoole\Http\Response as SwooleHttpResponse;
 use \Swoole\Websocket\Server as SwooleWebsocketServer;
 use \Swoole\Websocket\Frame as SwooleWebsocketFrame;
 
+// use Kernel\Pool\Pool;
+
 abstract class Server
 {
     const TYPE_TCP = 'tcp';
@@ -78,7 +80,11 @@ abstract class Server
     /**
      * @var Pool 对象池
      */
-    public $objectPool;
+    // public $objectPool;
+    /**
+     * @var int 请求ID
+     */
+    // public $requestId = 0;
     /**
      * Server constructor.
      *
@@ -313,6 +319,7 @@ abstract class Server
     public function startSwooles()
     {
         $this->serviceStartBefore();
+        // $this->objectPool = Pool::getInstance();
         $this->start();
     }
     /**

@@ -12,24 +12,18 @@ use Kernel\Utilities\Arr;
 use Kernel\Process\Inotify;
 use Kernel\Process\AutoReload;
 use Kernel\Utilities\Terminal;
+
+
+
 use FastRoute;
 
-// use Kernel\Coroutine\Context;
-// use Kernel\Coroutine\Event;
-// use Kernel\Coroutine\Signal;
-// use Kernel\Coroutine\Task;
-
-
-
-// use Kernel\Server\Http\Foundation\Cookie;
-// use Kernel\Server\Http\Foundation\Request\Request;
-// use Kernel\Server\Http\Foundation\Response\BaseResponse;
-// use Kernel\Server\Http\Foundation\Response\InternalErrorResponse;
-// use Kernel\Server\Http\Foundation\Response\JsonResponse;
-// use Kernel\Server\Http\Foundation\Response\Response;
-// use ZanPHP\Routing\Router;
-// use Kernel\Utilities\Time;
-// use Kernel\Timer\Timer;
+// \Dispatcher;
+// use FastRoute\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
+// use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
+// use FastRoute\RouteParser\Std;
+// use FastRoute\RouteCollector;
+// use function FastRoute\cachedDispatcher;
+// use function FastRoute\simpleDispatcher;
 
 /**
  *
@@ -39,6 +33,7 @@ class HttpServer extends Server
 
 
     public $router = null;
+    public $routes = [];
 
     public $dispatcher;
 
@@ -59,9 +54,21 @@ class HttpServer extends Server
         unset($set, $swoole_set);
         parent::__construct();
 
-        $this->router = $this->createRouter();
+        $this->initialize();
     }
 
+
+
+    public function initialize()
+    {
+        $this->router = $this->createRouter();
+        $this->registerRoutes();
+    }
+
+    /**
+     * FastRoute
+     * @return FastRoute
+     */
     protected function createRouter()
     {
         return new FastRoute\RouteCollector(
@@ -82,6 +89,95 @@ class HttpServer extends Server
 
         return $this->dispatcher;
     }
+
+    /**
+     * route.php
+     * @return routes
+     */
+    protected function registerRoutes()
+    {
+
+        $files = glob(ROUTE_PATH.DS."*.route.php");
+        // print_r($files);
+        foreach ($files as $file) {
+            $routes = is_file($file) ? include_once $file : array();
+            $this->routes = array_merge($this->routes, $routes);
+        }
+        // print_r($this->routes);
+
+
+        foreach ($this->routes as $value) {
+            if (!is_array($value[0]) && is_array($value[1])) {
+                $this->group($value[0], $value[1]);
+            } else {
+                $this->route($value[0], $value[1], $value[2]);
+            }
+        }
+    }
+
+    /**
+     * FastRoute addRoute
+     * @param  string $method
+     * @param  string $route
+     * @param  string $handler
+     * @return
+     */
+    protected function route($method, $route, $handler)
+    {
+        $this->router->addRoute($method, $route, $handler);
+
+        return $this;
+    }
+    /**
+     * FastRoute addRoute
+     * @param  string $method
+     * @param  string $route
+     * @param  string $handler
+     * @return
+     */
+    protected function group($group, $routes)
+    {
+        $this->router->addGroup($group, function (FastRoute\RouteCollector $router) use ($routes) {
+            foreach ($routes as list($method, $route, $handler)) {
+                $router->addRoute($method, $route, $handler);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * FastRoute dispatch
+     * @param  $request
+     * @return
+     */
+    public function dispatch($server)
+    {
+        $requestUri = $server['REQUEST_URI'];
+        $requestMethod = $server['REQUEST_METHOD'];
+        if (false !== $pos = strpos($requestUri, '?')) {
+            $requestUri = substr($requestUri, 0, $pos);
+        }
+        $requestUri = rawurldecode($requestUri);
+        $info = $this->getDispatcher()->dispatch($requestMethod, $requestUri);
+        switch ($info[0]) {
+            case FastRoute\Dispatcher::NOT_FOUND://0
+                return false;
+                break;
+            case FastRoute\Dispatcher::METHOD_NOT_ALLOWED://2
+                return true;
+                break;
+            case FastRoute\Dispatcher::FOUND://1
+            // $this->context->set('controller_name', $route['controller_name']);
+            // $this->context->set('action_name', $route['action_name']);
+            // $this->context->set('action_args', $route[1]);
+                $r = explode('@', $info[1]);
+                return ['controller_name'=>$r[0],'action_name'=>$r[1],'action_args'=>$info[2]];//[$info[1], $info[2]];
+                break;
+        }
+    }
+
+
     /**
      * 启动服务函数
      * @return
@@ -151,14 +247,14 @@ class HttpServer extends Server
         parent::onSwooleWorkerStart($swoole, $worker_id);
 
         //非任务投递进程
-        if (!$swoole->taskworker) {
+        // if (!$swoole->taskworker) {
             // $files = glob(ROUTE_PATH.DS."*.route.php");
             // foreach ($files as $file) {
             //     $data = is_file($file) ? include_once $file : array();
             //     Route::getInstance()->parseGroupRoutes($data);
             // }
             // Route::getInstance()->registerRoutes();
-        }
+        // }
         Terminal::drawStr(__METHOD__, 'red');
     }
 
