@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Response;
+namespace Kernel\Server\Http\Foundation\Response;
 
-use ZanPHP\HttpFoundation\Request\BaseRequest;
+use Kernel\Server\Http\Foundation\Request\BaseRequest;
 
 /**
  * Response represents an HTTP response.
