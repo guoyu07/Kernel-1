@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Request;
+namespace Kernel\Server\Http\Foundation\Request;
 
-use ZanPHP\HttpFoundation\Bag\FileBag;
-use ZanPHP\HttpFoundation\Bag\HeaderBag;
-use ZanPHP\HttpFoundation\Bag\ServerBag;
-use ZanPHP\HttpFoundation\Bag\ParameterBag;
-use ZanPHP\HttpFoundation\Request\AcceptHeader\AcceptHeader;
-use ZanPHP\Support\Ip;
+use Kernel\Server\Http\Foundation\Bag\FileBag;
+use Kernel\Server\Http\Foundation\Bag\HeaderBag;
+use Kernel\Server\Http\Foundation\Bag\ServerBag;
+use Kernel\Server\Http\Foundation\Bag\ParameterBag;
+use Kernel\Server\Http\Foundation\Request\AcceptHeader\AcceptHeader;
+use Kernel\Utilities\Ip;
 
 /**
  * Request represents an HTTP request.
@@ -1814,17 +1814,8 @@ class BaseRequest
      */
     private function setPhpDefaultLocale($locale)
     {
-        // if either the class Locale doesn't exist, or an exception is thrown when
-        // setting the default locale, the intl module is not installed, and
-        // the call can be ignored:
-        try {
-            if (class_exists('Locale', false)) {
-                \Locale::setDefault($locale);
-            }
-        } catch (\Throwable $t) {
-            echo_exception($t);
-        } catch (\Exception $e) {
-            echo_exception($e);
+        if (class_exists('Locale', false)) {
+            \Locale::setDefault($locale);
         }
     }
 

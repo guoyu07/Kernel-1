@@ -1,16 +1,15 @@
 <?php
 
-namespace ZanPHP\HttpFoundation\Request;
+namespace Kernel\Server\Http\Foundation\Request;
 
 use swoole_http_request as SwooleHttpRequest;
 
-use ZanPHP\Contracts\Http\HttpRequest as RequestContract;
-use ZanPHP\Contracts\Support\Arrayable;
-use ZanPHP\HttpFoundation\Bag\ParameterBag;
+
+use Kernel\Server\Http\Foundation\Bag\ParameterBag;
 use ZanPHP\Support\Arr;
 use ZanPHP\Support\Str;
 
-class Request extends BaseRequest implements Arrayable, RequestContract
+class Request extends BaseRequest
 {
     /**
      * The decoded JSON content for the request.

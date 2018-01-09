@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Request\AcceptHeader;
+namespace Kernel\Server\Http\Foundation\Request\AcceptHeader;
 
 /**
  * Represents an Accept-* header item.
