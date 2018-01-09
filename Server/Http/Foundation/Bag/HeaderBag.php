@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Bag;
+namespace Kernel\Server\Http\Foundation\Bag;
 
 /**
  * HeaderBag is a container for HTTP headers.

@@ -9,11 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\File;
+namespace Kernel\Server\Http\Foundation\File;
 
-use ZanPHP\HttpFoundation\File\Exception\FileException;
-use ZanPHP\HttpFoundation\File\Exception\FileNotFoundException;
-use ZanPHP\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Kernel\Server\Http\Foundation\File\MimeType\ExtensionGuesser;
+use Kernel\Coroutine\CallCC;
 
 /**
  * A file uploaded through a form.
@@ -238,7 +237,7 @@ class UploadedFile extends File
             return;
         }
 
-        throw new FileException($this->getErrorMessage());
+        throw new \Exception($this->getErrorMessage());
     }
 
     /**
@@ -264,10 +263,14 @@ class UploadedFile extends File
         }
 
         switch (substr($iniMax, -1)) {
-            case 't': $max *= 1024;
-            case 'g': $max *= 1024;
-            case 'm': $max *= 1024;
-            case 'k': $max *= 1024;
+            case 't':
+                $max *= 1024;
+            case 'g':
+                $max *= 1024;
+            case 'm':
+                $max *= 1024;
+            case 'k':
+                $max *= 1024;
         }
 
         return $max;
@@ -304,19 +307,19 @@ class UploadedFile extends File
      */
     private function move_upload_file($src, $dst)
     {
-        return callcc(function(callable $resolve, $task) use($src, $dst) {
+        return new CallCC(function (callable $resolve, $task) use ($src, $dst) {
             $chunk = 1024 * 1024;
             $offset = 0;
             $fileSize = filesize($src);
             $n = (int)ceil($fileSize / $chunk);
             $stopped = false;
 
-            $r = swoole_async_read($src, function($_, $content) use($src, $dst, $resolve, &$offset, &$n, &$stopped) {
+            $r = swoole_async_read($src, function ($_, $content) use ($src, $dst, $resolve, &$offset, &$n, &$stopped) {
                 $readSize = strlen($content);
                 $continue = ($readSize !== 0) && !$stopped;
 
                 if ($continue) {
-                    $r = swoole_async_write($dst, $content, $offset, function($_, $writeSize) use($resolve, $offset, $readSize, &$n, &$stopped) {
+                    $r = swoole_async_write($dst, $content, $offset, function ($_, $writeSize) use ($resolve, $offset, $readSize, &$n, &$stopped) {
                         // assert($readSize === $writeSize); // 分块全部写入
                         if (--$n === 0) {
                             $stopped = true;
@@ -326,7 +329,7 @@ class UploadedFile extends File
 
                     if (!$r) {
                         if (!$stopped) {
-                            $resolve(null, new FileException("Failed to write $src"));
+                            $resolve(null, new \Exception("Failed to write $src"));
                             $stopped = true;
                         }
                     }
@@ -337,7 +340,7 @@ class UploadedFile extends File
 
             if (!$r) {
                 $stopped = true;
-                $resolve(null, new FileException("Failed to read $src"));
+                $resolve(null, new \Exception("Failed to read $src"));
             }
         });
     }

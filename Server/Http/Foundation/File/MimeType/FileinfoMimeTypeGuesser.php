@@ -9,10 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\File\MimeType;
-use ZanPHP\HttpFoundation\File\Exception\AccessDeniedException;
-use ZanPHP\HttpFoundation\File\Exception\FileNotFoundException;
-
+namespace Kernel\Server\Http\Foundation\File\MimeType;
 
 /**
  * Guesses the mime type using the PECL extension FileInfo.
@@ -51,11 +48,11 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
     public function guess($path)
     {
         if (!is_file($path)) {
-            throw new FileNotFoundException($path);
+            throw new \Exception($path);
         }
 
         if (!is_readable($path)) {
-            throw new AccessDeniedException($path);
+            throw new \Exception($path);
         }
 
         if (!self::isSupported()) {

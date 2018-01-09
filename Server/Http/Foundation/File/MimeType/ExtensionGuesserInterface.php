@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\File\MimeType;
+namespace Kernel\Server\Http\Foundation\File\MimeType;
 
 /**
  * Guesses the file extension corresponding to a given mime type.

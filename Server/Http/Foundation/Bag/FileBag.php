@@ -9,10 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Bag;
+namespace Kernel\Server\Http\Foundation\Bag;
 
-use ZanPHP\HttpFoundation\File\UploadedFile;
-
+use Kernel\Server\Http\Foundation\File\UploadedFile;
 
 /**
  * FileBag is a container for uploaded files.

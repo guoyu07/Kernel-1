@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Bag;
+namespace Kernel\Server\Http\Foundation\Bag;
 
 /**
  * ServerBag is a container for HTTP headers from the $_SERVER variable.
@@ -32,8 +32,7 @@ class ServerBag extends ParameterBag
         foreach ($this->parameters as $key => $value) {
             if (0 === strpos($key, 'HTTP_')) {
                 $headers[substr($key, 5)] = $value;
-            }
-            // CONTENT_* are not prefixed with HTTP_
+            } // CONTENT_* are not prefixed with HTTP_
             elseif (isset($contentHeaders[$key])) {
                 $headers[$key] = $value;
             }

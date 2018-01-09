@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Bag;
+namespace Kernel\Server\Http\Foundation\Bag;
 
 /**
  * ParameterBag is a container for key/value pairs.

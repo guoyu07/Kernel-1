@@ -1,10 +1,9 @@
 <?php
 
-use ZanPHP\Coroutine\Signal;
-use ZanPHP\Coroutine\SysCall;
-use ZanPHP\Coroutine\Task;
-use ZanPHP\HttpFoundation\Cookie;
-
+use Kernel\Coroutine\Signal;
+use Kernel\Coroutine\SysCall;
+use Kernel\Coroutine\Task;
+use Kernel\Server\Http\Foundation\Cookie;
 
 function getCookieHandler()
 {

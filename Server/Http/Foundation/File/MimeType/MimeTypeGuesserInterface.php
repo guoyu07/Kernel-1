@@ -9,11 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\File\MimeType;
-
-use ZanPHP\HttpFoundation\File\Exception\AccessDeniedException;
-use ZanPHP\HttpFoundation\File\Exception\FileNotFoundException;
-
+namespace Kernel\Server\Http\Foundation\File\MimeType;
 
 /**
  * Guesses the mime type of a file.

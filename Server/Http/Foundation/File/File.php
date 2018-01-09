@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\File;
+namespace Kernel\Server\Http\Foundation\File;
 
-use ZanPHP\HttpFoundation\File\Exception\FileException;
-use ZanPHP\HttpFoundation\File\Exception\FileNotFoundException;
-use ZanPHP\HttpFoundation\File\MimeType\MimeTypeGuesser;
-use ZanPHP\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Kernel\Server\Http\Foundation\File\MimeType\MimeTypeGuesser;
+use Kernel\Server\Http\Foundation\File\MimeType\ExtensionGuesser;
 
 /**
  * A file in the file system.
@@ -34,7 +32,7 @@ class File extends \SplFileInfo
     public function __construct($path, $checkPath = true)
     {
         if ($checkPath && !is_file($path)) {
-            throw new FileNotFoundException($path);
+            throw new \Exception($path);
         }
 
         parent::__construct($path);
@@ -95,7 +93,7 @@ class File extends \SplFileInfo
 
         if (!@rename($this->getPathname(), $target)) {
             $error = error_get_last();
-            throw new FileException(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
+            throw new \Exception(sprintf('Could not move the file "%s" to "%s" (%s)', $this->getPathname(), $target, strip_tags($error['message'])));
         }
 
         @chmod($target, 0666 & ~umask());
@@ -107,10 +105,10 @@ class File extends \SplFileInfo
     {
         if (!is_dir($directory)) {
             if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
-                throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
+                throw new \Exception(sprintf('Unable to create the "%s" directory', $directory));
             }
         } elseif (!is_writable($directory)) {
-            throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
+            throw new \Exception(sprintf('Unable to write in the "%s" directory', $directory));
         }
 
         $target = rtrim($directory, '/\\').DIRECTORY_SEPARATOR.(null === $name ? $this->getBasename() : $this->getName($name));
