@@ -1,9 +1,9 @@
 <?php
 
-namespace ZanPHP\HttpFoundation\Response;
+namespace Kernel\Server\Http\Foundation\Response;
 
-use ZanPHP\Contracts\Http\ResponseTrait;
-use ZanPHP\Contracts\Network\Response as ResponseContract;
+use Kernel\Contracts\Http\ResponseTrait;
+use Kernel\Contracts\Network\Response as ResponseContract;
 
 class RedirectResponse extends BaseRedirectResponse implements ResponseContract
 {

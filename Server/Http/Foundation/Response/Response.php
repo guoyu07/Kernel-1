@@ -1,14 +1,14 @@
 <?php
 
-namespace ZanPHP\HttpFoundation\Response;
+namespace Kernel\Server\Http\Foundation\Response;
 
 use Exception;
 use ArrayObject;
 use JsonSerializable;
-use ZanPHP\Contracts\Http\ResponseTrait;
-use ZanPHP\Contracts\Network\Response as ResponseContract;
-use ZanPHP\Contracts\Support\Jsonable;
-use ZanPHP\Support\Json;
+use Kernel\Contracts\Http\ResponseTrait;
+use Kernel\Contracts\Network\Response as ResponseContract;
+use Kernel\Contracts\Support\Jsonable;
+use Kernel\Utilities\Json;
 
 class Response extends BaseResponse implements ResponseContract
 {
