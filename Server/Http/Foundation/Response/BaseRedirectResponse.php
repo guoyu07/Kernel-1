@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Response;
+namespace Kernel\Server\Http\Foundation\Response;
 
 /**
  * RedirectResponse represents an HTTP response doing a redirect.
@@ -90,7 +90,8 @@ class BaseRedirectResponse extends BaseResponse
     <body>
         Redirecting to <a href="%1$s">%1$s</a>.
     </body>
-</html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
+</html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8'))
+        );
 
         $this->headers->set('Location', $url);
 
