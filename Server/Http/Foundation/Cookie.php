@@ -3,7 +3,7 @@
 namespace Kernel\Server\Http\Foundation;
 
 use swoole_http_response as SwooleHttpResponse;
-use ZanPHP\Contracts\Config\Repository;
+use Kernel\Config\Config;
 use Kernel\Server\Http\Foundation\Request\Request;
 
 class Cookie
@@ -26,9 +26,8 @@ class Cookie
 
     private function init(Request $request, SwooleHttpResponse $swooleResponse)
     {
-        /** @var Repository $repository */
-        $repository  = make(Repository::class);
-        $config = $repository->get($this->configKey, null);
+
+        $config = Config::get($this->configKey, null);
         if (!$config) {
             throw new \InvalidArgumentException('Cookie config is required, see: http://zanphpdoc.zanphp.io/config/cookie.html');
         }
@@ -94,9 +93,8 @@ class Cookie
             '.kdt.im',
         ];
 
-        /** @var Repository $repository */
-        $repository  = make(Repository::class);
-        array_push($domainList, ...(array)$repository->get("cookie.domain", []));
+
+        array_push($domainList, ...(array)Config::get("cookie.domain", []));
 
         foreach ($domainList as $domain) {
             static::$domainWhiteList[$domain] = strlen($domain);
