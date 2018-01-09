@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace ZanPHP\HttpFoundation\Response;
+namespace Kernel\Server\Http\Foundation\Response;
 
 /**
  * Response represents an HTTP response in JSON format.
@@ -108,7 +108,6 @@ class BaseJsonResponse extends BaseResponse
             } catch (\Throwable $t) {
                 $e =  t2ex($t);
             } catch (\Exception $e) {
-
             }
 
             if (isset($e)) {
