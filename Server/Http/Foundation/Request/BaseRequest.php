@@ -354,6 +354,7 @@ class BaseRequest
         if (!isset($components['path'])) {
             $components['path'] = '/';
         }
+        
 
         switch (strtoupper($method)) {
             case 'POST':

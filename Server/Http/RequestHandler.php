@@ -13,17 +13,34 @@ use Kernel\Coroutine\TaskId;
 use Kernel\Utilities\Time;
 use Kernel\Timer\Timer;
 
+
+use Kernel\Server\Http\Foundation\Cookie as CookieAlias;
+use Kernel\Server\Http\Foundation\Request\Request;
+use Kernel\Server\Http\Foundation\Response\BaseResponse;
+use Kernel\Server\Http\Foundation\Response\InternalErrorResponse;
+use Kernel\Server\Http\Foundation\Response\JsonResponse;
+use Kernel\Server\Http\Foundation\Response\Response;
+use Kernel\Middleware\MiddlewareManager;
+use Kernel\Server\Http\RequestExceptionHandlerChain;
+use Kernel\Log\Logger;
+
 class RequestHandler
 {
 
     /** @var null|Context  */
     private $context = null;
 
+    /** @var MiddlewareManager */
+    private $middleWareManager = null;
+
+    /** @var Task */
+    private $task = null;
+
     /** @var Event */
     private $event = null;
 
-    /** @var HttpServer */
-    private $server = null;
+    /** @var Request */
+    private $request = null;
 
 
 
@@ -41,14 +58,39 @@ class RequestHandler
      */
     public function handle(SwooleHttpRequest $swooleRequest, SwooleHttpResponse $swooleResponse)
     {
+        try {
+            $request = Request::createFromSwooleHttpRequest($swooleRequest);
 
+            if (false === $this->initContext($request, $swooleRequest, $swooleResponse)) {
+                //filter ico file access
+                return;
+            }
+            $this->middleWareManager = new MiddlewareManager($request, $this->context);
 
-        $this->initContext($swooleRequest, $swooleResponse);
-
-        $timeout = $this->context->get('request_timeout');
-        $this->event->once($this->server->getRequestFinishJobId(), [$this, 'handleRequestFinish']);
-        Timer::after($timeout, [$this, 'handleTimeout'], $this->server->getRequestTimeoutJobId());
+            $timeout = $this->context->get('request_timeout');
+            $this->event->once($this->server->getRequestFinishJobId(), [$this, 'handleRequestFinish']);
+            Timer::after($timeout, [$this, 'handleTimeout'], $this->server->getRequestTimeoutJobId());
+            $requestTask = new RequestTask($request, $swooleResponse, $this->context, $this->middleWareManager);
+            $coroutine = $requestTask->run();
+            $this->task = new Task($coroutine, $this->context);
+            $this->task->run();
+            clear_ob();
+            $e = null;
+        } catch (\Throwable $t) {
+            $e = t2ex($t);
+        } catch (\Exception $e) {
+        }
+        clear_ob();
+        if ($this->middleWareManager) {
+            $coroutine = $this->middleWareManager->handleHttpException($e);
+        } else {
+            $coroutine = RequestExceptionHandlerChain::getInstance()->handle($e);
+        }
+        Task::execute($coroutine, $this->context);
+        $this->event->fire($this->server->getRequestFinishJobId());
     }
+
+
 
     /**
      * initContext
@@ -56,26 +98,30 @@ class RequestHandler
      * @param  SwooleHttpResponse $swooleResponse
      * @return
      */
-    private function initContext(SwooleHttpRequest $swooleRequest, SwooleHttpResponse $swooleResponse)
+    private function initContext($request, SwooleHttpRequest $swooleRequest, SwooleHttpResponse $swooleResponse)
     {
-
-        $server = $this->getServer($swooleRequest);
-        $route = $this->server->dispatch($server);
+        $route = $this->server->dispatch($request);
 
         if (false===$route) {
             $httpCode = 404;
             $this->sendFile($swooleResponse, $httpCode);
-            return ;
+            return false;
         }
         if (true===$route) {
             $httpCode = 405;
             $this->sendFile($swooleResponse, $httpCode);
-            return ;
+            return false;
         }
 
-
+        $this->request = $request;
         $this->context->set('swoole_request', $swooleRequest);
+        $this->context->set('request', $request);
         $this->context->set('swoole_response', $swooleResponse);
+        $this->context->set('server', $this->server);
+
+        $cookie = new CookieAlias($request, $swooleResponse);
+        $this->context->set('cookie', $cookie);
+
 
         $this->context->set('controller_name', $route['controller_name']);
         $this->context->set('action_name', $route['action_name']);
@@ -84,7 +130,6 @@ class RequestHandler
         $this->context->set('request_timeout', 30 * 1000);
         $this->context->set('request_end_event_name', $this->server->getRequestFinishJobId());
     }
-
 
     public function handleRequestFinish()
     {
@@ -98,27 +143,40 @@ class RequestHandler
         Task::execute($coroutine, $this->context);
     }
 
-
-    /**
-     * 获取server信息
-     * @param  SwooleHttpRequest $swooleRequest
-     * @return
-     */
-    public function getServer(SwooleHttpRequest $swooleHttpRequest)
+    public function handleTimeout()
     {
-        $header = isset($swooleHttpRequest->header) ? $swooleHttpRequest->header : [];
-        $server = isset($swooleHttpRequest->server) ? array_change_key_case($swooleHttpRequest->server, CASE_UPPER) : [];
-        if (isset($swooleHttpRequest->header)) {
-            foreach ($swooleHttpRequest->header as $key => $value) {
-                $newKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
-                $server[$newKey] = $value;
+        try {
+            $this->task->setStatus(Signal::TASK_KILLED);
+            $this->logTimeout();
+
+            $request = $this->context->get('request');
+            if ($request && $request->wantsJson()) {
+                $data = [
+                    'code' => 10000,
+                    'msg' => '网络超时',
+                    'data' => '',
+                ];
+                $response = new JsonResponse($data, BaseResponse::HTTP_GATEWAY_TIMEOUT);
+            } else {
+                $response = new InternalErrorResponse('服务器超时', BaseResponse::HTTP_GATEWAY_TIMEOUT);
             }
+
+            $this->context->set('response', $response);
+            $swooleResponse = $this->context->get('swoole_response');
+            $response->sendBy($swooleResponse);
+            $this->event->fire($this->server->getRequestFinishJobId());
+        } catch (\Throwable $t) {
+            echo_exception($t);
+        } catch (\Exception $ex) {
+            echo_exception($ex);
         }
-        $server['REQUEST_URI'] = preg_replace('/\/{2,}/', '/', $server['REQUEST_URI']);
-        $server['PATH_INFO'] = preg_replace('/\/{2,}/', '/', $server['PATH_INFO']);
-        $server['REQUEST_URI'] = preg_replace('#/$#', '', $server['REQUEST_URI']);
-        $server['PATH_INFO'] = preg_replace('#/$#', '', $server['PATH_INFO']);
-        return $server;
+    }
+
+    private function logTimeout()
+    {
+        $remoteIp = $this->request->getClientIp();
+        $route = $this->request->getRoute();
+        $query = http_build_query($this->request->query->all());
     }
 
     /**

@@ -15,7 +15,7 @@ class Timer
      * @param string     $jobId   标识任务的唯一标识符，必须唯一
      *
      * @return string    $jobId   timer job id
-     * @throws \Exception
+     * @throws InvalidArgumentException
      * @throws TimerExistException
      */
     public static function tick($interval, callable $callback, $jobId = '')
@@ -42,7 +42,7 @@ class Timer
      * @param string     $jobId   标识任务的唯一标识符，必须唯一
      *
      * @return string    $jobId timer job id
-     * @throws \Exception
+     * @throws InvalidArgumentException
      * @throws TimerExistException
      */
     public static function after($interval, callable $callback, $jobId = '')
@@ -162,7 +162,7 @@ class Timer
 
     /**
      * @param $interval
-     * @throws \Exception
+     * @throws InvalidArgumentException
      */
     private static function valid($interval)
     {
@@ -199,5 +199,24 @@ class Timer
 
         self::$counter++;
         return 'j_' . self::$counter;
+    }
+}
+
+if (! function_exists('sys_echo')) {
+    function sys_echo($context)
+    {
+        $workerId = isset($_SERVER["WORKER_ID"]) ? $_SERVER["WORKER_ID"] : "";
+        $dataStr = date("Y-m-d H:i:s");
+        echo "[$dataStr #$workerId] $context\n";
+    }
+}
+
+if (! function_exists('sys_error')) {
+    function sys_error($context)
+    {
+        $workerId = isset($_SERVER["WORKER_ID"]) ? $_SERVER["WORKER_ID"] : "";
+        $dataStr = date("Y-m-d H:i:s");
+        $context = str_replace("%", "%%", $context);
+        fprintf(STDERR, "[$dataStr #$workerId] $context\n");
     }
 }

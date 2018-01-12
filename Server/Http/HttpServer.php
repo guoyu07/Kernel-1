@@ -12,18 +12,7 @@ use Kernel\Utilities\Arr;
 use Kernel\Process\Inotify;
 use Kernel\Process\AutoReload;
 use Kernel\Utilities\Terminal;
-
-
-
 use FastRoute;
-
-// \Dispatcher;
-// use FastRoute\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
-// use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedGenerator;
-// use FastRoute\RouteParser\Std;
-// use FastRoute\RouteCollector;
-// use function FastRoute\cachedDispatcher;
-// use function FastRoute\simpleDispatcher;
 
 /**
  *
@@ -151,10 +140,10 @@ class HttpServer extends Server
      * @param  $request
      * @return
      */
-    public function dispatch($server)
+    public function dispatch($request)
     {
-        $requestUri = $server['REQUEST_URI'];
-        $requestMethod = $server['REQUEST_METHOD'];
+        $requestUri = $request->server->get('REQUEST_URI');
+        $requestMethod = $request->server->get('REQUEST_METHOD');
         if (false !== $pos = strpos($requestUri, '?')) {
             $requestUri = substr($requestUri, 0, $pos);
         }
@@ -172,6 +161,7 @@ class HttpServer extends Server
             // $this->context->set('action_name', $route['action_name']);
             // $this->context->set('action_args', $route[1]);
                 $r = explode('@', $info[1]);
+                $request->setRoute($requestUri);
                 return ['controller_name'=>$r[0],'action_name'=>$r[1],'action_args'=>$info[2]];//[$info[1], $info[2]];
                 break;
         }
@@ -410,12 +400,12 @@ class HttpServer extends Server
 
 
 
-    private function getRequestFinishJobId()
+    public function getRequestFinishJobId()
     {
         return spl_object_hash($this) . '_request_finish';
     }
 
-    private function getRequestTimeoutJobId()
+    public function getRequestTimeoutJobId()
     {
         return spl_object_hash($this) . '_handle_timeout';
     }

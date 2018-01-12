@@ -196,7 +196,7 @@ class Scheduler
             // 兼容PHP7 & PHP5
             if ($t instanceof \Throwable || $t instanceof \Exception) {
                 // sys_echo("Uncaught " . get_class($t));
-                // echo_exception($t);
+                echo_exception($t);
             }
             return true;
         }

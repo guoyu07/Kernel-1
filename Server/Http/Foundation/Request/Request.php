@@ -42,6 +42,18 @@ class Request extends BaseRequest
                 $server[$newKey] = $value;
             }
         }
+
+        $server['REQUEST_URI'] = preg_replace('/\/{2,}/', '/', $server['REQUEST_URI']);
+        $server['PATH_INFO'] = preg_replace('/\/{2,}/', '/', $server['PATH_INFO']);
+        $server['REQUEST_URI'] = preg_replace('#/$#', '', $server['REQUEST_URI']);
+        $server['PATH_INFO'] = preg_replace('#/$#', '', $server['PATH_INFO']);
+        if (empty($server['REQUEST_URI'])) {
+            $server['REQUEST_URI'] = '/';
+        }
+        if (empty($server['PATH_INFO'])) {
+            $server['PATH_INFO'] = '/';
+        }
+
         $request = new static($get, $post, $attributes, $cookie, $files, $server);
 
         // parse http body
