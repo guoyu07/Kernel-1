@@ -23,8 +23,12 @@ class HttpServer extends Server
 
     public $router = null;
     public $routes = [];
+    public $routeAlias = [];
+    // public $routeUri = [];
 
     public $dispatcher;
+
+
 
     public function __construct($key)
     {
@@ -60,12 +64,14 @@ class HttpServer extends Server
      */
     protected function createRouter()
     {
-        return new FastRoute\RouteCollector(
-            new FastRoute\RouteParser\Std(),
-            new FastRoute\DataGenerator\GroupCountBased()
+        return $this->container->make(
+            'FastRoute\RouteCollector',
+            [
+                new FastRoute\RouteParser\Std(),
+                new FastRoute\DataGenerator\GroupCountBased()
+            ]
         );
     }
-
 
     /**
      * @return FastRoute\Dispatcher\GroupCountBased
@@ -73,9 +79,13 @@ class HttpServer extends Server
     public function getDispatcher()
     {
         if ($this->dispatcher === null) {
-            $this->dispatcher = new FastRoute\Dispatcher\GroupCountBased($this->router->getData());
+            $this->dispatcher = $this->container->make(
+                'FastRoute\Dispatcher\GroupCountBased',
+                [
+                    $this->router->getData()
+                ]
+            );
         }
-
         return $this->dispatcher;
     }
 
@@ -87,19 +97,15 @@ class HttpServer extends Server
     {
 
         $files = glob(ROUTE_PATH.DS."*.route.php");
-        // print_r($files);
         foreach ($files as $file) {
             $routes = is_file($file) ? include_once $file : array();
             $this->routes = array_merge($this->routes, $routes);
         }
-        // print_r($this->routes);
-
-
         foreach ($this->routes as $value) {
             if (!is_array($value[0]) && is_array($value[1])) {
                 $this->group($value[0], $value[1]);
             } else {
-                $this->route($value[0], $value[1], $value[2]);
+                $this->route($value[0], $value[1], $value[2], $value[3]);
             }
         }
     }
@@ -111,9 +117,10 @@ class HttpServer extends Server
      * @param  string $handler
      * @return
      */
-    protected function route($method, $route, $handler)
+    protected function route($method, $route, $handler, $routeAlias)
     {
         $this->router->addRoute($method, $route, $handler);
+        $this->routeAlias[$routeAlias] = $route;
 
         return $this;
     }
@@ -126,9 +133,10 @@ class HttpServer extends Server
      */
     protected function group($group, $routes)
     {
-        $this->router->addGroup($group, function (FastRoute\RouteCollector $router) use ($routes) {
-            foreach ($routes as list($method, $route, $handler)) {
+        $this->router->addGroup($group, function (FastRoute\RouteCollector $router) use ($group, $routes) {
+            foreach ($routes as list($method, $route, $handler,$routeAlias)) {
                 $router->addRoute($method, $route, $handler);
+                $this->routeAlias[$routeAlias] = $group.$route;
             }
         });
 
@@ -142,8 +150,8 @@ class HttpServer extends Server
      */
     public function dispatch($request)
     {
-        $requestUri = $request->server->get('REQUEST_URI');
-        $requestMethod = $request->server->get('REQUEST_METHOD');
+        $requestUri = $request->server('REQUEST_URI');
+        $requestMethod = $request->server('REQUEST_METHOD');
         if (false !== $pos = strpos($requestUri, '?')) {
             $requestUri = substr($requestUri, 0, $pos);
         }
@@ -157,12 +165,7 @@ class HttpServer extends Server
                 return true;
                 break;
             case FastRoute\Dispatcher::FOUND://1
-            // $this->context->set('controller_name', $route['controller_name']);
-            // $this->context->set('action_name', $route['action_name']);
-            // $this->context->set('action_args', $route[1]);
-                $r = explode('@', $info[1]);
-                $request->setRoute($requestUri);
-                return ['controller_name'=>$r[0],'action_name'=>$r[1],'action_args'=>$info[2]];//[$info[1], $info[2]];
+                return [$info[1],$info[2]];
                 break;
         }
     }
@@ -392,21 +395,32 @@ class HttpServer extends Server
      */
     public function onSwooleRequest(SwooleHttpRequest $swooleHttpRequest, SwooleHttpResponse $swooleHttpResponse)
     {
-        (new RequestHandler($this))->handle($swooleHttpRequest, $swooleHttpResponse);
-
-        // $request = Request::createFromSwooleHttpRequest($swooleHttpRequest);
-        // var_dump($request);
+        $swooleHttpRequest = $this->beforeSwooleHttpRequest($swooleHttpRequest);
+        $this->container->make('Kernel\Server\Http\RequestHandler', [$this])->handle($swooleHttpRequest, $swooleHttpResponse);
     }
 
-
-
-    public function getRequestFinishJobId()
+    private function beforeSwooleHttpRequest(SwooleHttpRequest $swooleHttpRequest)
     {
-        return spl_object_hash($this) . '_request_finish';
-    }
+        $request_uri = $swooleHttpRequest->server['request_uri'];
+        $path_info = $swooleHttpRequest->server['path_info'];
+        $request_uri = preg_replace('/\/{2,}/', '/', $request_uri);
+        $path_info = preg_replace('/\/{2,}/', '/', $path_info);
+        $request_uri = preg_replace('#/$#', '', $request_uri);
+        $path_info = preg_replace('#/$#', '', $path_info);
+        if (empty($request_uri)) {
+            $request_uri = '/';
+        }
+        if (empty($path_info)) {
+            $path_info = '/';
+        }
+        $swooleHttpRequest->server['request_uri'] = $request_uri;
+        $swooleHttpRequest->server['path_info'] = $path_info;
 
-    public function getRequestTimeoutJobId()
-    {
-        return spl_object_hash($this) . '_handle_timeout';
+
+
+
+
+
+        return $swooleHttpRequest;
     }
 }

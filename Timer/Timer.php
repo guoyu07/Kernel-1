@@ -202,21 +202,21 @@ class Timer
     }
 }
 
-if (! function_exists('sys_echo')) {
-    function sys_echo($context)
-    {
-        $workerId = isset($_SERVER["WORKER_ID"]) ? $_SERVER["WORKER_ID"] : "";
-        $dataStr = date("Y-m-d H:i:s");
-        echo "[$dataStr #$workerId] $context\n";
-    }
-}
-
-if (! function_exists('sys_error')) {
-    function sys_error($context)
-    {
-        $workerId = isset($_SERVER["WORKER_ID"]) ? $_SERVER["WORKER_ID"] : "";
-        $dataStr = date("Y-m-d H:i:s");
-        $context = str_replace("%", "%%", $context);
-        fprintf(STDERR, "[$dataStr #$workerId] $context\n");
-    }
-}
+// if (! function_exists('sys_echo')) {
+//     function sys_echo($context)
+//     {
+//         $workerId = isset($_SERVER["WORKER_ID"]) ? $_SERVER["WORKER_ID"] : "";
+//         $dataStr = date("Y-m-d H:i:s");
+//         echo "[$dataStr #$workerId] $context\n";
+//     }
+// }
+//
+// if (! function_exists('sys_error')) {
+//     function sys_error($context)
+//     {
+//         $workerId = isset($_SERVER["WORKER_ID"]) ? $_SERVER["WORKER_ID"] : "";
+//         $dataStr = date("Y-m-d H:i:s");
+//         $context = str_replace("%", "%%", $context);
+//         fprintf(STDERR, "[$dataStr #$workerId] $context\n");
+//     }
+// }

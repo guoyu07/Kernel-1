@@ -14,6 +14,7 @@ use \Swoole\Http\Request as SwooleHttpRequest;
 use \Swoole\Http\Response as SwooleHttpResponse;
 use \Swoole\Websocket\Server as SwooleWebsocketServer;
 use \Swoole\Websocket\Frame as SwooleWebsocketFrame;
+use Kernel\Container\Container;
 
 // use Kernel\Pool\Pool;
 
@@ -77,14 +78,12 @@ abstract class Server
      * @var string
      */
     public $swooleType;
+
     /**
-     * @var Pool 对象池
+     * 容器
+     * @var  obj
      */
-    // public $objectPool;
-    /**
-     * @var int 请求ID
-     */
-    // public $requestId = 0;
+    public $container;
     /**
      * Server constructor.
      *
@@ -96,6 +95,7 @@ abstract class Server
         $this->checkSystem();
         static::setInstance($this);
         $this->setTimezone();
+        $this->container = new Container;
         $this->startTimeFloat = microtime(1);
         $this->startTime      = time();
         $this->pidFilePath = STORAGE_PID_PATH.DS.$this->serviceName.'.pid';
@@ -104,6 +104,11 @@ abstract class Server
         ServerPid::init($this->pidFilePath);
         $this->monitor = new Monitor($this->serviceName, $this->pidFilePath);
     }
+
+
+
+
+
     /**
      * 设置时区
      * @return void
