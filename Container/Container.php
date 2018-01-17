@@ -10,6 +10,8 @@ use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionParameter;
 
+// use Generator;
+
 class Container implements ContainerInterface, ArrayAccess
 {
     /**

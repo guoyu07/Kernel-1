@@ -167,8 +167,6 @@ class Task
         } catch (\Throwable $e) {
         } catch (\Exception $e) {
         }
-        // sys_echo("Uncaught " . get_class($e));
-        echo_exception($e);
     }
 
     public function bindUncaughtExceptionEvent(callable $callback)
@@ -195,8 +193,6 @@ class Task
         } catch (\Throwable $e) {
         } catch (\Exception $e) {
         }
-        // sys_echo("In fireUncaughtExceptionEvent, Uncaught " . get_class($e));
-        echo_exception($e);
     }
 
     private function caughtCoroutine(\Generator $gen)
@@ -207,8 +203,6 @@ class Task
         } catch (\Throwable $e) {
         } catch (\Exception $e) {
         }
-        // sys_echo("In caughtCoroutine, Uncaught " . get_class($e));
-        echo_exception($e);
         $this->fireUncaughtExceptionEvent($e);
     }
 }

@@ -33,14 +33,6 @@ class Logger
         $logHandle = new \Monolog\Logger(Config::get('logger.channel'));
         $logHandle->setTimezone(new \DateTimeZone(Config::get('common.timezone')));
 
-
-        // $logHandle->pushHandler(new RotatingFileHandler(
-        //     STORAGE_LOG_PATH .DS. 't.log',
-        //     15,
-        //     \Monolog\Logger::DEBUG
-        // ));
-
-
         $uri = 'mongodb://'.implode(Config::get('store.logger.host'), ',').'/';
         $client = new Client($uri, Config::get('store.logger.uriOptions'), Config::get('store.logger.driverOptions'));
         $mongodb = new MongoDBHandler($client, Config::get('store.logger.database'), Config::get('store.logger.collection'));

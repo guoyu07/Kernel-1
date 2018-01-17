@@ -7,6 +7,9 @@ use Kernel\Coroutine\Contract\Async;
 class Scheduler
 {
     private $task = null;
+    /**
+     * @var SplStack
+     */
     private $stack = null;
 
     public function __construct(Task $task)
