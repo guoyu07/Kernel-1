@@ -71,20 +71,21 @@ class RequestHandler
         if (false === $this->initContext($request, $swooleRequest, $swooleResponse)) {
             return ;
         }
+        $coroutine_handle = $this->server->container->make('Kernel\Server\Http\RequestTask', [
+            $request, $swooleResponse, $this->context
+        ]);
+
         try {
             $timeout = $this->context->get('request_timeout');
             $this->event->once($this->getRequestFinishJobId(), [$this, 'handleRequestFinish']);
             Timer::after($timeout, [$this, 'handleTimeout'], $this->getRequestTimeoutJobId());
 
-            $coroutine_handle = $this->server->container->make('Kernel\Server\Http\RequestTask', [
-                $request, $swooleResponse, $this->context
-            ]);
-
             $coroutine = $coroutine_handle->run();
-            $this->task = $this->server->container->make('Kernel\Coroutine\Task', [
+
+            $this->task = new Task(
                 $coroutine,
                 $this->context
-            ]);
+            );
 
             $this->task->run();
 
@@ -97,10 +98,6 @@ class RequestHandler
         while (ob_get_level() > 0) {
             ob_end_flush();
         }
-
-        $coroutine_handle = $this->server->container->make('Kernel\Server\Http\RequestTask', [
-            $request, $swooleResponse, $this->context
-        ]);
 
         $coroutine = $coroutine_handle->handleHttpException($e);
         Task::execute($coroutine, $this->context);
@@ -162,6 +159,7 @@ class RequestHandler
         $coroutine_handle = $this->server->container->make('Kernel\Server\Http\RequestTask', [
             $request, $swooleResponse, $this->context
         ]);
+
         $response =  $coroutine_handle->responseError('服务器超时', 502);
         $this->context->set('response', $response);
         $response->sendBy($swooleResponse);
