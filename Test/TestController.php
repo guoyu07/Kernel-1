@@ -1,9 +1,13 @@
 <?php
 namespace Kernel\Test;
 
-use Kernel\Server\Http\Foundation\Request\Request;
-use Kernel\Server\Http\Foundation\Response\Response;
 use Kernel\Coroutine\Context;
+use Kernel\Server\Http\Foundation\Request;
+use Kernel\Server\Http\Foundation\Response;
+use Kernel\Server\Http\Foundation\HtmlResponse;
+use Kernel\Server\Http\Foundation\XmlResponse;
+use Kernel\Server\Http\Foundation\JsonResponse;
+use Kernel\Server\Http\Foundation\ImageResponse;
 
 class TestController
 {
@@ -28,13 +32,18 @@ class TestController
         yield $this->display();
     }
 
+    public function callback1()
+    {
+        yield $this->display();
+    }
+
 
 
 
 
     public function output($content)
     {
-        return new Response($content);
+        return new HtmlResponse($content);
     }
 
 

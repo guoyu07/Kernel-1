@@ -75,6 +75,12 @@ class Request
      */
     protected $method;
 
+
+    const JSON = 'Json';
+    const XML = 'Xml';
+    const HTML = 'Html';
+    const IMAGE = 'Image';
+
     /**
      * @param array           $query      The GET parameters
      * @param array           $request    The POST parameters
@@ -115,6 +121,21 @@ class Request
     }
 
 
+    public function getContentType()
+    {
+        if ($this->wantsJson()) {
+            return self::JSON;
+        } elseif ($this->wantsXml()) {
+            return self::XML;
+        } elseif ($this->wantsImage()) {
+            return self::IMAGE;
+        } elseif ($this->wantsHtml()) {
+            return self::HTML;
+        } else {
+            return self::HTML;
+        }
+    }
+
     /**
      *
      * @return bool
@@ -127,6 +148,45 @@ class Request
             $isJson = stripos($this->server('REQUEST_URI'), '.json') !== false;
         }
         return $isJson;
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function wantsXml()
+    {
+        $acceptable = preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $this->server('HTTP_ACCEPT'), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $isXml = isset($acceptable[0]) && Str::contains($acceptable[0], ['/xml', '+xml']);
+        if (!$isXml) {
+            $isXml = stripos($this->server('REQUEST_URI'), '.xml') !== false;
+        }
+        return $isXml;
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function wantsImage()
+    {
+        $acceptable = preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $this->server('HTTP_ACCEPT'), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $isImage = isset($acceptable[0]) && Str::contains($acceptable[0], ['/image', '+image']);
+        return $isImage;
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function wantsHtml()
+    {
+        $acceptable = preg_split('/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/', $this->server('HTTP_ACCEPT'), 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $isHtml = isset($acceptable[0]) && Str::contains($acceptable[0], ['/html', '+html']);
+        if (!$isHtml) {
+            $isHtml = (stripos($this->server('REQUEST_URI'), '.html') !== false  || stripos($this->server('REQUEST_URI'), '.htm') !== false || stripos($this->server('REQUEST_URI'), '.shtml') !== false);
+        }
+        return $isHtml;
     }
 
     /**

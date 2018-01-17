@@ -24,6 +24,7 @@ class HttpServer extends Server
     public $router = null;
     public $routes = [];
     public $routeAlias = [];
+    public $middleware = [];
     // public $routeUri = [];
 
     public $dispatcher;
@@ -56,6 +57,7 @@ class HttpServer extends Server
     {
         $this->router = $this->createRouter();
         $this->registerRoutes();
+        $this->registerMiddleware();
     }
 
     /**
@@ -109,6 +111,36 @@ class HttpServer extends Server
             }
         }
     }
+
+    /**
+     * Middleware.php
+     * @return Middleware
+     */
+    protected function registerMiddleware()
+    {
+        $files = glob(MIDDLEWARE_PATH.DS."*.middleware.php");
+        foreach ($files as $file) {
+            $middleware = is_file($file) ? include_once $file : array();
+            $this->middleware = array_merge($this->middleware, $middleware);
+        }
+    }
+
+    /**
+     * 解析middleware
+     * @param  string $router
+     * @return middleware or bool
+     */
+    public function dispatchMiddleware($router)
+    {
+        if (!isset($this->middleware[$router])) {
+            return false;
+        }
+        return $this->middleware[$router];
+    }
+
+
+
+
 
     /**
      * FastRoute addRoute

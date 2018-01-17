@@ -28,14 +28,17 @@ class RequestHandler
 
     /** @var Request */
     private $request = null;
+    /** @var Swoole */
+    private $server = null;
 
 
 
     public function __construct(HttpServer $HttpServer)
     {
-        $this->context = new Context();
-        $this->event = $this->context->getEvent();
         $this->server = $HttpServer;
+        $this->context = $this->server->container->make('Kernel\Coroutine\Context');
+        // $this->context = new Context();
+        $this->event = $this->context->getEvent();
     }
     /**
      * 请求句柄
@@ -45,61 +48,61 @@ class RequestHandler
      */
     public function handle(SwooleHttpRequest $swooleRequest, SwooleHttpResponse $swooleResponse)
     {
-        try {
-            $get = isset($swooleRequest->get) ? $swooleRequest->get : [];
-            $post = isset($swooleRequest->post) ? $swooleRequest->post : [];
-            $cookie = isset($swooleRequest->cookie) ? $swooleRequest->cookie : [];
-            $files = isset($swooleRequest->files) ? $swooleRequest->files : [];
-            $header = isset($swooleRequest->header) ? $swooleRequest->header : [];
-            $server = isset($swooleRequest->server) ? array_change_key_case($swooleRequest->server, CASE_UPPER) : [];
-            $rawContent = $swooleRequest->rawContent();
-
-            foreach ($header as $key => $value) {
-                $newKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
-                $server[$newKey] = $value;
-            }
-            //添加内存值
-            $server['REQUEST_MEM_START'] = memory_get_usage(false);
-
-            $request = new Request($get, $post, [], $cookie, $files, $server, $header, $rawContent);
 
 
-            if (false === $this->initContext($request, $swooleRequest, $swooleResponse)) {
-                return;
-            }
-            var_dump($request);
+        $get = isset($swooleRequest->get) ? $swooleRequest->get : [];
+        $post = isset($swooleRequest->post) ? $swooleRequest->post : [];
+        $cookie = isset($swooleRequest->cookie) ? $swooleRequest->cookie : [];
+        $files = isset($swooleRequest->files) ? $swooleRequest->files : [];
+        $header = isset($swooleRequest->header) ? $swooleRequest->header : [];
+        $server = isset($swooleRequest->server) ? array_change_key_case($swooleRequest->server, CASE_UPPER) : [];
+        $rawContent = $swooleRequest->rawContent();
+
+        foreach ($header as $key => $value) {
+            $newKey = 'HTTP_' . strtoupper(str_replace('-', '_', $key));
+            $server[$newKey] = $value;
+        }
+        //添加内存值
+        $server['REQUEST_MEM_START'] = memory_get_usage(false);
+
+        $request = $this->server->container->make('Kernel\Server\Http\Foundation\Request', [
+            $get, $post, [], $cookie, $files, $server, $header, $rawContent
+        ]);
+        if (false === $this->initContext($request, $swooleRequest, $swooleResponse)) {
             return ;
-
+        }
+        try {
             $timeout = $this->context->get('request_timeout');
             $this->event->once($this->getRequestFinishJobId(), [$this, 'handleRequestFinish']);
             Timer::after($timeout, [$this, 'handleTimeout'], $this->getRequestTimeoutJobId());
 
-            $requestTask = new RequestTask($request, $swooleResponse, $this->context);
-            $coroutine = $requestTask->run();
-            $this->task = new Task($coroutine, $this->context);
+            $coroutine_handle = $this->server->container->make('Kernel\Server\Http\RequestTask', [
+                $request, $swooleResponse, $this->context
+            ]);
+
+            $coroutine = $coroutine_handle->run();
+            $this->task = $this->server->container->make('Kernel\Coroutine\Task', [
+                $coroutine,
+                $this->context
+            ]);
+
             $this->task->run();
 
             while (ob_get_level() > 0) {
                 ob_end_flush();
             }
-
-            $e = null;
-        } catch (\Throwable $t) {
-            $e = t2ex($t);
+            return ;
         } catch (\Exception $e) {
         }
-
         while (ob_get_level() > 0) {
             ob_end_flush();
         }
 
-        if ($this->middleWareManager) {
-            $coroutine = $this->middleWareManager->handleHttpException($e);
-        } else {
-            $coroutine = RequestExceptionHandlerChain::getInstance()->handle($e);
-        }
+        $coroutine_handle = $this->server->container->make('Kernel\Server\Http\RequestTask', [
+            $request, $swooleResponse, $this->context
+        ]);
 
-
+        $coroutine = $coroutine_handle->handleHttpException($e);
         Task::execute($coroutine, $this->context);
         $this->event->fire($this->getRequestFinishJobId());
     }
@@ -135,58 +138,38 @@ class RequestHandler
 
         $this->context->set('controller_handle', $route[0]);
         $this->context->set('controller_handle_args', $route[1]);
+        $this->context->set('middleware', $this->server->dispatchMiddleware($route[0]));
         $this->context->set('request_time', $request->server('REQUEST_TIME'));
-        $this->context->set('request_timeout', 30 * 1000);
+        $this->context->set('request_timeout', 3 * 1000);
         $this->context->set('request_end_event_name', $this->getRequestFinishJobId());
     }
 
     public function handleRequestFinish()
     {
         Timer::clearAfterJob($this->getRequestTimeoutJobId());
-        $response = $this->context->get('response');
-        if ($response === null) {
-            //伪造响应,避免terminate接口传入null导致fatal error
-            $response = new Response();
-        }
-        $coroutine = $this->middleWareManager->executeTerminators($response);
-        Task::execute($coroutine, $this->context);
+        return;
     }
 
     public function handleTimeout()
     {
-        try {
-            $this->task->setStatus(Signal::TASK_KILLED);
-            $this->logTimeout();
 
-            $request = $this->context->get('request');
-            if ($request && $request->wantsJson()) {
-                $data = [
-                    'code' => 10000,
-                    'msg' => '网络超时',
-                    'data' => '',
-                ];
-                $response = new JsonResponse($data, BaseResponse::HTTP_GATEWAY_TIMEOUT);
-            } else {
-                $response = new InternalErrorResponse('服务器超时', BaseResponse::HTTP_GATEWAY_TIMEOUT);
-            }
+        $this->task->setStatus(Signal::TASK_KILLED);
 
-            $this->context->set('response', $response);
-            $swooleResponse = $this->context->get('swoole_response');
-            $response->sendBy($swooleResponse);
-            $this->event->fire($this->getRequestFinishJobId());
-        } catch (\Throwable $t) {
-            echo_exception($t);
-        } catch (\Exception $ex) {
-            echo_exception($ex);
-        }
+        $request = $this->context->get('request');
+
+        $swooleResponse = $this->context->get('swoole_response');
+
+        $coroutine_handle = $this->server->container->make('Kernel\Server\Http\RequestTask', [
+            $request, $swooleResponse, $this->context
+        ]);
+        $response =  $coroutine_handle->responseError('服务器超时', 502);
+        $this->context->set('response', $response);
+        $response->sendBy($swooleResponse);
+        $this->event->fire($this->getRequestFinishJobId());
+        return ;
     }
 
-    private function logTimeout()
-    {
-        $remoteIp = $this->request->getClientIp();
-        $route = $this->request->getRoute();
-        $query = http_build_query($this->request->query->all());
-    }
+
 
     /**
      * 直接响应静态文件
