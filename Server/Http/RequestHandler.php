@@ -37,7 +37,6 @@ class RequestHandler
     {
         $this->server = $HttpServer;
         $this->context = $this->server->container->make('Kernel\Coroutine\Context');
-        // $this->context = new Context();
         $this->event = $this->context->getEvent();
     }
     /**
@@ -68,12 +67,19 @@ class RequestHandler
         $request = $this->server->container->make('Kernel\Server\Http\Foundation\Request', [
             $get, $post, [], $cookie, $files, $server, $header, $rawContent
         ]);
+
+
+
+
         if (false === $this->initContext($request, $swooleRequest, $swooleResponse)) {
             return ;
         }
+
+
         $coroutine_handle = $this->server->container->make('Kernel\Server\Http\RequestTask', [
             $request, $swooleResponse, $this->context
         ]);
+
 
         try {
             $timeout = $this->context->get('request_timeout');
