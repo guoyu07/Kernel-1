@@ -15,6 +15,11 @@ use \Swoole\Http\Response as SwooleHttpResponse;
 use \Swoole\Websocket\Server as SwooleWebsocketServer;
 use \Swoole\Websocket\Frame as SwooleWebsocketFrame;
 use Kernel\Container\Container;
+use Kernel\Pools\RedisAsynPool;
+use Kernel\Pools\MysqlAsynPool;
+use Kernel\Pools\AsynPool;
+use Kernel\Proxy\MysqlProxyFactory;
+use Kernel\Proxy\RedisProxyFactory;
 
 // use Kernel\Pool\Pool;
 
@@ -84,6 +89,42 @@ abstract class Server
      * @var  obj
      */
     public $container;
+
+    /**
+     * @var array Redis代理管理器
+     */
+    protected $redisProxyManager = [];
+
+    /**
+     * @var array Mysql代理管理器
+     */
+    protected $mysqlProxyManager = [];
+
+    /**
+     * @var array 连接池
+     */
+    protected $asynPools = [];
+
+    /**
+     * @var AsynPoolManager 连接池管理器
+     */
+    protected $asynPoolManager;
+
+
+    /**
+     * @var int 进程类型
+     */
+    public $processType = Marco::PROCESS_MASTER;
+
+
+    /**
+     * 系统注册的定时器列表
+     *
+     * @var array
+     */
+    public $sysTimers;
+
+
     /**
      * Server constructor.
      *
@@ -415,6 +456,7 @@ abstract class Server
         $processName = $this->serviceName .':master';
         //设置主进程名称
         $this->setProcessName($processName);
+        $this->processType = Marco::PROCESS_MASTER;
         //刷新进程文件
         $pidList = ServerPid::makePidList('master', $swoole->master_pid, $processName);
         ServerPid::putPidList($pidList);
@@ -466,16 +508,225 @@ abstract class Server
             $this->setProcessName($taskProcessName);
             $pidList = ServerPid::makePidList('task', $swoole->worker_pid, $taskProcessName);
             Terminal::drawStr("Create Task Process Name->".$processName. "-task-num:{$taskId}", 'green');
+
+            $this->processType = Marco::PROCESS_TASKER;
         } else {
             //启动 worker 进程
             $workerProcessName = $processName. ":work-num-:{$swoole->worker_id}";
             $this->setProcessName($workerProcessName);
             $pidList = ServerPid::makePidList('work', $swoole->worker_pid, $workerProcessName);
             Terminal::drawStr("Create Work Process Name->".$processName. "work-num-:{$swoole->worker_id}", 'green');
+
+            $this->processType = Marco::PROCESS_WORKER;
         }
+
+
+
+
+
 
         ServerPid::putPidList($pidList);
     }
+
+    public function initMysqlProxies()
+    {
+        $mysqlProxy = Config::get('store.mysql_proxy', null);
+        if ($mysqlProxy) {
+            $mysqlProxy = array_keys($mysqlProxy);
+            foreach ($mysqlProxy as $activeProxy) {
+                $this->mysqlProxyManager[$activeProxy] = MysqlProxyFactory::makeProxy(
+                    $activeProxy,
+                    Config::get('store.mysql_proxy.'.$activeProxy)
+                );
+            }
+        }
+    }
+
+    public function initRedisProxies()
+    {
+        $redisProxy = Config::get('store.redis_proxy', null);
+        if ($redisProxy) {
+            $redisProxy = array_keys($redisProxy);
+            foreach ($redisProxy as $activeProxy) {
+                $this->redisProxyManager[$activeProxy] = RedisProxyFactory::makeProxy(
+                    $activeProxy,
+                    Config::get('store.redis_proxy.'.$activeProxy)
+                );
+            }
+        }
+    }
+
+    /**
+     * 初始化连接池
+     */
+    public function initAsynPools()
+    {
+        $asynPools = [];
+        $redisConfig = Config::get('store.redis', null);
+
+        if ($redisConfig) {
+            $redisConfig = array_keys($redisConfig);
+            foreach ($redisConfig as $poolKey) {
+                $asynPools[RedisAsynPool::ASYN_NAME . $poolKey] = new RedisAsynPool(Config::get('store.redis', null), $poolKey);
+            }
+        }
+
+        $mysqlConfig = Config::get('store.mysql', null);
+        if ($mysqlConfig) {
+            $mysqlConfig = array_keys($mysqlConfig);
+            foreach ($mysqlConfig as $poolKey => $val) {
+                $asynPools[MysqlAsynPool::ASYN_NAME . $poolKey] = new MysqlAsynPool(Config::get('store.mysql', null), $poolKey);
+            }
+        }
+        $this->asynPools = $asynPools;
+    }
+
+
+    /**
+     * 获取连接池
+     *
+     * @param string $name 连接池名称
+     * @return AsynPool
+     */
+    public function getAsynPool($name)
+    {
+        return $this->asynPools[$name] ?? null;
+    }
+
+
+    /**
+     * 手工添加AsynPool
+     *
+     * @param string $name 连接池名称
+     * @param AsynPool $pool 连接池对象
+     * @param bool $isRegister 是否注册到asynPoolManager
+     * @throws Exception
+     * @return $this
+     */
+    public function addAsynPool($name, AsynPool $pool, $isRegister = false)
+    {
+        if (key_exists($name, $this->asynPools)) {
+            throw new Exception('pool key is exists!');
+        }
+        $this->asynPools[$name] = $pool;
+        if ($isRegister && $this->asynPoolManager) {
+            $pool->workerInit($this->swoole->worker_id ?? 0);
+            $this->asynPoolManager->registerAsyn($pool);
+        }
+
+        return $this;
+    }
+
+
+
+    /**
+     * 手工添加redis代理
+     *
+     * @param string $name 代理名称
+     * @param IProxy $proxy 代理实例
+     * @throws Exception
+     * @return $this
+     */
+    public function addRedisProxy($name, $proxy)
+    {
+        if (key_exists($name, $this->redisProxyManager)) {
+            throw new Exception('proxy key is exists!');
+        }
+        $this->redisProxyManager[$name] = $proxy;
+
+        return $this;
+    }
+
+    /**
+     * 获取redis代理
+     *
+     * @param string $name 代理名称
+     * @return mixed
+     */
+    public function getRedisProxy($name)
+    {
+        return $this->redisProxyManager[$name] ?? null;
+    }
+
+    /**
+     * 设置redis代理
+     *
+     * @param string $name 代理名称
+     * @param IProxy $proxy 代理实例
+     * @return $this
+     */
+    public function setRedisProxy($name, $proxy)
+    {
+        $this->redisProxyManager[$name] = $proxy;
+        return $this;
+    }
+
+    /**
+     * 手工添加mysql代理
+     *
+     * @param string $name 代理名称
+     * @param IProxy $proxy 代理实例
+     * @throws Exception
+     * @return $this
+     */
+    public function addMysqlProxy($name, $proxy)
+    {
+        if (key_exists($name, $this->mysqlProxyManager)) {
+            throw new Exception('proxy key is exists!');
+        }
+        $this->mysqlProxyManager[$name] = $proxy;
+
+        return $this;
+    }
+
+    /**
+     * 获取mysql代理
+     *
+     * @param string $name 代理名称
+     * @return mixed
+     */
+    public function getMysqlProxy($name)
+    {
+        return $this->mysqlProxyManager[$name] ?? null;
+    }
+
+    /**
+     * 设置mysql代理
+     *
+     * @param string $name 代理名称
+     * @param IProxy $proxy 代理实例
+     * @return $this
+     */
+    public function setMysqlProxy($name, $proxy)
+    {
+        $this->mysqlProxyManager[$name] = $proxy;
+        return $this;
+    }
+
+    /**
+     * 获取所有的redisProxy
+     *
+     * @return array
+     */
+    public function &getRedisProxies()
+    {
+        return $this->redisProxyManager;
+    }
+
+
+    /**
+     * 包装SerevrMessageBody消息
+     * @param $type
+     * @param $message
+     * @return string
+     */
+    public function packSerevrMessageBody($type, $message)
+    {
+        $data['type'] = $type;
+        $data['message'] = $message;
+        return serialize($data);
+    }
+
 
 
     /**
@@ -621,6 +872,8 @@ abstract class Server
         ServerPid::putPidList($pidList);
 
         Terminal::drawStr("Create Manage Process Name->".$processName, 'green');
+
+        $this->processType = Marco::PROCESS_MANAGER;
     }
     /**
      * 当管理进程结束时调用它

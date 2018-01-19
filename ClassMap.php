@@ -21,6 +21,7 @@ return [
         'GuzzleHttp\Stream'=>__DIR__.DS.'Library'.DS.'guzzle'.DS.'streams'.DS.'src',
         'React\Promise'=>__DIR__.DS.'Library'.DS.'reactphp'.DS.'promise'.DS.'src',
         'Elasticsearch'=>__DIR__.DS.'Library'.DS.'elastic'.DS.'elasticsearch-php'.DS.'src'.DS.'Elasticsearch',
+        'Flexihash'=>__DIR__.DS.'Library'.DS.'pda'.DS.'flexihash'.DS.'src',
         'Kernel'=>__DIR__,
     ],
     'files' => [

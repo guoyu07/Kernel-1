@@ -13,6 +13,12 @@ use Kernel\Process\Inotify;
 use Kernel\Process\AutoReload;
 use Kernel\Utilities\Terminal;
 use FastRoute;
+use Kernel\Pools\RedisAsynPool;
+use Kernel\Pools\MysqlAsynPool;
+use Kernel\Pools\AsynPool;
+use Kernel\Proxy\MysqlProxyFactory;
+use Kernel\Proxy\RedisProxyFactory;
+use Kernel\Server\Marco;
 
 /**
  *
@@ -271,6 +277,41 @@ class HttpServer extends Server
     {
         parent::onSwooleWorkerStart($swoole, $worker_id);
 
+        if ($this->processType == Marco::PROCESS_WORKER || $this->processType == Marco::PROCESS_TIMER) {
+            $this->initAsynPools();
+            $this->initRedisProxies();
+            $this->initMysqlProxies();
+
+            //注册
+            $this->asynPoolManager = new AsynPoolManager(null, $this);
+            $this->asynPoolManager->noEventAdd();
+            foreach ($this->asynPools as $pool) {
+                if ($pool) {
+                    $pool->workerInit($worker_id);
+                    $this->asynPoolManager->registerAsyn($pool);
+                }
+            }
+
+            if (!empty($this->redisProxyManager)) {
+                //redis proxy监测
+                $this->sysTimers[] = $this->swoole->tick(5000, function () {
+                    foreach ($this->redisProxyManager as $proxy) {
+                        $proxy->check();
+                    }
+                });
+            }
+
+            if (!empty($this->mysqlProxyManager)) {
+                // mysql proxy监测
+                $this->sysTimers[] = $this->swoole->tick(5000, function () {
+                    foreach ($this->mysqlProxyManager as $proxy) {
+                        $proxy->check();
+                    }
+                });
+            }
+        }
+
+
         //非任务投递进程
         // if (!$swoole->taskworker) {
             // $files = glob(ROUTE_PATH.DS."*.route.php");
@@ -431,6 +472,14 @@ class HttpServer extends Server
         $this->container->make('Kernel\Server\Http\RequestHandler', [$this])->handle($swooleHttpRequest, $swooleHttpResponse);
     }
 
+
+
+
+    /**
+     * 规整数据
+     * @param  SwooleHttpRequest $swooleHttpRequest
+     * @return
+     */
     private function beforeSwooleHttpRequest(SwooleHttpRequest $swooleHttpRequest)
     {
         $request_uri = $swooleHttpRequest->server['request_uri'];
@@ -447,11 +496,6 @@ class HttpServer extends Server
         }
         $swooleHttpRequest->server['request_uri'] = $request_uri;
         $swooleHttpRequest->server['path_info'] = $path_info;
-
-
-
-
-
 
         return $swooleHttpRequest;
     }

@@ -49,3 +49,6 @@
 [submodule "Library/elastic/elasticsearch-php"]
 	path = Library/elastic/elasticsearch-php
 	url = https://github.com/elastic/elasticsearch-php.git
+[submodule "Library/pda/flexihash"]
+	path = Library/pda/flexihash
+	url = https://github.com/pda/flexihash.git
