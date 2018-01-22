@@ -121,6 +121,17 @@ abstract class Server
 
 
     /**
+     * @var Pool 对象池
+     */
+    public $objectPool;
+
+    /**
+     * @var \Yac 系统共享对象操作句柄
+     */
+    public $sysCache;
+
+
+    /**
      * Server constructor.
      *
      * @throws Exception
@@ -360,7 +371,9 @@ abstract class Server
     public function startSwooles()
     {
         $this->serviceStartBefore();
-        // $this->objectPool = Pool::getInstance();
+        // 初始化Yac共享内存
+        $this->sysCache  = new \Yac('sys_cache_');
+        $this->objectPool = Pool::getInstance();
         $this->start();
     }
     /**
@@ -523,7 +536,7 @@ abstract class Server
         ServerPid::putPidList($pidList);
     }
 
-    
+
     /**
      * 包装SerevrMessageBody消息
      * @param $type

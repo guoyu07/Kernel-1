@@ -74,4 +74,9 @@ class Marco
         self::PROCESS_TIMER                         => 'Timer',
         self::PROCESS_USER                          => 'User',
     ];
+
+    /**
+     * 销毁PUBLIC成员变量资源，默认
+     */
+    const DS_PUBLIC                                 = 1<<0;
 }

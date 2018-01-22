@@ -13,11 +13,12 @@ use Kernel\Process\Inotify;
 use Kernel\Process\AutoReload;
 use Kernel\Utilities\Terminal;
 use FastRoute;
+use Kernel\Server\Marco;
 
 /**
  *
  */
-class HttpServer extends Server
+abstract class HttpServer extends Server
 {
 
 
@@ -25,7 +26,6 @@ class HttpServer extends Server
     public $routes = [];
     public $routeAlias = [];
     public $middleware = [];
-    // public $routeUri = [];
 
     public $dispatcher;
 
@@ -270,17 +270,14 @@ class HttpServer extends Server
     public function onSwooleWorkerStart(SwooleServer $swoole, int $worker_id)
     {
         parent::onSwooleWorkerStart($swoole, $worker_id);
-        //非任务投递进程
-        // if (!$swoole->taskworker) {
-            // $files = glob(ROUTE_PATH.DS."*.route.php");
-            // foreach ($files as $file) {
-            //     $data = is_file($file) ? include_once $file : array();
-            //     Route::getInstance()->parseGroupRoutes($data);
-            // }
-            // Route::getInstance()->registerRoutes();
-        // }
         Terminal::drawStr(__METHOD__, 'red');
     }
+
+
+
+
+
+
 
 
 
@@ -295,7 +292,6 @@ class HttpServer extends Server
         Terminal::drawStr(__METHOD__, 'red');
         parent::onSwooleWorkerStop($swoole, $worker_id);
     }
-
 
     /**
      * 有新的连接进入时，在worker进程中回调
