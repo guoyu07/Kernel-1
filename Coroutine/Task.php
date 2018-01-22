@@ -13,6 +13,8 @@ class Task
     protected $scheduler = null;
     protected $status = 0;
 
+    public $container;
+
     public static function execute($coroutine, Context $context = null, $taskId = 0, Task $parentTask = null)
     {
         if (is_callable($coroutine)) {
@@ -39,6 +41,7 @@ class Task
         $this->coroutine = $this->caughtCoroutine($coroutine);
         $this->taskId = $taskId ? $taskId : TaskId::create();
         $this->parentTask = $parentTask;
+        $this->container = $context->get('server')->container;
 
         if ($context) {
             $this->context = $context;
@@ -48,6 +51,19 @@ class Task
 
         $this->scheduler = new Scheduler($this);
     }
+
+
+    public function setContainer($container)
+    {
+        $this->container = $container;
+    }
+
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+
 
     public function run()
     {

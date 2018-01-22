@@ -86,49 +86,10 @@ abstract class Server
     public $container;
 
     /**
-     * @var array Redis代理管理器
-     */
-    protected $redisProxyManager = [];
-
-    /**
-     * @var array Mysql代理管理器
-     */
-    protected $mysqlProxyManager = [];
-
-    /**
-     * @var array 连接池
-     */
-    protected $asynPools = [];
-
-    /**
-     * @var AsynPoolManager 连接池管理器
-     */
-    protected $asynPoolManager;
-
-
-    /**
      * @var int 进程类型
      */
     public $processType = Marco::PROCESS_MASTER;
 
-
-    /**
-     * 系统注册的定时器列表
-     *
-     * @var array
-     */
-    public $sysTimers;
-
-
-    /**
-     * @var Pool 对象池
-     */
-    public $objectPool;
-
-    /**
-     * @var \Yac 系统共享对象操作句柄
-     */
-    public $sysCache;
 
 
     /**
@@ -371,9 +332,6 @@ abstract class Server
     public function startSwooles()
     {
         $this->serviceStartBefore();
-        // 初始化Yac共享内存
-        $this->sysCache  = new \Yac('sys_cache_');
-        $this->objectPool = Pool::getInstance();
         $this->start();
     }
     /**

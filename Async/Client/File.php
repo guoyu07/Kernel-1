@@ -1,8 +1,10 @@
 <?php
 
-namespace Kernel\Async\Client;
+namespace Group\Async\Client;
 
-class File
+use Config;
+
+class File extends Base
 {
     protected $filename;
 
@@ -12,9 +14,7 @@ class File
 
     protected $flags = 0;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function read($filename)
     {
@@ -34,12 +34,12 @@ class File
     {
         switch ($this->action) {
             case 'read':
-                swoole_async_readfile($this->filename, function ($filename, $content) use ($callback) {
+                swoole_async_readfile($this->filename, function($filename, $content) use ($callback) {
                     call_user_func_array($callback, array('response' => $content, 'error' => null, 'calltime' => 0));
                 });
                 break;
             case 'write':
-                swoole_async_writefile($this->filename, $this->content, function ($filename) use ($callback) {
+                swoole_async_writefile($this->filename, $this->content, function($filename) use ($callback) {
                     call_user_func_array($callback, array('response' => true, 'error' => null, 'calltime' => 0));
                 }, $this->flags);
                 break;

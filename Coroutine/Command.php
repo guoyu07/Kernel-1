@@ -93,6 +93,16 @@ class Command
         });
     }
 
+    public static function getContainer()
+    {
+        return new SysCall(function (Task $task) {
+            $context = $task->getContainer();
+            $task->send($context);
+
+            return Signal::TASK_CONTINUE;
+        });
+    }
+
     public static function getContextArray()
     {
         return new SysCall(function (Task $task) {
