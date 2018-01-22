@@ -1,13 +1,13 @@
 <?php
 
-namespace Group\Async;
+namespace Kernel\Async;
 
 use Config;
-use \Group\Async\Client\Redis;
-use \Group\Async\Pool\RedisProxy;
+use \Kernel\Async\Client\Redis;
+use \Kernel\Async\Pool\RedisProxy;
 
 class AsyncRedis
-{   
+{
     protected static $timeout = 1;
 
     protected static $usePool = true;
@@ -38,19 +38,18 @@ class AsyncRedis
      * @return void
      */
     public static function __callStatic($method, $parameters)
-    {   
+    {
         if (self::$usePool) {
             $pool = app('redisPool');
             $redis = new RedisProxy($pool);
         } else {
             $container = (yield getContainer());
             $timeout = self::$timeout;
-            $redis = $container->singleton('redis', function() use ($timeout) {
+            $redis = $container->singleton('redis', function () use ($timeout) {
                 $redis = new Redis();
                 $redis->setTimeout($timeout);
                 return $redis;
             });
-            
         }
 
         $redis->setMethod($method);

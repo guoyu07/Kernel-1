@@ -1,14 +1,13 @@
 <?php
 
-namespace Group\Async\Pool;
+namespace Kernel\Async\Pool;
 
 use swoole_redis;
 use splQueue;
-use Config;
-use Group\Async\Pool\Pool;
+use Kernel\Async\Pool\Pool;
 
 class RedisPool extends Pool
-{   
+{
     //splQueue
     protected $poolQueue;
 
@@ -44,7 +43,7 @@ class RedisPool extends Pool
 
     //初始化连接数
     public function createResources()
-    {   
+    {
         $ip = $this->config['default']['host'];
         $port = $this->config['default']['port'];
         if (isset($this->config['default']['auth'])) {
@@ -52,7 +51,7 @@ class RedisPool extends Pool
         }
         $this->options['timeout'] = $this->timeout;
 
-        for ($i = $this->ableCount; $i < $this->maxPool; $i++) { 
+        for ($i = $this->ableCount; $i < $this->maxPool; $i++) {
             $client = new swoole_redis($this->options);
             $client->connect($ip, $port, function (swoole_redis $client, $res) {
                 if ($res) {
@@ -84,7 +83,7 @@ class RedisPool extends Pool
         $method = $task['methd'];
         $parameters = $task['parameters'];
         $callback = $task['callback'];
-        array_push($parameters, function(swoole_redis $client, $res) use ($callback) {
+        array_push($parameters, function (swoole_redis $client, $res) use ($callback) {
             if ($res === false) {
                 call_user_func_array($callback, array('response' => false, 'error' => $client->errMsg));
             } else {
@@ -101,8 +100,7 @@ class RedisPool extends Pool
      */
     public function close()
     {
-        foreach ($this->resources as $conn)
-        {
+        foreach ($this->resources as $conn) {
             $conn->close();
         }
     }

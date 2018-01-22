@@ -1,13 +1,13 @@
 <?php
 
-namespace Group\Async;
+namespace Kernel\Async;
 
 use Config;
-use \Group\Async\Pool\MysqlProxy;
-use \Group\Async\Client\Mysql;
+use \Kernel\Async\Pool\MysqlProxy;
+use \Kernel\Async\Client\Mysql;
 
 class AsyncMysql
-{   
+{
     protected static $timeout = 1;
 
     protected static $userPool = true;
@@ -28,14 +28,14 @@ class AsyncMysql
      * @return array|boolean
      */
     public static function query($sql, $userPool = true)
-    {   
+    {
         if ($userPool && self::$userPool) {
             $pool = app('mysqlPool');
             $mysql = new MysqlProxy($pool);
         } else {
             $container = (yield getContainer());
             $timeout = self::$timeout;
-            $mysql = $container->singleton('mysql', function() use ($timeout) {
+            $mysql = $container->singleton('mysql', function () use ($timeout) {
                 $mysql = new Mysql();
                 $mysql->setTimeout($timeout);
                 return $mysql;
@@ -56,7 +56,7 @@ class AsyncMysql
      * @return boolean
      */
     public static function begin()
-    {   
+    {
         self::$userPool = false;
         $res = (yield self::query('begin', false));
         yield $res;

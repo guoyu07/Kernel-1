@@ -1,17 +1,17 @@
 <?php
 
-namespace Group\Async;
+namespace Kernel\Async;
 
-use Config;
-use Group\Async\Client\File;
+// use Config;
+use Kernel\Async\Client\File;
 
 class AsyncFile
-{   
+{
     /**
      * 异步读取 文件大小必须小于4M
      */
     public static function read($filename)
-    {   
+    {
         $file = new File();
         $file->read($filename);
         $res = (yield $file);
@@ -23,7 +23,7 @@ class AsyncFile
      * 异步写入 文件大小必须小于4M
      */
     public static function write($filename, $content, $flags = 0)
-    {   
+    {
         self::checWritePermission($filename);
 
         $file = new File();
@@ -39,7 +39,7 @@ class AsyncFile
      * @Exception
      */
     private static function checWritePermission($filename)
-    {   
+    {
         $parts = explode('/', $filename);
         $file = array_pop($parts);
         $dir = '';

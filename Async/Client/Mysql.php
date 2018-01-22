@@ -1,10 +1,10 @@
 <?php
 
-namespace Group\Async\Client;
+namespace Kernel\Async\Client;
 
 use swoole_mysql;
-use Config;
-use Group\Async\Pool\Result;
+// use Config;
+use Kernel\Async\Pool\Result;
 
 class Mysql extends Base
 {
@@ -18,16 +18,16 @@ class Mysql extends Base
 
     protected $mysql;
 
-    public function __construct()
-    {   
-        $config = Config::get('database::pdo');
+    public function __construct($config)
+    {
+
         $this->config = [
-            'host' => $config['default']['host'],
-            'port' => $config['default']['port'],
-            'user' => $config['default']['user'],
-            'password' => $config['default']['password'],
-            'database' => $config['default']['dbname'],
-            'charset' => $config['default']['charset'],
+            'host' => $config['host'],
+            'port' => $config['port'],
+            'user' => $config['user'],
+            'password' => $config['password'],
+            'database' => $config['database'],
+            'charset' => $config['charset'],
             'timeout' => $this->timeout,
         ];
 
@@ -51,13 +51,13 @@ class Mysql extends Base
     }
 
     public function call(callable $callback)
-    {   
+    {
         $this->calltime = microtime(true);
 
         if ($this->mysql->connected === true) {
             $this->execute($callback);
         } else {
-            $this->mysql->connect($this->config, function(swoole_mysql $mysql, $res) use ($callback) {
+            $this->mysql->connect($this->config, function (swoole_mysql $mysql, $res) use ($callback) {
                 if ($res === false) {
                     call_user_func_array($callback, array('response' => false, 'error' => "connect to mysql server failed", 'calltime' => 0));
                     return;
@@ -71,7 +71,7 @@ class Mysql extends Base
     public function execute($callback)
     {
         if ($this->sql == "begin") {
-            $this->mysql->begin(function(swoole_mysql $mysql, $res) use ($callback) {
+            $this->mysql->begin(function (swoole_mysql $mysql, $res) use ($callback) {
                 if ($res === false) {
                     call_user_func_array($callback, array('response' => false, 'error' => $mysql->error));
                     return;
@@ -82,7 +82,7 @@ class Mysql extends Base
         }
 
         if ($this->sql == "commit") {
-            $this->mysql->commit(function(swoole_mysql $mysql, $res) use ($callback) {
+            $this->mysql->commit(function (swoole_mysql $mysql, $res) use ($callback) {
                 if ($res === false) {
                     call_user_func_array($callback, array('response' => false, 'error' => $mysql->error));
                     return;
@@ -93,7 +93,7 @@ class Mysql extends Base
         }
 
         if ($this->sql == "rollback") {
-            $this->mysql->rollback(function(swoole_mysql $mysql, $res) use ($callback) {
+            $this->mysql->rollback(function (swoole_mysql $mysql, $res) use ($callback) {
                 if ($res === false) {
                     call_user_func_array($callback, array('response' => false, 'error' => $mysql->error));
                     return;
@@ -103,7 +103,7 @@ class Mysql extends Base
             return;
         }
 
-        $this->mysql->query($this->sql, function(swoole_mysql $mysql, $res) use ($callback) {
+        $this->mysql->query($this->sql, function (swoole_mysql $mysql, $res) use ($callback) {
             $this->calltime = microtime(true) - $this->calltime;
             if ($res === false) {
                 call_user_func_array($callback, array('response' => false, 'error' => $mysql->error, 'calltime' => $this->calltime));

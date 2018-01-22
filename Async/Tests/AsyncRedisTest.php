@@ -1,14 +1,14 @@
 <?php
 
-namespace Group\Async\Tests;
+namespace Kernel\Async\Tests;
 
-use Test;
+// use Test;
 use AsyncRedis;
 
 class AsyncRedisTest extends Test
 {
     public function unitredis()
-    {   
+    {
         AsyncRedis::enablePool(false);
 
         yield AsyncRedis::set('foo', 'bar');

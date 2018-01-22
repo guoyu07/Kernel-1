@@ -1,11 +1,11 @@
 <?php
 
-namespace Group\Async\Pool;
+namespace Kernel\Async\Pool;
 
 class Result
 {
     protected $res;
-    
+
     protected $affectedRows;
 
     protected $insertId;
@@ -32,4 +32,3 @@ class Result
         return $this->insertId;
     }
 }
-

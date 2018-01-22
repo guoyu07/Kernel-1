@@ -1,6 +1,6 @@
 <?php
 
-namespace Group\Async\Tests;
+namespace Kernel\Async\Tests;
 
 use Test;
 use AsyncTcp;
@@ -8,14 +8,15 @@ use AsyncTcp;
 class AsyncTcpTest extends Test
 {
     public function unittcp()
-    {   
+    {
         $tcp = new AsyncTcp('127.0.0.1', 9501);
         $res = (yield $tcp->call('hello server!'));
         $res = (yield $tcp->call('hello server!'));
         //$this->assertEquals(false, $res);
-dump($res);
+        var_dump($res);
         $tcp->addCall('hello server1!');
         $tcp->addCall('hello server2!');
-        $res = (yield $tcp->multiCall());dump($res);
+        $res = (yield $tcp->multiCall());
+        var_dump($res);
     }
 }

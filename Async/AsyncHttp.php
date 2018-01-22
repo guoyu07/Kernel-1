@@ -1,13 +1,13 @@
 <?php
 
-namespace Group\Async;
+namespace Kernel\Async;
 
-use Config;
-use Group\Async\Client\Http;
-use Group\Async\Client\Dns;
+// use Config;
+use Kernel\Async\Client\Http;
+use Kernel\Async\Client\Dns;
 
 class AsyncHttp
-{   
+{
     protected $domain;
 
     protected $serv;
@@ -31,7 +31,7 @@ class AsyncHttp
     ];
 
     public function __construct($domain)
-    {   
+    {
         $this->domain = $domain;
     }
 
@@ -43,7 +43,7 @@ class AsyncHttp
     {
         $this->timeout = $timeout;
     }
-    
+
     public function setKeepalive($keepalive)
     {
         $this->keepalive = $keepalive;
@@ -70,7 +70,7 @@ class AsyncHttp
      * @return Group\Async\Client\Http
      */
     public function getClient($path)
-    {   
+    {
         $client = new Http($this->serv, $this->port, $this->ssl);
         $client->setTimeout($this->timeout);
         $client->setKeepalive($this->keepalive);
@@ -87,7 +87,7 @@ class AsyncHttp
      * @return array|false
      */
     public function get($path, $data = [])
-    {   
+    {
         yield $this->parseDomain();
 
         if ($data) {
@@ -111,7 +111,7 @@ class AsyncHttp
      * @return array|false
      */
     public function post($path, $data = [])
-    {   
+    {
         yield $this->parseDomain();
 
         $this->headers['Content-Type'] = "application/x-www-form-urlencoded;charset=UTF-8";
@@ -131,7 +131,7 @@ class AsyncHttp
      * 解析域名
      */
     private function parseDomain()
-    {   
+    {
         preg_match("/^http:\/\/(.*)/", $this->domain, $matchs);
         if ($matchs) {
             $this->port = 80;
@@ -147,7 +147,7 @@ class AsyncHttp
             return;
         }
 
-        throw new \Exception("Error domain, must start with http:// or https://", 1);   
+        throw new \Exception("Error domain, must start with http:// or https://", 1);
     }
 
     /**

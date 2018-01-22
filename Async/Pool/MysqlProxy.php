@@ -1,8 +1,8 @@
 <?php
 
-namespace Group\Async\Pool;
+namespace Kernel\Async\Pool;
 
-use Group\Async\Client\Base;
+use Kernel\Async\Client\Base;
 
 class MysqlProxy extends Base
 {
@@ -15,13 +15,12 @@ class MysqlProxy extends Base
     protected $method;
 
     public function __construct($pool)
-    {   
+    {
         $this->pool = $pool;
     }
 
     public function getConnection()
     {
-        
     }
 
     public function query($sql)
@@ -31,7 +30,7 @@ class MysqlProxy extends Base
     }
 
     public function call(callable $callback)
-    {   
+    {
         $this->pool->request($this->method, $this->sql, $callback);
     }
 }

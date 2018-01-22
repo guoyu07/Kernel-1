@@ -1,8 +1,8 @@
 <?php
 
-namespace Group\Async\Pool;
+namespace Kernel\Async\Pool;
 
-use Group\Async\Client\Base;
+use Kernel\Async\Client\Base;
 
 class RedisProxy extends Base
 {
@@ -13,7 +13,7 @@ class RedisProxy extends Base
     protected $method;
 
     public function __construct($pool)
-    {   
+    {
         $this->pool = $pool;
     }
 
@@ -28,7 +28,7 @@ class RedisProxy extends Base
     }
 
     public function call(callable $callback)
-    {   
+    {
         $this->pool->request($this->method, $this->parameters, $callback);
     }
 }

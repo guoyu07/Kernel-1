@@ -1,9 +1,10 @@
 <?php
 
-namespace Group\Async\Client;
+namespace Kernel\Async\Client;
 
 use swoole_redis;
-use Config;
+
+// use Config;
 
 class Redis extends Base
 {
@@ -25,13 +26,13 @@ class Redis extends Base
 
     protected $connected = false;
 
-    public function __construct()
-    {   
-        $config = Config::get("database::redis");
-        $this->ip = $config['default']['host'];
-        $this->port = $config['default']['port'];
-        if (isset($config['default']['auth'])) {
-            $this->options['password'] = $config['default']['auth'];
+    public function __construct($config)
+    {
+
+        $this->ip = $config['ip'];
+        $this->port = $config['port'];
+        if (isset($config['password'])) {
+            $this->options['password'] = $config['password'];
         }
         $this->options['timeout'] = $this->timeout;
     }
@@ -58,7 +59,7 @@ class Redis extends Base
     }
 
     public function call(callable $callback)
-    {   
+    {
         $this->calltime = microtime(true);
 
         if ($this->connected === true) {
@@ -80,7 +81,7 @@ class Redis extends Base
     {
         $method = $this->method;
         $parameters = $this->parameters;
-        array_push($parameters, function(swoole_redis $client, $res) use ($callback) {
+        array_push($parameters, function (swoole_redis $client, $res) use ($callback) {
             $this->calltime = microtime(true) - $this->calltime;
             if ($res === false) {
                 call_user_func_array($callback, array('response' => false, 'error' => $client->errMsg, 'calltime' => $this->calltime));

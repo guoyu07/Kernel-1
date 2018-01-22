@@ -1,11 +1,11 @@
 <?php
 
-namespace Group\Async\Pool;
+namespace Kernel\Async\Pool;
 
 use splQueue;
 
 abstract class Pool
-{   
+{
     //splQueue
     protected $poolQueue;
 
@@ -46,7 +46,7 @@ abstract class Pool
     abstract public function doTask();
 
     public function request($methd, $parameters, callable $callback)
-    {   
+    {
         //入队列
         $this->taskQueue->push(['methd' => $methd, 'parameters' => $parameters, 'callback' => $callback]);
 
@@ -67,7 +67,7 @@ abstract class Pool
 
     /**
      * put一个资源
-     */ 
+     */
     public function put($resource)
     {
         $this->resources[spl_object_hash($resource)] = $resource;
@@ -80,7 +80,7 @@ abstract class Pool
 
     /**
      * 释放资源入队列
-     */ 
+     */
     public function release($resource)
     {
         $this->poolQueue->enqueue($resource);

@@ -1,12 +1,13 @@
 <?php
 
-namespace Group\Async\Pool;
+namespace Kernel\Async\Pool;
 
 use swoole_mysql;
-use Group\Async\Pool\Pool;
-use Group\Async\Pool\Result;
+use Kernel\Async\Pool\Pool;
+use Kernel\Async\Pool\Result;
 use splQueue;
-use Config;
+
+// use Config;
 
 class MysqlPool extends Pool
 {
@@ -55,9 +56,9 @@ class MysqlPool extends Pool
             'timeout' => $this->timeout,
         ];
 
-        for ($i = $this->ableCount; $i < $this->maxPool; $i++) { 
+        for ($i = $this->ableCount; $i < $this->maxPool; $i++) {
             $mysql = new swoole_mysql;
-            $mysql->connect($this->config, function(swoole_mysql $mysql, $res) {
+            $mysql->connect($this->config, function (swoole_mysql $mysql, $res) {
                 if ($res) {
                     $this->put($mysql);
                 } else {
@@ -92,7 +93,7 @@ class MysqlPool extends Pool
         $task = $this->taskQueue->dequeue();
         $methd = $task['methd'];
         $callback = $task['callback'];
-        $resource->$methd($task['parameters'], function(swoole_mysql $mysql, $res) use ($callback) {
+        $resource->$methd($task['parameters'], function (swoole_mysql $mysql, $res) use ($callback) {
             if ($res === false) {
                 call_user_func_array($callback, array('response' => false, 'error' => $mysql->error));
                 $this->release($mysql);
@@ -110,8 +111,7 @@ class MysqlPool extends Pool
      */
     public function close()
     {
-        foreach ($this->resources as $conn)
-        {
+        foreach ($this->resources as $conn) {
             if ($conn->connected) {
                 $conn->close();
             }

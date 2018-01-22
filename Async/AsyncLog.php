@@ -1,11 +1,11 @@
 <?php
 
-namespace Group\Async;
+namespace Kernel\Async;
 
-use Config;
+// use Config;
 
 class AsyncLog
-{   
+{
     /**
      * 日志存储路径
      * @var string $logDir
@@ -18,7 +18,7 @@ class AsyncLog
      * @param  string $model The log model
      * @return Boolean
      */
-    public static function debug($message, array $context  = [], $model = 'web.app')
+    public static function debug($message, array $context = [], $model = 'web.app')
     {
         return self::writeLog(__FUNCTION__, $message, $context, $model);
     }
@@ -29,7 +29,7 @@ class AsyncLog
      * @param  string $model The log model
      * @return Boolean
      */
-    public static function info($message, array $context  = [], $model = 'web.app')
+    public static function info($message, array $context = [], $model = 'web.app')
     {
         return self::writeLog(__FUNCTION__, $message, $context, $model);
     }
@@ -40,7 +40,7 @@ class AsyncLog
      * @param  string $model The log model
      * @return Boolean
      */
-    public static function notice($message, array $context  = [], $model = 'web.app')
+    public static function notice($message, array $context = [], $model = 'web.app')
     {
         return self::writeLog(__FUNCTION__, $message, $context, $model);
     }
@@ -51,7 +51,7 @@ class AsyncLog
      * @param  string $model The log model
      * @return Boolean
      */
-    public static function warning($message, array $context  = [], $model = 'web.app')
+    public static function warning($message, array $context = [], $model = 'web.app')
     {
         return self::writeLog(__FUNCTION__, $message, $context, $model);
     }
@@ -62,7 +62,7 @@ class AsyncLog
      * @param  string $model The log model
      * @return Boolean
      */
-    public static function error($message, array $context  = [], $model = 'web.app')
+    public static function error($message, array $context = [], $model = 'web.app')
     {
         return self::writeLog(__FUNCTION__, $message, $context, $model);
     }
@@ -73,7 +73,7 @@ class AsyncLog
      * @param  string $model The log model
      * @return Boolean
      */
-    public static function critical($message, array $context  = [], $model = 'web.app')
+    public static function critical($message, array $context = [], $model = 'web.app')
     {
         return self::writeLog(__FUNCTION__, $message, $context, $model);
     }
@@ -84,7 +84,7 @@ class AsyncLog
      * @param  string $model The log model
      * @return Boolean
      */
-    public static function alert($message, array $context  = [], $model = 'web.app')
+    public static function alert($message, array $context = [], $model = 'web.app')
     {
         return self::writeLog(__FUNCTION__, $message, $context, $model);
     }
@@ -95,7 +95,7 @@ class AsyncLog
      * @param  string $model The log model
      * @return Boolean
      */
-    public static function emergency($message, array $context  = [], $model = 'web.app')
+    public static function emergency($message, array $context = [], $model = 'web.app')
     {
         return self::writeLog(__FUNCTION__, $message, $context, $model);
     }
@@ -108,8 +108,8 @@ class AsyncLog
      * @return Boolean
      */
     public static function writeLog($level, $message, $context, $model)
-    {   
-        $env = Config::get("app::environment");
+    {
+        $env = ENV;
         $logDir = static::$logDir;
         if (!empty($context)) {
             $context = json_encode($context);
