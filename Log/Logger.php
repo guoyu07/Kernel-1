@@ -28,6 +28,7 @@ class Logger
      */
     public static function init()
     {
+        return false;
 
         //构建日志监听频道
         $logHandle = new \Monolog\Logger(Config::get('logger.channel'));
@@ -53,6 +54,7 @@ class Logger
      */
     public static function setInstance($app)
     {
+        return false;
         static::$logHandle = $app;
     }
 
@@ -62,6 +64,7 @@ class Logger
      */
     public static function getInstance()
     {
+        return false;
         return static::$logHandle;
     }
 

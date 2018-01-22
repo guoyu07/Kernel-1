@@ -11,6 +11,7 @@ use splQueue;
 
 class MysqlPool extends Pool
 {
+    const ASYN_NAME = 'mysql.';
     //splQueue
     protected $poolQueue;
 

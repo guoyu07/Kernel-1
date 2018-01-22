@@ -3,7 +3,6 @@
 namespace Kernel\Async\Client;
 
 use swoole_mysql;
-// use Config;
 use Kernel\Async\Pool\Result;
 
 class Mysql extends Base

@@ -18,7 +18,7 @@ use Kernel\Server\Marco;
 /**
  *
  */
-abstract class HttpServer extends Server
+class HttpServer extends Server
 {
 
 

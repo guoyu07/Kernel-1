@@ -8,6 +8,7 @@ use Kernel\Async\Pool\Pool;
 
 class RedisPool extends Pool
 {
+    const ASYN_NAME = 'mysql.';
     //splQueue
     protected $poolQueue;
 

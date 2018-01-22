@@ -4,31 +4,7 @@ namespace Kernel\Server;
 
 class Marco
 {
-    /**
-     * 分布式模式
-     */
-    const CLUSTER                                   = 0;
-    /**
-     * 主从模式
-     */
-    const MASTER_SLAVE                              = 1;
-    /**
-     * ASYN
-     */
-    const MSG_TYPR_ASYN = 9000;
 
-    /**
-     * 不进行序列化
-     */
-    const SERIALIZE_NONE                            = 0;
-    /**
-     * PHP serialize
-     */
-    const SERIALIZE_PHP                             = 1;
-    /**
-     * PHP IGBINARY
-     */
-    const SERIALIZE_IGBINARY                        = 2;
     /**
      * 进程为WORKER
      */
@@ -61,22 +37,4 @@ class Marco
      * 进程为USER（默认）
      */
     const PROCESS_USER                              = 4096;
-    /**
-     * 进程名称
-     */
-    const PROCESS_NAME                              = [
-        self::PROCESS_MASTER                        => 'Master',
-        self::PROCESS_MANAGER                       => 'Manager',
-        self::PROCESS_WORKER                        => 'Worker',
-        self::PROCESS_TASKER                        => 'Tasker',
-        self::PROCESS_RELOAD                        => 'Reload',
-        self::PROCESS_CONFIG                        => 'Config',
-        self::PROCESS_TIMER                         => 'Timer',
-        self::PROCESS_USER                          => 'User',
-    ];
-
-    /**
-     * 销毁PUBLIC成员变量资源，默认
-     */
-    const DS_PUBLIC                                 = 1<<0;
 }

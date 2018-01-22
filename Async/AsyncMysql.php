@@ -30,13 +30,13 @@ class AsyncMysql
     public static function query($sql, $userPool = true)
     {
         if ($userPool && self::$userPool) {
-            $pool = app('mysqlPool');
+            $pool = app('Kernel\Async\Pool\MysqlPool');
             $mysql = new MysqlProxy($pool);
         } else {
             $container = (yield getContainer());
             $timeout = self::$timeout;
-            $mysql = $container->singleton('mysql', function () use ($timeout) {
-                $mysql = new Mysql();
+            $mysql = $container->singleton('Kernel\Async\Client\Mysql', function () use ($timeout) {
+                $mysql = new Kernel\Async\Client\Mysql();
                 $mysql->setTimeout($timeout);
                 return $mysql;
             });
