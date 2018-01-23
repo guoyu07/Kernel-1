@@ -18,7 +18,7 @@ use Kernel\Server\Marco;
 /**
  *
  */
-class HttpServer extends Server
+abstract class HttpServer extends Server
 {
 
 
@@ -33,6 +33,8 @@ class HttpServer extends Server
 
     public function __construct($key)
     {
+        // self::$instance = $this;
+        static::setInstance($this);
         $this->config = $key;
         $this->serviceName = Config::get($this->config.'.service_name');
         $this->swooleType = Config::get($this->config.'.swoole_type');
@@ -220,6 +222,13 @@ class HttpServer extends Server
         if (Config::get($this->config.'.auto_reload', false)) {
             AutoReload::startProcess($this);
         }
+
+        swoole_async_set([
+            'thread_num'         => 4,
+            'aio_mode'           => SWOOLE_AIO_BASE,
+            'use_async_resolver' => true,
+            'dns_lookup_random'  => true,
+        ]);
         $this->swoole->start();
     }
 

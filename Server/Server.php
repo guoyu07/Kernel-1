@@ -16,9 +16,6 @@ use \Swoole\Websocket\Server as SwooleWebsocketServer;
 use \Swoole\Websocket\Frame as SwooleWebsocketFrame;
 use Kernel\Container\Container;
 
-use Kernel\Async\Pool\MysqlPool;
-use Kernel\Async\Pool\RedisPool;
-
 // use Kernel\Pool\Pool;
 
 abstract class Server
@@ -109,9 +106,9 @@ abstract class Server
     {
         // 检查系统配置
         $this->checkSystem();
-        static::setInstance($this);
+        
         $this->setTimezone();
-        $this->container = new Container;
+        $this->container = Container::getInstance();
         $this->startTimeFloat = microtime(1);
         $this->startTime      = time();
         $this->pidFilePath = STORAGE_PID_PATH.DS.$this->serviceName.'.pid';
@@ -121,34 +118,35 @@ abstract class Server
         $this->monitor = new Monitor($this->serviceName, $this->pidFilePath);
 
         //注册连接池
-        $this->initAsynPool();
     }
 
 
-    /**
-     * 注册连接池
-     * @return
-     */
-    public function initAsynPool()
-    {
-        $redisPools = [];
-        $redisPoolsConf = Config::get('store.redis');
-        $redisActivePools = array_keys($redisPoolsConf);
-        foreach ($redisActivePools as $poolKey) {
-            $redisPools[RedisPool::ASYN_NAME . $poolKey] = new RedisPool($redisPoolsConf, $poolKey);
-        }
-
-
-        $mysqlPools = [];
-        $mysqlPoolsConf = Config::get('store.mysql');
-        $mysqlActivePools = array_keys($mysqlPoolsConf);
-        foreach ($mysqlActivePools as $poolKey) {
-            $mysqlPools[MysqlPool::ASYN_NAME . $poolKey] = new MysqlPool($mysqlPoolsConf, $poolKey);
-        }
-
-        $this->redisPools = $redisPools;
-        $this->mysqlPools = $mysqlPools;
-    }
+    // /**
+    //  * 注册连接池
+    //  * @return
+    //  */
+    // public function initAsynPool()
+    // {
+    //     $redisPools = [];
+    //     $redisPoolsConf = Config::get('store.redis');
+    //     $redisActivePools = array_keys($redisPoolsConf);
+    //     // print_r($redisActivePools);
+    //     foreach ($redisActivePools as $poolKey) {
+    //         // echo $poolKey;
+    //         $redisPools[RedisPool::ASYN_NAME . $poolKey] = new RedisPool($redisPoolsConf, $poolKey);
+    //     }
+    //
+    //
+    //     $mysqlPools = [];
+    //     $mysqlPoolsConf = Config::get('store.mysql');
+    //     $mysqlActivePools = array_keys($mysqlPoolsConf);
+    //     foreach ($mysqlActivePools as $poolKey) {
+    //         $mysqlPools[MysqlPool::ASYN_NAME . $poolKey] = new MysqlPool($mysqlPoolsConf, $poolKey);
+    //     }
+    //
+    //     $this->redisPools = $redisPools;
+    //     $this->mysqlPools = $mysqlPools;
+    // }
 
 
 
@@ -199,7 +197,7 @@ abstract class Server
     {
         return static::$instance;
     }
-    
+
     /**
      * 解析命令行
      * @return  void
@@ -524,7 +522,9 @@ abstract class Server
 
 
 
-
+        // if ($this->processType == Marco::PROCESS_WORKER) {
+        //     $this->initAsynPool();
+        // }
 
 
         ServerPid::putPidList($pidList);

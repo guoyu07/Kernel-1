@@ -15,6 +15,11 @@ use ReflectionParameter;
 class Container implements ContainerInterface, ArrayAccess
 {
     /**
+     * 实例化对象
+     * @var  object
+     */
+    private static $handle;
+    /**
      * 容器实例对象
      *
      * @var static
@@ -62,6 +67,19 @@ class Container implements ContainerInterface, ArrayAccess
      * @var array
      */
     protected $reboundCallbacks = array();
+
+
+    /**
+     * 初始化一个Model实例
+     * 用单列模式替换
+     */
+    public static function getInstance()
+    {
+        if (!isset(self::$handle)) {
+            self::$handle=new Container;
+        }
+        return self::$handle;
+    }
 
     /**
      * 判断给定的抽象类型是否已经绑定到容器上
