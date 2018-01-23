@@ -10,7 +10,6 @@ namespace Kernel\Log;
 use MongoDB\Client;
 use Monolog\ErrorHandler;
 use Monolog\Handler\MongoDBHandler;
-// use Monolog\Handler\RotatingFileHandler;
 use DateTimeZone;
 use Kernel\Config\Config;
 
@@ -28,8 +27,6 @@ class Logger
      */
     public static function init()
     {
-        // return false;
-
         //构建日志监听频道
         $logHandle = new \Monolog\Logger(Config::get('logger.channel'));
         $logHandle->setTimezone(new \DateTimeZone(Config::get('common.timezone')));
