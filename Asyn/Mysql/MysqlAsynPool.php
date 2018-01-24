@@ -258,7 +258,6 @@ class MysqlAsynPool extends AsynPool
     public function commit($callback, $id)
     {
         $this->query($callback, $id, 'commit');
-
     }
 
     /**
@@ -305,7 +304,9 @@ class MysqlAsynPool extends AsynPool
      */
     public function getSync()
     {
-        if ($this->mysql_client!=null) return $this->mysql_client;
+        if ($this->mysql_client!=null) {
+            return $this->mysql_client;
+        }
         $activeConfig = $this->config['mysql'][$this->active];
         $this->mysql_client = new Miner();
         $this->mysql_client->pdoConnect($activeConfig);

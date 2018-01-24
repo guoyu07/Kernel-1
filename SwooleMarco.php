@@ -1,7 +1,9 @@
 <?php
 /**
- * 定义常量
- * @var [type]
+ * Created by PhpStorm.
+ * User: zhangjincheng
+ * Date: 16-7-20
+ * Time: 下午1:39
  */
 
 namespace Kernel;

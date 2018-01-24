@@ -7,6 +7,7 @@
  */
 
 namespace Kernel\Components\Cluster;
+
 use Kernel\Memory\Pool;
 use Kernel\Pack\ClusterPack;
 
@@ -57,10 +58,8 @@ class ClusterClient
             }
         });
         $this->client->on("BufferEmpty", function ($cli) {
-
         });
         $this->client->on("BufferFull", function ($cli) {
-
         });
         $this->client->connect($this->ip, $this->port);
     }

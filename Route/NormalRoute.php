@@ -8,7 +8,6 @@
 
 namespace Kernel\Route;
 
-
 use Kernel\CoreBase\SwooleException;
 
 class NormalRoute implements IRoute
@@ -34,7 +33,6 @@ class NormalRoute implements IRoute
         } else {
             throw new SwooleException('route 数据缺少必要字段');
         }
-
     }
 
     /**

@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\Reload;
 
-
 class InotifyReload
 {
     const RELOAD_SIG = 'reload_sig';
@@ -48,7 +47,6 @@ class InotifyReload
             // 把文件加入inotify监控，这里只监控了IN_MODIFY文件更新事件
             $wd = inotify_add_watch($this->inotifyFd, $file, IN_MODIFY);
             $monitor_files[$wd] = $file;
-
         }
 
         // 监控inotify句柄可读事件
@@ -108,4 +106,3 @@ class InotifyReload
         });
     }
 }
-

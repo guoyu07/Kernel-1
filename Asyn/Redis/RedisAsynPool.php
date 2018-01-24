@@ -9,7 +9,6 @@
 
 namespace Kernel\Asyn\Redis;
 
-
 use Kernel\Asyn\AsynPool;
 use Kernel\CoreBase\SwooleException;
 use Kernel\Memory\Pool;
@@ -152,6 +151,7 @@ class RedisAsynPool extends AsynPool
                             $arguments[] = $harray;
                         }
                     }
+                    var_dump($arguments);
                     break;
                 case 'lpush':
                 case 'srem':
@@ -366,7 +366,7 @@ class RedisAsynPool extends AsynPool
             if (!$result) {
                 throw new SwooleException($client->errMsg);
             }
-            if (!empty($this->config->get('redis.' . $this->active . '.password',""))) {//存在验证
+            if (!empty($this->config->get('redis.' . $this->active . '.password', ""))) {//存在验证
                 $client->auth($this->config['redis'][$this->active]['password'], function ($client, $result) {
                     if (!$result) {
                         $errMsg = $client->errMsg;
@@ -428,7 +428,7 @@ class RedisAsynPool extends AsynPool
         if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             try {
                 $value = call_user_func_array([$this->getSync(), $name], $arg);
-            }catch (\RedisException $e){
+            } catch (\RedisException $e) {
                 $this->redis_client = null;
                 $value = call_user_func_array([$this->getSync(), $name], $arg);
             }
@@ -445,20 +445,22 @@ class RedisAsynPool extends AsynPool
      */
     public function getSync()
     {
-        if ($this->redis_client!=null) return $this->redis_client;
+        if ($this->redis_client!=null) {
+            return $this->redis_client;
+        }
         //同步redis连接，给task使用
         $this->redis_client = new \Redis();
         if ($this->redis_client->connect($this->config['redis'][$this->active]['ip'], $this->config['redis'][$this->active]['port']) == false) {
             throw new SwooleException($this->redis_client->getLastError());
             $this->redis_client = null;
         }
-        if (!empty($this->config->get('redis.' . $this->active . '.password',""))) {//存在验证
+        if (!empty($this->config->get('redis.' . $this->active . '.password', ""))) {//存在验证
             if ($this->redis_client->auth($this->config['redis'][$this->active]['password']) == false) {
                 throw new SwooleException($this->redis_client->getLastError());
                 $this->redis_client = null;
             }
         }
-        if($this->config->has('redis.' . $this->active . '.select')) {//存在select
+        if ($this->config->has('redis.' . $this->active . '.select')) {//存在select
             $this->redis_client->select($this->config['redis'][$this->active]['select']);
         }
         return $this->redis_client;

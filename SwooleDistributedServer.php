@@ -104,12 +104,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
     private $bind_ip;
 
     /**
-     * 重载锁
-     * @var array
-     */
-    private $reloadLockMap = [];
-
-    /**
      * SwooleDistributedServer constructor.
      */
     public function __construct()
@@ -185,11 +179,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         Timer::init();
         //init锁
         $this->initLock = new \swoole_lock(SWOOLE_RWLOCK);
-        //reload锁
-        for ($i = 0; $i < $this->worker_num; $i++) {
-            $lock = new \swoole_lock(SWOOLE_MUTEX);
-            $this->reloadLockMap[$i] = $lock;
-        }
     }
 
     /**
@@ -282,7 +271,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         $send_data = getInstance()->packServerMessageBody($type, $uns_data, $callStaticFuc);
         if ($this->server->worker_id == $workerId) {
             //自己的进程是收不到消息的所以这里执行下
-            call_user_func($callStaticFuc, $uns_data);
+            getInstance()->server->defer(function () use ($callStaticFuc, $uns_data) {
+                call_user_func($callStaticFuc, $uns_data);
+            });
         } else {
             getInstance()->server->sendMessage($send_data, $workerId);
         }
@@ -333,15 +324,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         }
     }
 
-    /**
-     * 是否是重载
-     */
-    protected function isReload()
-    {
-        $lock = $this->reloadLockMap[$this->workerId];
-        $result = $lock->trylock();
-        return !$result;
-    }
 
     /**
      * 获取同步redis
@@ -545,6 +527,8 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
     {
         parent::onSwooleWorkerStart($serv, $workerId);
         $this->initAsynPools($workerId);
+        $this->redis_pool = $this->asynPools['redisPool'] ?? null;
+        $this->mysql_pool = $this->asynPools['mysqlPool'] ?? null;
         //进程锁保证只有一个进程会执行以下的代码,reload也不会执行
         if (!$this->isTaskWorker() && $this->initLock->trylock()) {
             //进程启动后进行开服的初始化
@@ -556,15 +540,12 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         }
         //向SDHelp進程取數據
         if (!$this->isTaskWorker()) {
-            $isReload = $this->isReload();
             ConsulHelp::start();
             TimerTask::start();
             if ($this->config->get('catCache.enable', false)) {
                 TimerCallBack::init();
-                Coroutine::startCoroutine(function () use ($workerId, $isReload) {
-                    if (!$isReload) {
-                        yield EventDispatcher::getInstance()->addOnceCoroutine(CatCacheProcess::READY);
-                    }
+                Coroutine::startCoroutine(function () use ($workerId) {
+                    yield EventDispatcher::getInstance()->addOnceCoroutine(CatCacheProcess::READY);
                     yield Actor::recovery($workerId);
                 });
             }
@@ -584,8 +565,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         if ($this->config->get('mysql.enable', true)) {
             $this->asynPools['mysqlPool'] = new MysqlAsynPool($this->config, $this->config->get('mysql.active'));
         }
-        $this->redis_pool = $this->asynPools['redisPool'] ?? null;
-        $this->mysql_pool = $this->asynPools['mysqlPool'] ?? null;
     }
 
     /**
@@ -880,6 +859,28 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             $status['coroutine_num'] += $result['coroutine_num'];
         }
         return $status;
+    }
+
+    public function getOneActor()
+    {
+        return Actor::getActors();
+    }
+
+    /**
+     * 获取所有的Actors
+     * @return array|void
+     */
+    public function getAllActors()
+    {
+        $data = [];
+        for ($i = 0; $i < $this->worker_num; $i++) {
+            $result = yield ProcessManager::getInstance()->getRpcCallWorker($i)->getOneActor();
+            if (empty($result)) {
+                continue;
+            }
+            $data = array_merge($data, $result);
+        }
+        return $data;
     }
 
     /**

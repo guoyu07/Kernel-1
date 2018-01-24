@@ -34,7 +34,7 @@ class TcpClientRequestCoroutine extends CoroutineBase
      * @return $this
      * @throws SwooleException
      */
-    public function init($pool, $data, $oneway=false)
+    public function init($pool, $data, $oneway = false)
     {
         $this->pool = $pool;
         $this->data = $data;

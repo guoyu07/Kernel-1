@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\Consul;
 
-
 use Kernel\CoreBase\SwooleException;
 
 class ConsulServices
@@ -78,7 +77,6 @@ class ConsulServices
                     $this->addServices($serviceName, $address, $port, "http");
                 }
             }
-
         }
         //再找有没有减少
         //先看tcp

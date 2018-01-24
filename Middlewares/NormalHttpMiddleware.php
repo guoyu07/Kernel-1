@@ -42,7 +42,7 @@ class NormalHttpMiddleware extends HttpMiddleware
             } else {
                 $this->interrupt();
             }
-        } else if (!empty($extension)) {//有后缀
+        } elseif (!empty($extension)) {//有后缀
             $www_path = $this->getHostRoot($host) . $path;
             $result = httpEndFile($www_path, $this->request, $this->response);
             if (!$result) {

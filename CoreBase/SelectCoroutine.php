@@ -58,6 +58,5 @@ class SelectCoroutine extends CoroutineBase
 
     public function send($callback)
     {
-
     }
 }

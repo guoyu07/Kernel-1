@@ -113,8 +113,8 @@ class HttpOutput
             }*/
         }
         if (is_array($output)||is_object($output)) {
-            $this->setHeader('Content-Type','text/html; charset=UTF-8');
-            $output = json_encode($output,JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);
+            $this->setHeader('Content-Type', 'text/html; charset=UTF-8');
+            $output = json_encode($output, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT);
             $output = "<pre>$output</pre>";
         }
         $this->response->end($output);

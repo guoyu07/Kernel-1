@@ -8,7 +8,6 @@
 
 namespace Kernel\Coroutine;
 
-
 use Kernel\CoreBase\SwooleException;
 
 /**
@@ -69,7 +68,7 @@ abstract class CoroutineBase implements ICoroutineBase
         $this->noException = false;
     }
 
-    public abstract function send($callback);
+    abstract public function send($callback);
 
     public function getResult()
     {
@@ -124,7 +123,6 @@ abstract class CoroutineBase implements ICoroutineBase
      */
     protected function onTimerOutHandle()
     {
-
     }
 
     /**

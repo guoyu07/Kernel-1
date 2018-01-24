@@ -37,12 +37,10 @@ class NonJsonPack implements IPack
 
     function encode($buffer)
     {
-
     }
 
     function decode($buffer)
     {
-
     }
 
     public function getProbufSet()

@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\Process;
 
-
 use Kernel\Components\Event\EventDispatcher;
 use Kernel\Coroutine\Coroutine;
 use Kernel\SwooleMarco;
@@ -38,12 +37,10 @@ abstract class Process extends ProcessRPC
         $this->name = $name;
         $this->worker_id = $worker_id;
         $this->coroutine_need = $coroutine_need;
+        $this->process = new \swoole_process([$this, '__start'], false, 2);
         $this->config = getInstance()->config;
         $this->log = getInstance()->log;
-        if (getInstance()->server != null) {
-            $this->process = new \swoole_process([$this, '__start'], false, 2);
-            getInstance()->server->addProcess($this->process);
-        }
+        getInstance()->server->addProcess($this->process);
     }
 
     public function __start($process)
@@ -70,7 +67,7 @@ abstract class Process extends ProcessRPC
     /**
      * @param $process
      */
-    public abstract function start($process);
+    abstract public function start($process);
 
     /**
      * 关服处理

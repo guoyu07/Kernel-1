@@ -95,5 +95,4 @@ class Lock
     {
         return $this->lock_id;
     }
-
 }

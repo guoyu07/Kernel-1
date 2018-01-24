@@ -28,15 +28,11 @@ use Kernel\Coroutine\Coroutine;
  */
 abstract class SwooleServer extends ProcessRPC
 {
-    /**
-     * 配置文件版本
-     */
-    const config_version = 2;
 
     /**
      * 版本
      */
-    const version = "2.7.7-beta";
+    const version = "v1";
 
     /**
      * server name
@@ -139,8 +135,16 @@ abstract class SwooleServer extends ProcessRPC
                 break;
             case 'mongodb':
                 $uri = 'mongodb://'.implode($this->config->get('log.mongodb.host'), ',').'/';
-                $client = new Client($uri, $this->config->get('log.mongodb.uriOptions'), $this->config->get('log.mongodb.driverOptions'));
-                $mongodb = new MongoDBHandler($client, $this->config->get('log.mongodb.database'), $this->config->get('log.mongodb.collection', 'logger'));
+                $client = new Client(
+                    $uri,
+                    $this->config->get('log.mongodb.uriOptions'),
+                    $this->config->get('log.mongodb.driverOptions')
+                );
+                $mongodb = new MongoDBHandler(
+                    $client,
+                    $this->config->get('log.mongodb.database'),
+                    $this->config->get('log.mongodb.collection', 'logger')
+                );
                 $logHandle->pushHandler($mongodb);
                 break;
         }
@@ -154,6 +158,7 @@ abstract class SwooleServer extends ProcessRPC
     public function __construct()
     {
         $this->onErrorHandel = [$this, 'onErrorHandel'];
+        Start::initServer($this);
         $this->setConfig();
         $this->middlewareManager = new MiddlewareManager();
         $this->user = $this->config->get('server.set.user', '');

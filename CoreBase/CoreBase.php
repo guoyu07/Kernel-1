@@ -8,7 +8,6 @@
 
 namespace Kernel\CoreBase;
 
-
 use Monolog\Logger;
 use Noodlehaus\Config;
 use Kernel\Asyn\Mysql\MysqlAsynPool;
@@ -108,7 +107,6 @@ class CoreBase extends Child
         try {
             $this->logger->addRecord($level, $message, $this->getContext());
         } catch (\Exception $e) {
-
         }
     }
 }

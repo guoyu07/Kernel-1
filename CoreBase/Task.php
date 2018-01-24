@@ -96,12 +96,10 @@ class TheTaskProxy extends Proxy
 
     public function beforeCall($name, $arguments = null)
     {
-
     }
 
     public function afterCall($name, $arguments = null)
     {
-
     }
 
     public function __call($name, $arguments)

@@ -8,7 +8,6 @@
 
 namespace Kernel\CoreBase;
 
-
 use Kernel\Memory\Pool;
 
 class ActorRpc

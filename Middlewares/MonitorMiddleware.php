@@ -8,7 +8,6 @@
 
 namespace Kernel\Middlewares;
 
-
 use Kernel\Components\Middleware\Middleware;
 use Kernel\Components\Process\ProcessManager;
 use Kernel\Components\SDHelp\SDHelpProcess;

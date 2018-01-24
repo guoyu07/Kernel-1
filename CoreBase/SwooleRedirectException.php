@@ -6,6 +6,7 @@
  * Time: 上午11:35
  */
 namespace Kernel\CoreBase;
+
 use Exception;
 
 /**

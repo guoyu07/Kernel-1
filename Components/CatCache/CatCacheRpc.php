@@ -43,5 +43,4 @@ class CatCacheRpc implements \ArrayAccess
     {
         $this->__call("offsetUnset", [$offset]);
     }
-
 }

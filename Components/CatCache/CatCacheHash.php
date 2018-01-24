@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\CatCache;
 
-
 class CatCacheHash implements \ArrayAccess
 {
     /**

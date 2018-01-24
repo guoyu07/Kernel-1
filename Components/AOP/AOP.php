@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\AOP;
 
-
 class AOP implements IAOP
 {
     /**

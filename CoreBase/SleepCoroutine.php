@@ -32,6 +32,5 @@ class SleepCoroutine extends CoroutineBase
 
     public function send($callback)
     {
-
     }
 }

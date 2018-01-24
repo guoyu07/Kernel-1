@@ -35,5 +35,4 @@ class ConsoleModel extends Model
             getInstance()->pub('$SYS/status', $status);
         }
     }
-
 }

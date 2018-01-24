@@ -26,7 +26,6 @@ class MqttPack implements IPack, IMqtt
      */
     public function encode($buffer)
     {
-
     }
 
     /**
@@ -35,7 +34,6 @@ class MqttPack implements IPack, IMqtt
      */
     public function decode($buffer)
     {
-
     }
 
     public function pack($data, $topic = null)

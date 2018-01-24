@@ -66,11 +66,11 @@ class EventDispatcher
         if ($numListeners > 0) {
             $index = array_search($listener, $this->_eventListeners [$type]);
             if ($index !== null) {
-                unset ($this->_eventListeners [$type] [$index]);
+                unset($this->_eventListeners [$type] [$index]);
             }
         }
         if ($numListeners == 0) {
-            unset ($this->_eventListeners [$type]);
+            unset($this->_eventListeners [$type]);
         }
     }
 
@@ -83,7 +83,7 @@ class EventDispatcher
     public function removeAll($type = null)
     {
         if ($type) {
-            unset ($this->_eventListeners [$type]);
+            unset($this->_eventListeners [$type]);
         } else {
             $this->_eventListeners = array();
         }

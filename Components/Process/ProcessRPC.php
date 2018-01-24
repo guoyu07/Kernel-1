@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\Process;
 
-
 use Kernel\CoreBase\Child;
 use Kernel\Coroutine\Coroutine;
 use Kernel\SwooleMarco;
@@ -39,7 +38,7 @@ abstract class ProcessRPC extends Child
      */
     public function phaseProxy($object)
     {
-        $reflection = new \ReflectionClass (get_class($object));
+        $reflection = new \ReflectionClass(get_class($object));
         $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
         //遍历所有的方法
         foreach ($methods as $method) {
@@ -98,8 +97,7 @@ abstract class ProcessRPC extends Child
     {
         $func = $message['func'];
         $result = call_user_func_array([$this->rpcProxy ?? $this, $func], $message['arg']);
-        if ($result instanceof \Generator)//需要协程调度
-        {
+        if ($result instanceof \Generator) {//需要协程调度
             if (!$this->coroutine_need) {
                 throw new \Exception("该进程不支持协程调度器");
             }
@@ -130,7 +128,9 @@ abstract class ProcessRPC extends Child
     {
         if (getInstance()->isUserProcess($worker_id)) {
             $process = ProcessManager::getInstance()->getProcessFromID($worker_id);
-            if ($process == null) return;
+            if ($process == null) {
+                return;
+            }
             if ($worker_id == getInstance()->workerId) {
                 $process->readData($data);
             } else {

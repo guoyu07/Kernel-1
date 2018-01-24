@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\Consul;
 
-
 use Kernel\Asyn\TcpClient\SdTcpRpcPool;
 
 class ConsulRpc extends SdTcpRpcPool
@@ -46,10 +45,10 @@ class ConsulRpc extends SdTcpRpcPool
      * @param $oneway
      * @return \Kernel\Asyn\TcpClient\TcpClientRequestCoroutine
      */
-    public function call($name,$arguments,$oneway)
+    public function call($name, $arguments, $oneway)
     {
         $sendData = $this->helpToBuildSDControllerQuest($this->context, $this->service, $name);
         $sendData['params'] = $arguments;
-        return $this->coroutineSend($sendData,$oneway);
+        return $this->coroutineSend($sendData, $oneway);
     }
 }

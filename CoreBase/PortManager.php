@@ -46,7 +46,7 @@ class PortManager
             $this->portConfig[$value['socket_port']] = $value;
             if ($value['socket_type'] == self::SOCK_WS) {
                 $this->websocket_enable = true;
-            } else if ($value['socket_type'] == self::SOCK_HTTP) {
+            } elseif ($value['socket_type'] == self::SOCK_HTTP) {
                 $this->http_enable = true;
             } else {
                 $this->tcp_enable = true;
@@ -63,7 +63,7 @@ class PortManager
     {
         if ($this->websocket_enable) {
             $type = self::SOCK_WS;
-        } else if ($this->http_enable) {
+        } elseif ($this->http_enable) {
             $type = self::SOCK_HTTP;
         } else {
             $type = self::SOCK_TCP;
@@ -85,7 +85,9 @@ class PortManager
     public function buildPort(SwooleServer $swoole_server, $first_port)
     {
         foreach ($this->portConfig as $key => $value) {
-            if ($value['socket_port'] == $first_port) continue;
+            if ($value['socket_port'] == $first_port) {
+                continue;
+            }
             //获得set
             $set = $this->getProbufSet($value['socket_port']);
             if (array_key_exists('ssl_cert_file', $value)) {
@@ -135,7 +137,6 @@ class PortManager
                 $port->on('close', [$swoole_server, $value['close'] ?? 'onSwooleClose']);
                 $port->on('packet', [$swoole_server, $value['packet'] ?? 'onSwoolePacket']);
             }
-
         }
     }
 
@@ -350,8 +351,14 @@ class PortManager
         Coroutine::startCoroutine(function () use ($controller_instance, $uid, $fd, $controller_name, $method_name) {
             $context = [];
             $controller_instance->setContext($context);
-            yield $controller_instance->setClientData($uid, $fd, null,
-                $controller_name, $method_name, null);
+            yield $controller_instance->setClientData(
+                $uid,
+                $fd,
+                null,
+                $controller_name,
+                $method_name,
+                null
+            );
             unset($context);
         });
     }

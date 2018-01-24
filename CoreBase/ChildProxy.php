@@ -8,7 +8,6 @@
 
 namespace Kernel\CoreBase;
 
-
 use Kernel\Components\AOP\Proxy;
 
 class ChildProxy extends Proxy

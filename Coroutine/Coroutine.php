@@ -8,7 +8,6 @@
 
 namespace Kernel\Coroutine;
 
-
 use Kernel\Memory\Pool;
 
 class Coroutine
@@ -55,7 +54,6 @@ class Coroutine
             } else {
                 $task->run();
             }
-
         }
     }
 
@@ -103,7 +101,9 @@ class Coroutine
      */
     public static function startCoroutine(callable $function, array $params = null)
     {
-        if ($params == null) $params = [];
+        if ($params == null) {
+            $params = [];
+        }
         try {
             $generator = call_user_func_array($function, $params);
         } catch (\Exception $e) {

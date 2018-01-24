@@ -1,5 +1,6 @@
 <?php
 namespace Kernel\CoreBase;
+
 /**
  * Model 涉及到数据有关的处理
  * 对象池模式，实例会被反复使用，成员变量缓存数据记得在销毁时清理
@@ -34,5 +35,4 @@ class Model extends CoreBase
         parent::destroy();
         ModelFactory::getInstance()->revertModel($this);
     }
-
 }

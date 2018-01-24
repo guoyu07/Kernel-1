@@ -8,7 +8,6 @@
 
 namespace Kernel\Coroutine;
 
-
 use Kernel\Memory\Pool;
 
 class CoroutineTask

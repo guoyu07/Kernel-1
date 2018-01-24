@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\Middleware;
 
-
 use Kernel\CoreBase\CoreBase;
 
 abstract class Middleware extends CoreBase implements IMiddleware

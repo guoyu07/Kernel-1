@@ -162,6 +162,15 @@ class Console extends Controller
     }
 
     /**
+     * 获取所有Actor
+     */
+    public function back_getAllActor()
+    {
+        $result = yield getInstance()->getAllActors();
+        $this->autoSend($result);
+    }
+
+    /**
      * 获取Actor信息
      * @param $name
      */

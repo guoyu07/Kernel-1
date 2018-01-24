@@ -1,5 +1,6 @@
 <?php
 namespace Kernel\Route;
+
 /**
  * Created by PhpStorm.
  * User: zhangjincheng
@@ -23,5 +24,4 @@ interface IRoute
     function errorHandle(\Exception $e, $fd);
 
     function errorHttpHandle(\Exception $e, $request, $response);
-
 }

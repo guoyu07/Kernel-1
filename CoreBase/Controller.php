@@ -413,7 +413,9 @@ class Controller extends CoreBase
      */
     protected function unBindUid()
     {
-        if (empty($this->uid)) return;
+        if (empty($this->uid)) {
+            return;
+        }
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'unBindUid', 'uid' => $this->uid];
         } else {
@@ -489,7 +491,9 @@ class Controller extends CoreBase
      */
     protected function addSub($topic)
     {
-        if (empty($this->uid)) return;
+        if (empty($this->uid)) {
+            return;
+        }
         getInstance()->addSub($topic, $this->uid);
     }
 
@@ -498,7 +502,9 @@ class Controller extends CoreBase
      */
     protected function removeSub($topic)
     {
-        if (empty($this->uid)) return;
+        if (empty($this->uid)) {
+            return;
+        }
         getInstance()->removeSub($topic, $this->uid);
     }
 

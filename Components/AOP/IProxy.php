@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\AOP;
 
-
 interface IProxy
 {
     function beforeCall($name, $arguments);

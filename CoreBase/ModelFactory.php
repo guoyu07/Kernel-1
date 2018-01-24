@@ -1,5 +1,6 @@
 <?php
 namespace Kernel\CoreBase;
+
 /**
  * Model工厂模式
  * Created by PhpStorm.
@@ -46,7 +47,8 @@ class ModelFactory
     {
         $model = str_replace('/', '\\', $old_model);
         if (!array_key_exists($old_model, $this->pool)) {
-            $this->pool[$old_model] = new \SplStack();;
+            $this->pool[$old_model] = new \SplStack();
+            ;
         }
         if (!$this->pool[$old_model]->isEmpty()) {
             $model_instance = $this->pool[$old_model]->shift();

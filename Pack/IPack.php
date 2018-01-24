@@ -1,5 +1,6 @@
 <?php
 namespace Kernel\Pack;
+
 /**
  * Created by PhpStorm.
  * User: zhangjincheng

@@ -8,7 +8,6 @@
 
 namespace Kernel\Components\Process;
 
-
 use Kernel\Components\Event\EventDispatcher;
 use Kernel\Memory\Pool;
 

@@ -38,7 +38,6 @@ abstract class AMQPTaskProcess extends Process
         if (!$this->config->has('amqp')) {
             secho("AMQP", "未发现AMQP配置文件");
             while (true) {
-
             }
             return;
         }
@@ -109,6 +108,5 @@ abstract class AMQPTaskProcess extends Process
      * @param $body
      * @return string
      */
-    protected abstract function route($body);
-
+    abstract protected function route($body);
 }
