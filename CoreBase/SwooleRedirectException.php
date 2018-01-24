@@ -5,13 +5,13 @@
  * Date: 16-7-15
  * Time: 上午11:35
  */
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 use Exception;
 
 /**
  * 重定向
  * Class SwooleRedirectException
- * @package Server\CoreBase
+ * @package Kernel\CoreBase
  */
 class SwooleRedirectException extends \Exception
 {

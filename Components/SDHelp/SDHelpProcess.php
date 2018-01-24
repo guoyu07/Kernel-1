@@ -6,12 +6,12 @@
  * Time: 下午2:55
  */
 
-namespace Server\Components\SDHelp;
+namespace Kernel\Components\SDHelp;
 
-use Server\Components\Consul\ConsulLeader;
-use Server\Components\Process\Process;
-use Server\Components\Reload\InotifyReload;
-use Server\Components\TimerTask\TimerTask;
+use Kernel\Components\Consul\ConsulLeader;
+use Kernel\Components\Process\Process;
+use Kernel\Components\Reload\InotifyReload;
+use Kernel\Components\TimerTask\TimerTask;
 
 class SDHelpProcess extends Process
 {

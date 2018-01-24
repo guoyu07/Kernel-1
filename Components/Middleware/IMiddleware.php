@@ -6,7 +6,7 @@
  * Time: 上午11:37
  */
 
-namespace Server\Components\Middleware;
+namespace Kernel\Components\Middleware;
 
 interface IMiddleware
 {

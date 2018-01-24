@@ -6,12 +6,12 @@
  * Time: 下午3:19
  */
 
-namespace Server\Coroutine;
+namespace Kernel\Coroutine;
 
 /**
  * 熔断器
  * Class Fuse
- * @package Server\Coroutine
+ * @package Kernel\Coroutine
  */
 class Fuse
 {

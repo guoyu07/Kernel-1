@@ -4,15 +4,15 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT;
+namespace Kernel\Asyn\MQTT;
 
-use Server\Asyn\MQTT\Message\Base;
-use Server\Asyn\MQTT\Message\Will;
+use Kernel\Asyn\MQTT\Message\Base;
+use Kernel\Asyn\MQTT\Message\Will;
 
 /**
  * Class MQTT
  *
- * @package Server\Asyn\MQTT
+ * @package Kernel\Asyn\MQTT
  */
 class MQTT implements IMqtt
 {
@@ -930,8 +930,8 @@ class MQTT implements IMqtt
     /**
      * Read Message And Create Message Object
      *
-     * @return \Server\Asyn\MQTT\Message\Base
-     * @throws \Server\Asyn\MQTT\Exception
+     * @return \Kernel\Asyn\MQTT\Message\Base
+     * @throws \Kernel\Asyn\MQTT\Exception
      */
     protected function message_read($data)
     {

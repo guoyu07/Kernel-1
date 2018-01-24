@@ -6,7 +6,7 @@
  * Time: 下午7:27
  */
 
-namespace Server\Components\AOP;
+namespace Kernel\Components\AOP;
 
 
 class AOP implements IAOP

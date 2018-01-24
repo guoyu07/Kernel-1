@@ -6,10 +6,10 @@
  * Time: 下午7:17
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 
-use Server\Components\AOP\Proxy;
+use Kernel\Components\AOP\Proxy;
 
 class ChildProxy extends Proxy
 {

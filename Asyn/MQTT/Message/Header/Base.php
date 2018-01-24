@@ -4,10 +4,10 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT\Message\Header;
-use Server\Asyn\MQTT\Debug;
-use Server\Asyn\MQTT\Exception;
-use Server\Asyn\MQTT\Utility;
+namespace Kernel\Asyn\MQTT\Message\Header;
+use Kernel\Asyn\MQTT\Debug;
+use Kernel\Asyn\MQTT\Exception;
+use Kernel\Asyn\MQTT\Utility;
 
 
 /**
@@ -57,11 +57,11 @@ class Base
 
     /**
      *
-     * @var \Server\Asyn\MQTT\Message\Base
+     * @var \Kernel\Asyn\MQTT\Message\Base
      */
     protected $message;
 
-    public function __construct(\Server\Asyn\MQTT\Message\Base $message)
+    public function __construct(\Kernel\Asyn\MQTT\Message\Base $message)
     {
         $this->message = $message;
     }
@@ -72,7 +72,7 @@ class Base
      * @param string & $packet_data
      * @param int    $remaining_length
      * @param int    & $payload_pos
-     * @throws \Server\Asyn\MQTT\Exception
+     * @throws \Kernel\Asyn\MQTT\Exception
      */
     final public function decode(& $packet_data, $remaining_length, & $payload_pos)
     {

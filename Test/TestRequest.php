@@ -6,11 +6,11 @@
  * Time: 下午3:33
  */
 
-namespace Server\Test;
+namespace Kernel\Test;
 
 
 use Exception;
-use Server\CoreBase\PortManager;
+use Kernel\CoreBase\PortManager;
 
 class TestRequest
 {

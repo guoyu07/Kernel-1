@@ -4,17 +4,17 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT\Message\Header;
-use Server\Asyn\MQTT\Debug;
-use Server\Asyn\MQTT\Message;
-use Server\Asyn\MQTT\Utility;
-use Server\Asyn\MQTT\Exception;
+namespace Kernel\Asyn\MQTT\Message\Header;
+use Kernel\Asyn\MQTT\Debug;
+use Kernel\Asyn\MQTT\Message;
+use Kernel\Asyn\MQTT\Utility;
+use Kernel\Asyn\MQTT\Exception;
 
 
 /**
  * Fixed Header definition for PUBLISH
  *
- * @property \Server\Asyn\MQTT\Message\PUBLISH $message
+ * @property \Kernel\Asyn\MQTT\Message\PUBLISH $message
  */
 class PUBLISH extends Base
 {

@@ -6,11 +6,11 @@
  * Time: 上午10:59
  */
 
-namespace Server\Console;
+namespace Kernel\Console;
 
 
 use app\AppServer;
-use Server\Components\CatCache\CatCacheProcess;
+use Kernel\Components\CatCache\CatCacheProcess;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

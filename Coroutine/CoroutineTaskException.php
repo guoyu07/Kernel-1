@@ -6,7 +6,7 @@
  * Time: 下午5:46
  */
 
-namespace Server\Coroutine;
+namespace Kernel\Coroutine;
 
 
 class CoroutineTaskException

@@ -4,12 +4,12 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT;
+namespace Kernel\Asyn\MQTT;
 
 /**
  * Packet Identifier Generator
  *
- * @package Server\Asyn\MQTT
+ * @package Kernel\Asyn\MQTT
  */
 class PacketIdentifier
 {
@@ -58,7 +58,7 @@ class PacketIdentifier
 /**
  * Interface ifPacketIdentifierStore
  *
- * @package Server\Asyn\MQTT
+ * @package Kernel\Asyn\MQTT
  */
 interface ifPacketIdentifierStore
 {

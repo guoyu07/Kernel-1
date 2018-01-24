@@ -6,7 +6,7 @@
  * Time: 下午4:30
  */
 
-namespace Server\Asyn\Redis;
+namespace Kernel\Asyn\Redis;
 
 class RedisRoute
 {
@@ -54,7 +54,7 @@ class RedisRoute
 
     /**
      * @param $name
-     * @return \Server\Asyn\AsynPool
+     * @return \Kernel\Asyn\AsynPool
      */
     public function getRedisPool($name='redisPool')
     {

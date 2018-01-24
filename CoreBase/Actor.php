@@ -6,16 +6,16 @@
  * Time: 下午1:47
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 
-use Server\Components\CatCache\CatCacheRpcProxy;
-use Server\Components\Cluster\ClusterProcess;
-use Server\Components\Event\EventCoroutine;
-use Server\Components\Event\EventDispatcher;
-use Server\Components\Process\ProcessManager;
-use Server\Coroutine\Coroutine;
-use Server\Memory\Pool;
+use Kernel\Components\CatCache\CatCacheRpcProxy;
+use Kernel\Components\Cluster\ClusterProcess;
+use Kernel\Components\Event\EventCoroutine;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Memory\Pool;
 
 abstract class Actor extends CoreBase
 {

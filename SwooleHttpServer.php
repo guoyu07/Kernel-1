@@ -7,13 +7,12 @@
  * Time: 上午9:42
  */
 
-namespace Server;
-
+namespace Kernel;
 
 use League\Plates\Engine;
-use Server\Components\Consul\ConsulHelp;
-use Server\CoreBase\ControllerFactory;
-use Server\Coroutine\Coroutine;
+use Kernel\Components\Consul\ConsulHelp;
+use Kernel\CoreBase\ControllerFactory;
+use Kernel\Coroutine\Coroutine;
 
 abstract class SwooleHttpServer extends SwooleServer
 {
@@ -155,7 +154,5 @@ abstract class SwooleHttpServer extends SwooleServer
             }
             unset($context);
         });
-
     }
-
 }

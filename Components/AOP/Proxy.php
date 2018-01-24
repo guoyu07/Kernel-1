@@ -6,7 +6,7 @@
  * Time: 下午7:17
  */
 
-namespace Server\Components\AOP;
+namespace Kernel\Components\AOP;
 
 
 abstract class Proxy implements IProxy

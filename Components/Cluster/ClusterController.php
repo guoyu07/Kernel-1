@@ -6,19 +6,19 @@
  * Time: 上午10:52
  */
 
-namespace Server\Components\Cluster;
+namespace Kernel\Components\Cluster;
 
-use Server\Components\Event\EventDispatcher;
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
-use Server\CoreBase\Actor;
-use Server\CoreBase\Child;
-use Server\Start;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\CoreBase\Actor;
+use Kernel\CoreBase\Child;
+use Kernel\Start;
 
 /**
  * 集群控制器
  * Class Cluster
- * @package Server\Controllers
+ * @package Kernel\Controllers
  */
 class ClusterController extends Child
 {

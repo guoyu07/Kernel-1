@@ -6,7 +6,7 @@
  * Time: 下午2:43
  */
 
-namespace Server\Pack;
+namespace Kernel\Pack;
 
 class ConsolePack extends NonJsonPack
 {

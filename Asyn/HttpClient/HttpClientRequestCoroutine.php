@@ -6,10 +6,10 @@
  * Time: 下午4:25
  */
 
-namespace Server\Asyn\HttpClient;
+namespace Kernel\Asyn\HttpClient;
 
-use Server\Coroutine\CoroutineBase;
-use Server\Memory\Pool;
+use Kernel\Coroutine\CoroutineBase;
+use Kernel\Memory\Pool;
 
 class HttpClientRequestCoroutine extends CoroutineBase
 {

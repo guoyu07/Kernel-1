@@ -6,7 +6,7 @@
  * Time: 17:33
  */
 
-namespace Server\Coroutine;
+namespace Kernel\Coroutine;
 
 class CoroutineNull
 {

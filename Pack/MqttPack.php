@@ -6,15 +6,15 @@
  * Time: 下午2:43
  */
 
-namespace Server\Pack;
+namespace Kernel\Pack;
 
-use Server\Asyn\MQTT\Exception;
-use Server\Asyn\MQTT\IMqtt;
-use Server\Asyn\MQTT\Message;
-use Server\Asyn\MQTT\Message\Base;
-use Server\Asyn\MQTT\MQTT;
-use Server\Asyn\MQTT\Utility;
-use Server\CoreBase\SwooleException;
+use Kernel\Asyn\MQTT\Exception;
+use Kernel\Asyn\MQTT\IMqtt;
+use Kernel\Asyn\MQTT\Message;
+use Kernel\Asyn\MQTT\Message\Base;
+use Kernel\Asyn\MQTT\MQTT;
+use Kernel\Asyn\MQTT\Utility;
+use Kernel\CoreBase\SwooleException;
 
 class MqttPack implements IPack, IMqtt
 {
@@ -102,8 +102,8 @@ class MqttPack implements IPack, IMqtt
     /**
      * Read Message And Create Message Object
      *
-     * @return \Server\Asyn\MQTT\Message\Base
-     * @throws \Server\Asyn\MQTT\Exception
+     * @return \Kernel\Asyn\MQTT\Message\Base
+     * @throws \Kernel\Asyn\MQTT\Exception
      */
     protected function message_read($data)
     {

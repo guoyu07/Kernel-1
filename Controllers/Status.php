@@ -6,19 +6,19 @@
  * Time: 上午11:29
  */
 
-namespace Server\Controllers;
+namespace Kernel\Controllers;
 
-use Server\Components\Cluster\ClusterProcess;
-use Server\Components\Consul\ConsulHelp;
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
-use Server\CoreBase\Controller;
+use Kernel\Components\Cluster\ClusterProcess;
+use Kernel\Components\Consul\ConsulHelp;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\CoreBase\Controller;
 
 /**
  * SD状态控制器
  * 返回SD的运行状态
  * Class StatusController
- * @package Server\Controllers
+ * @package Kernel\Controllers
  */
 class Status extends Controller
 {

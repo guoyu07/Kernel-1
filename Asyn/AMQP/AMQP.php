@@ -6,7 +6,7 @@
  * Time: 下午5:38
  */
 
-namespace Server\Asyn\AMQP;
+namespace Kernel\Asyn\AMQP;
 
 use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Wire\IO\StreamIO;

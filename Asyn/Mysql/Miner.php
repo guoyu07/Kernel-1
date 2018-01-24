@@ -6,9 +6,9 @@
  * Time: 下午1:44
  */
 
-namespace Server\Asyn\Mysql;
+namespace Kernel\Asyn\Mysql;
 
-use Server\Memory\Pool;
+use Kernel\Memory\Pool;
 
 /**
  * A dead simple PHP class for building SQL statements. No manual string

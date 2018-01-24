@@ -6,16 +6,16 @@
  * Time: 上午10:52
  */
 
-namespace Server\Components\AMQPTaskSystem;
+namespace Kernel\Components\AMQPTaskSystem;
 
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
-use Server\Asyn\AMQP\AMQP;
-use Server\Asyn\Mysql\MysqlAsynPool;
-use Server\Asyn\Redis\RedisAsynPool;
-use Server\Components\Process\Process;
-use Server\Coroutine\Coroutine;
-use Server\Memory\Pool;
+use Kernel\Asyn\AMQP\AMQP;
+use Kernel\Asyn\Mysql\MysqlAsynPool;
+use Kernel\Asyn\Redis\RedisAsynPool;
+use Kernel\Components\Process\Process;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Memory\Pool;
 
 abstract class AMQPTaskProcess extends Process
 {

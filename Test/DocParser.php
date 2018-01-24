@@ -6,7 +6,7 @@
  * Time: 下午1:39
  */
 
-namespace Server\Test;
+namespace Kernel\Test;
 
 
 class DocParser

@@ -1,8 +1,8 @@
 <?php
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
-use Server\Memory\Pool;
-use Server\SwooleMarco;
+use Kernel\Memory\Pool;
+use Kernel\SwooleMarco;
 
 /**
  * Task的代理

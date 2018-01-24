@@ -6,16 +6,16 @@
  * Time: 下午5:32
  */
 
-namespace Server\Memory;
+namespace Kernel\Memory;
 
-use Server\CoreBase\SwooleException;
-use Server\DataBase\RedisAsynPool;
+use Kernel\CoreBase\SwooleException;
+use Kernel\DataBase\RedisAsynPool;
 
 /**
  * 通过redis，协程实现的分布式锁
  * 使用时必须在协程环境中
  * Class Lock
- * @package Server\Memory
+ * @package Kernel\Memory
  */
 class Lock
 {

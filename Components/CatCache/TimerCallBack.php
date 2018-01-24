@@ -6,14 +6,14 @@
  * Time: 下午12:16
  */
 
-namespace Server\Components\CatCache;
+namespace Kernel\Components\CatCache;
 
 
-use Server\Components\Event\Event;
-use Server\Components\Event\EventDispatcher;
-use Server\CoreBase\Child;
-use Server\Coroutine\Coroutine;
-use Server\Memory\Pool;
+use Kernel\Components\Event\Event;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\CoreBase\Child;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Memory\Pool;
 
 class TimerCallBack
 {

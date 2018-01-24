@@ -6,12 +6,12 @@
  * Time: 下午1:47
  */
 
-namespace Server\Asyn\Redis;
+namespace Kernel\Asyn\Redis;
 
 /**
  * Redis lua 脚本管理器
  * Class RedisLuaManager
- * @package Server\Asyn\Redis
+ * @package Kernel\Asyn\Redis
  */
 class RedisLuaManager
 {

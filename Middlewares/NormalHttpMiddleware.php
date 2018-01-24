@@ -6,9 +6,9 @@
  * Time: 下午2:45
  */
 
-namespace Server\Middlewares;
+namespace Kernel\Middlewares;
 
-use Server\Components\Middleware\HttpMiddleware;
+use Kernel\Components\Middleware\HttpMiddleware;
 
 class NormalHttpMiddleware extends HttpMiddleware
 {

@@ -6,10 +6,10 @@
  * Time: 下午2:57
  */
 
-namespace Server\Components\CatCache;
+namespace Kernel\Components\CatCache;
 
-use Server\Components\Event\EventDispatcher;
-use Server\Components\Process\Process;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\Process\Process;
 
 class CatCacheProcess extends Process
 {

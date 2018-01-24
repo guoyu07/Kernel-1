@@ -4,7 +4,7 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT;
+namespace Kernel\Asyn\MQTT;
 
 class MessageHandler
 {

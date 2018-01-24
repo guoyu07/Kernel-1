@@ -6,9 +6,9 @@
  * Time: 下午2:14
  */
 
-namespace Server\Components\Cluster;
-use Server\Memory\Pool;
-use Server\Pack\ClusterPack;
+namespace Kernel\Components\Cluster;
+use Kernel\Memory\Pool;
+use Kernel\Pack\ClusterPack;
 
 class ClusterClient
 {

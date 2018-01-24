@@ -6,10 +6,10 @@
  * Time: 下午2:26
  */
 
-namespace Server\Components\Consul;
+namespace Kernel\Components\Consul;
 
 
-use Server\CoreBase\SwooleException;
+use Kernel\CoreBase\SwooleException;
 
 class ConsulServices
 {

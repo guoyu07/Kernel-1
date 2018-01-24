@@ -1,11 +1,11 @@
 <?php
 
-namespace Server\Components\AMQPTaskSystem;
+namespace Kernel\Components\AMQPTaskSystem;
 
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
-use Server\CoreBase\CoreBase;
-use Server\Memory\Pool;
+use Kernel\CoreBase\CoreBase;
+use Kernel\Memory\Pool;
 
 /**
  * Controller 控制器

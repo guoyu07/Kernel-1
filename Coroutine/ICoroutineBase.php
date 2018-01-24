@@ -6,7 +6,7 @@
  * Time: 下午4:20
  */
 
-namespace Server\Coroutine;
+namespace Kernel\Coroutine;
 
 
 interface ICoroutineBase

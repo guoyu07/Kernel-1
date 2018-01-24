@@ -6,10 +6,10 @@
  * Time: 下午1:48
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 
-use Server\Components\CatCache\CatCacheRpcProxy;
+use Kernel\Components\CatCache\CatCacheRpcProxy;
 
 class ActorContext implements \ArrayAccess
 {

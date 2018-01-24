@@ -5,12 +5,12 @@
  */
 
 
-namespace Server\Asyn\MQTT;
+namespace Kernel\Asyn\MQTT;
 
 /**
  * Swoole Client
  *
- * @package Server\Asyn\MQTT
+ * @package Kernel\Asyn\MQTT
  */
 class SwooleClient
 {

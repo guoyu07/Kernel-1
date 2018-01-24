@@ -6,12 +6,12 @@
  * Time: 下午5:25
  */
 
-namespace Server\Middlewares;
+namespace Kernel\Middlewares;
 
 
-use Server\Components\Middleware\Middleware;
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
+use Kernel\Components\Middleware\Middleware;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
 
 class MonitorMiddleware extends Middleware
 {

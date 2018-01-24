@@ -6,14 +6,14 @@
  * Time: 上午11:55
  */
 
-namespace Server\Components\CatCache;
+namespace Kernel\Components\CatCache;
 
-use Server\Components\Event\EventDispatcher;
+use Kernel\Components\Event\EventDispatcher;
 
 /**
  * 緩存的RPC代理
  * Class CatCacheRpcProxy
- * @package Server\Components\CatCache
+ * @package Kernel\Components\CatCache
  */
 class CatCacheRpcProxy implements \ArrayAccess
 {

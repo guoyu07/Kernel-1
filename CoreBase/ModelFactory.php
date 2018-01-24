@@ -1,5 +1,5 @@
 <?php
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 /**
  * Model工厂模式
  * Created by PhpStorm.
@@ -67,7 +67,7 @@ class ModelFactory
             $model_instance->core_name = $old_model;
             $this->addNewCount($old_model);
         } else {
-            $class_name = "Server\\Models\\$model";
+            $class_name = "Kernel\\Models\\$model";
             if (class_exists($class_name)) {
                 $model_instance = new $class_name;
                 $model_instance->core_name = $old_model;

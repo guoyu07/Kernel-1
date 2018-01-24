@@ -1,12 +1,12 @@
 <?php
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 use ArgumentCountError;
 use Monolog\Logger;
-use Server\Asyn\Mysql\Miner;
-use Server\Start;
-use Server\SwooleMarco;
+use Kernel\Asyn\Mysql\Miner;
+use Kernel\Start;
+use Kernel\SwooleMarco;
 
 /**
  * Controller 控制器

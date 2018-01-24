@@ -1,10 +1,10 @@
 <?php
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
-use Server\Components\AOP\Proxy;
-use Server\Coroutine\CoroutineNull;
-use Server\Memory\Pool;
+use Kernel\Components\AOP\Proxy;
+use Kernel\Coroutine\CoroutineNull;
+use Kernel\Memory\Pool;
 
 /**
  * Task 异步任务

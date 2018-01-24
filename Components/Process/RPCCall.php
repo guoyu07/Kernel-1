@@ -6,11 +6,11 @@
  * Time: 上午10:37
  */
 
-namespace Server\Components\Process;
+namespace Kernel\Components\Process;
 
 
-use Server\Components\Event\EventDispatcher;
-use Server\Memory\Pool;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Memory\Pool;
 
 class RPCCall
 {
@@ -43,7 +43,7 @@ class RPCCall
     /**
      * @param $name
      * @param $arguments
-     * @return bool|\Server\Components\Event\EventCoroutine
+     * @return bool|\Kernel\Components\Event\EventCoroutine
      */
     public function __call($name, $arguments)
     {

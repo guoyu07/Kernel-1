@@ -6,12 +6,12 @@
  * Time: 下午4:25
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
-use Server\Coroutine\CoroutineBase;
-use Server\Coroutine\CoroutineNull;
-use Server\Coroutine\CoroutineTaskException;
-use Server\Memory\Pool;
+use Kernel\Coroutine\CoroutineBase;
+use Kernel\Coroutine\CoroutineNull;
+use Kernel\Coroutine\CoroutineTaskException;
+use Kernel\Memory\Pool;
 
 class TaskCoroutine extends CoroutineBase
 {

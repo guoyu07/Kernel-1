@@ -6,11 +6,11 @@
  * Time: 上午10:59
  */
 
-namespace Server\Console;
+namespace Kernel\Console;
 
 
 use app\AppServer;
-use Server\Start;
+use Kernel\Start;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

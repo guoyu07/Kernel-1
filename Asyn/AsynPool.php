@@ -7,11 +7,11 @@
  * Time: 上午11:40
  */
 
-namespace Server\Asyn;
+namespace Kernel\Asyn;
 
 
 use Noodlehaus\Config;
-use Server\Coroutine\CoroutineChangeToken;
+use Kernel\Coroutine\CoroutineChangeToken;
 
 abstract class AsynPool implements IAsynPool
 {

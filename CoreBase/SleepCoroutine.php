@@ -6,14 +6,14 @@
  * Time: 下午4:25
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
-use Server\Coroutine\CoroutineBase;
+use Kernel\Coroutine\CoroutineBase;
 
 /**
  * 用于并发选择1个结果，相当于go的select
  * Class SelectCoroutine
- * @package Server\CoreBase
+ * @package Kernel\CoreBase
  */
 class SleepCoroutine extends CoroutineBase
 {

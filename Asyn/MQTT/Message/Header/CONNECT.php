@@ -4,18 +4,18 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT\Message\Header;
+namespace Kernel\Asyn\MQTT\Message\Header;
 
-use Server\Asyn\MQTT\Debug;
-use Server\Asyn\MQTT\Exception;
-use Server\Asyn\MQTT\MQTT;
-use Server\Asyn\MQTT\Utility;
+use Kernel\Asyn\MQTT\Debug;
+use Kernel\Asyn\MQTT\Exception;
+use Kernel\Asyn\MQTT\MQTT;
+use Kernel\Asyn\MQTT\Utility;
 
 
 /**
  * Fixed Header definition for CONNECT
  *
- * @property \Server\Asyn\MQTT\Message\CONNECT $message
+ * @property \Kernel\Asyn\MQTT\Message\CONNECT $message
  */
 class CONNECT extends Base
 {

@@ -6,13 +6,13 @@
  * Time: 下午12:10
  */
 
-namespace Server\Components\Consul;
+namespace Kernel\Components\Consul;
 
-use Server\Components\Event\Event;
-use Server\Components\Event\EventDispatcher;
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
-use Server\Coroutine\Coroutine;
+use Kernel\Components\Event\Event;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\Coroutine\Coroutine;
 
 class ConsulHelp
 {

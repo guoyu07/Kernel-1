@@ -1,12 +1,12 @@
 <?php
 
-namespace Server\Tasks;
+namespace Kernel\Tasks;
 
-use Server\CoreBase\Task;
+use Kernel\CoreBase\Task;
 
 /**
  * Class TestCache
- * @package Server\Tasks
+ * @package Kernel\Tasks
  */
 class TestCache extends Task
 {

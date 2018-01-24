@@ -6,14 +6,14 @@
  * Time: 下午12:49
  */
 
-namespace Server\Memory;
+namespace Kernel\Memory;
 
-use Server\CoreBase\SwooleException;
+use Kernel\CoreBase\SwooleException;
 
 /**
  * 对象复用池
  * Class Pool
- * @package Server\Memory
+ * @package Kernel\Memory
  */
 class Pool
 {

@@ -6,7 +6,7 @@
  * Time: 上午9:17
  */
 
-namespace Server\Components\Reload;
+namespace Kernel\Components\Reload;
 
 
 class InotifyReload

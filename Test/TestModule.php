@@ -6,16 +6,16 @@
  * Time: 下午1:00
  */
 
-namespace Server\Test;
+namespace Kernel\Test;
 
-use Server\Coroutine\Coroutine;
-use Server\Coroutine\CoroutineTask;
-use Server\Memory\Pool;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Coroutine\CoroutineTask;
+use Kernel\Memory\Pool;
 
 /**
  * 单元测试组件
  * Class TestModule
- * @package Server\test
+ * @package Kernel\test
  */
 class TestModule
 {

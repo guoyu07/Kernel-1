@@ -6,7 +6,7 @@
  * Time: 下午2:40
  */
 
-namespace Server\Components\GrayLog;
+namespace Kernel\Components\GrayLog;
 
 
 class GrayLogHelp

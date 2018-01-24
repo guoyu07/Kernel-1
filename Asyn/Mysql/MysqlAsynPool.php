@@ -7,11 +7,11 @@
  * Time: 上午10:19
  */
 
-namespace Server\Asyn\Mysql;
+namespace Kernel\Asyn\Mysql;
 
-use Server\Asyn\AsynPool;
-use Server\CoreBase\SwooleException;
-use Server\Memory\Pool;
+use Kernel\Asyn\AsynPool;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Memory\Pool;
 
 class MysqlAsynPool extends AsynPool
 {

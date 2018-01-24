@@ -6,14 +6,14 @@
  * Time: 上午10:52
  */
 
-namespace Server\Components\Cluster;
+namespace Kernel\Components\Cluster;
 
 use Ds\Set;
-use Server\Asyn\HttpClient\HttpClient;
-use Server\Components\Event\EventDispatcher;
-use Server\Components\Process\Process;
-use Server\CoreBase\Actor;
-use Server\Start;
+use Kernel\Asyn\HttpClient\HttpClient;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\Process\Process;
+use Kernel\CoreBase\Actor;
+use Kernel\Start;
 
 class ClusterProcess extends Process
 {

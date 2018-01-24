@@ -6,8 +6,8 @@
 
 
 
-namespace Server\Asyn\MQTT\Exception;
-use Server\Asyn\MQTT\Exception;
+namespace Kernel\Asyn\MQTT\Exception;
+use Kernel\Asyn\MQTT\Exception;
 
 /**
  * Exception: Connect failed with return value

@@ -6,14 +6,14 @@
  * Time: 下午4:00
  */
 
-namespace Server\Components\Consul;
+namespace Kernel\Components\Consul;
 
 
-use Server\Asyn\HttpClient\HttpClient;
-use Server\Components\Event\EventDispatcher;
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
-use Server\Start;
+use Kernel\Asyn\HttpClient\HttpClient;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\Start;
 
 class ConsulLeader
 {

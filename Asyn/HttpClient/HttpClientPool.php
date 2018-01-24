@@ -6,11 +6,11 @@
  * Time: 上午10:13
  */
 
-namespace Server\Asyn\HttpClient;
+namespace Kernel\Asyn\HttpClient;
 
 
-use Server\Asyn\AsynPool;
-use Server\CoreBase\SwooleException;
+use Kernel\Asyn\AsynPool;
+use Kernel\CoreBase\SwooleException;
 
 class HttpClientPool extends AsynPool
 {

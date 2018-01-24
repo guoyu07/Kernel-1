@@ -6,7 +6,7 @@
  * Time: 下午6:08
  */
 
-namespace Server\Components\CatCache;
+namespace Kernel\Components\CatCache;
 
 
 class CatCacheHash implements \ArrayAccess

@@ -6,7 +6,7 @@
  * Time: 上午11:47
  */
 
-namespace Server\Components\AOP;
+namespace Kernel\Components\AOP;
 
 
 interface IProxy

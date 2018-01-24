@@ -1,6 +1,6 @@
 <?php
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 /**
  * Created by PhpStorm.

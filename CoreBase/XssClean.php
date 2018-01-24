@@ -6,7 +6,7 @@
  * Time: 下午12:55
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 
 use voku\helper\AntiXSS;

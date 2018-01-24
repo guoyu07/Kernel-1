@@ -5,7 +5,7 @@
  */
 
 
-namespace Server\Asyn\MQTT;
+namespace Kernel\Asyn\MQTT;
 
 /**
  * Message type definitions

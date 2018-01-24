@@ -6,10 +6,10 @@
  * Time: 下午3:33
  */
 
-namespace Server\Test;
+namespace Kernel\Test;
 
 
-use Server\Coroutine\CoroutineNull;
+use Kernel\Coroutine\CoroutineNull;
 
 class TestResponse
 {

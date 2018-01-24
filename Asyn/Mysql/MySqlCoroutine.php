@@ -6,11 +6,11 @@
  * Time: 下午4:25
  */
 
-namespace Server\Asyn\Mysql;
+namespace Kernel\Asyn\Mysql;
 
-use Server\CoreBase\SwooleException;
-use Server\Coroutine\CoroutineBase;
-use Server\Memory\Pool;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Coroutine\CoroutineBase;
+use Kernel\Memory\Pool;
 
 class MySqlCoroutine extends CoroutineBase
 {

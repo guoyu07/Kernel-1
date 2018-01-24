@@ -1,32 +1,32 @@
 <?php
 
-namespace Server;
+namespace Kernel;
 
-use Server\Asyn\MQTT\Utility;
-use Server\Asyn\Mysql\Miner;
-use Server\Asyn\Mysql\MysqlAsynPool;
-use Server\Asyn\Redis\RedisAsynPool;
-use Server\Asyn\Redis\RedisLuaManager;
-use Server\Components\Backstage\BackstageProcess;
-use Server\Components\CatCache\CatCacheProcess;
-use Server\Components\CatCache\TimerCallBack;
-use Server\Components\Cluster\ClusterHelp;
-use Server\Components\Cluster\ClusterProcess;
-use Server\Components\Consul\ConsulHelp;
-use Server\Components\Consul\ConsulProcess;
-use Server\Components\Event\EventDispatcher;
-use Server\Components\GrayLog\GrayLogHelp;
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
-use Server\Components\TimerTask\Timer;
-use Server\Components\TimerTask\TimerTask;
-use Server\CoreBase\Actor;
-use Server\CoreBase\ControllerFactory;
-use Server\CoreBase\ModelFactory;
-use Server\CoreBase\SwooleException;
-use Server\Coroutine\Coroutine;
-use Server\Memory\Pool;
-use Server\Test\TestModule;
+use Kernel\Asyn\MQTT\Utility;
+use Kernel\Asyn\Mysql\Miner;
+use Kernel\Asyn\Mysql\MysqlAsynPool;
+use Kernel\Asyn\Redis\RedisAsynPool;
+use Kernel\Asyn\Redis\RedisLuaManager;
+use Kernel\Components\Backstage\BackstageProcess;
+use Kernel\Components\CatCache\CatCacheProcess;
+use Kernel\Components\CatCache\TimerCallBack;
+use Kernel\Components\Cluster\ClusterHelp;
+use Kernel\Components\Cluster\ClusterProcess;
+use Kernel\Components\Consul\ConsulHelp;
+use Kernel\Components\Consul\ConsulProcess;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\GrayLog\GrayLogHelp;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\Components\TimerTask\Timer;
+use Kernel\Components\TimerTask\TimerTask;
+use Kernel\CoreBase\Actor;
+use Kernel\CoreBase\ControllerFactory;
+use Kernel\CoreBase\ModelFactory;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Memory\Pool;
+use Kernel\Test\TestModule;
 
 /**
  * Created by PhpStorm.
@@ -224,7 +224,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
     {
         $send_data = $this->packServerMessageBody($type, $uns_data, $callStaticFuc);
         for ($i = 0; $i < $this->worker_num + $this->task_num; $i++) {
-            if ($this->server->worker_id == $i) continue;
+            if ($this->server->worker_id == $i) {
+                continue;
+            }
             $this->server->sendMessage($send_data, $i);
         }
         //自己的进程是收不到消息的所以这里执行下
@@ -241,7 +243,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
     {
         $send_data = $this->packServerMessageBody($type, $uns_data, $callStaticFuc);
         for ($i = 0; $i < $this->worker_num; $i++) {
-            if ($this->server->worker_id == $i) continue;
+            if ($this->server->worker_id == $i) {
+                continue;
+            }
             $this->server->sendMessage($send_data, $i);
         }
         //自己的进程是收不到消息的所以这里执行下
@@ -362,7 +366,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         } else {
             $this->server->task($send_data);
         }
-        if ($fromDispatch) return;
+        if ($fromDispatch) {
+            return;
+        }
         if ($this->isCluster()) {
             ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_sendToAll($data);
         }
@@ -380,7 +386,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             $fd = $this->uid_fd_table->get($uid)['fd'];
             $this->send($fd, $data, true);
         } else {
-            if ($fromDispatch) return;
+            if ($fromDispatch) {
+                return;
+            }
             if ($this->isCluster()) {
                 ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_sendToUid($uid, $data);
             }
@@ -419,7 +427,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             $task_data = $this->packServerMessageBody(SwooleMarco::MSG_TYPE_SEND_BATCH, ['data' => $data, 'fd' => $current_fds]);
             if ($this->isTaskWorker()) {
                 $this->onSwooleTask($this->server, 0, 0, $task_data);
-            } else if ($this->isWorker()) {
+            } elseif ($this->isWorker()) {
                 $this->server->task($task_data);
             } else {
                 foreach ($current_fds as $fd) {
@@ -431,7 +439,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                 $this->send($fd, $data, true);
             }
         }
-        if ($fromDispatch) return;
+        if ($fromDispatch) {
+            return;
+        }
         //本机处理不了的发给dispatch
         if ($this->isCluster()) {
             if (count($uids) > 0) {
@@ -651,7 +661,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             $fd = $this->uid_fd_table->get($uid)['fd'];
             $this->close($fd);
         } else {
-            if ($fromDispatch) return;
+            if ($fromDispatch) {
+                return;
+            }
             if ($this->isCluster()) {
                 ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_kickUid($uid);
             }
@@ -859,7 +871,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         $status = ['pool' => [], 'model_pool' => [], 'controller_pool' => [], 'coroutine_num' => 0];
         for ($i = 0; $i < $this->worker_num; $i++) {
             $result = yield ProcessManager::getInstance()->getRpcCallWorker($i)->getPoolStatus();
-            if (empty($result)) return;
+            if (empty($result)) {
+                return;
+            }
             $this->helpMerge($status['pool'], $result['pool']);
             $this->helpMerge($status['model_pool'], $result['model_pool']);
             $this->helpMerge($status['controller_pool'], $result['controller_pool']);

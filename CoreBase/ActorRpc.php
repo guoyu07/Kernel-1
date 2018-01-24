@@ -6,10 +6,10 @@
  * Time: 上午10:14
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 
-use Server\Memory\Pool;
+use Kernel\Memory\Pool;
 
 class ActorRpc
 {

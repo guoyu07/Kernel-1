@@ -6,11 +6,11 @@
  * Time: 上午10:46
  */
 
-namespace Server\Tasks;
+namespace Kernel\Tasks;
 
 
-use Server\CoreBase\Task;
-use Server\Test\TestModule;
+use Kernel\CoreBase\Task;
+use Kernel\Test\TestModule;
 
 class UnitTestTask extends Task
 {

@@ -6,10 +6,10 @@
  * Time: 下午3:18
  */
 
-namespace Server\Components\Backstage;
+namespace Kernel\Components\Backstage;
 
 
-use Server\CoreBase\PortManager;
+use Kernel\CoreBase\PortManager;
 
 class BackstageHelp
 {

@@ -6,10 +6,10 @@
  * Time: 下午2:55
  */
 
-namespace Server\Components\Backstage;
+namespace Kernel\Components\Backstage;
 
-use Server\Components\Process\Process;
-use Server\CoreBase\SwooleException;
+use Kernel\Components\Process\Process;
+use Kernel\CoreBase\SwooleException;
 
 class BackstageProcess extends Process
 {

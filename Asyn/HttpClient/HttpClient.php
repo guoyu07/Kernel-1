@@ -5,10 +5,10 @@
  * Date: 16-9-2
  * Time: 下午1:44
  */
-namespace Server\Asyn\HttpClient;
+namespace Kernel\Asyn\HttpClient;
 
-use Server\CoreBase\SwooleException;
-use Server\Memory\Pool;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Memory\Pool;
 
 class HttpClient
 {

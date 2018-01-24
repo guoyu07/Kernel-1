@@ -7,12 +7,12 @@
  * Time: 上午10:19
  */
 
-namespace Server\Asyn\Redis;
+namespace Kernel\Asyn\Redis;
 
 
-use Server\Asyn\AsynPool;
-use Server\CoreBase\SwooleException;
-use Server\Memory\Pool;
+use Kernel\Asyn\AsynPool;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Memory\Pool;
 
 class RedisAsynPool extends AsynPool
 {

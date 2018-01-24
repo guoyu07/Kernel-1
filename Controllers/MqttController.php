@@ -6,25 +6,25 @@
  * Time: 下午3:40
  */
 
-namespace Server\Controllers;
+namespace Kernel\Controllers;
 
 
-use Server\Asyn\MQTT\Message\CONNACK;
-use Server\Asyn\MQTT\Message\CONNECT;
-use Server\Asyn\MQTT\Message\DISCONNECT;
-use Server\Asyn\MQTT\Message\PINGREQ;
-use Server\Asyn\MQTT\Message\PINGRESP;
-use Server\Asyn\MQTT\Message\PUBACK;
-use Server\Asyn\MQTT\Message\PUBCOMP;
-use Server\Asyn\MQTT\Message\PUBLISH;
-use Server\Asyn\MQTT\Message\PUBREC;
-use Server\Asyn\MQTT\Message\PUBREL;
-use Server\Asyn\MQTT\Message\SUBACK;
-use Server\Asyn\MQTT\Message\SUBSCRIBE;
-use Server\Asyn\MQTT\Message\UNSUBACK;
-use Server\Asyn\MQTT\Message\UNSUBSCRIBE;
-use Server\CoreBase\Controller;
-use Server\Pack\MqttPack;
+use Kernel\Asyn\MQTT\Message\CONNACK;
+use Kernel\Asyn\MQTT\Message\CONNECT;
+use Kernel\Asyn\MQTT\Message\DISCONNECT;
+use Kernel\Asyn\MQTT\Message\PINGREQ;
+use Kernel\Asyn\MQTT\Message\PINGRESP;
+use Kernel\Asyn\MQTT\Message\PUBACK;
+use Kernel\Asyn\MQTT\Message\PUBCOMP;
+use Kernel\Asyn\MQTT\Message\PUBLISH;
+use Kernel\Asyn\MQTT\Message\PUBREC;
+use Kernel\Asyn\MQTT\Message\PUBREL;
+use Kernel\Asyn\MQTT\Message\SUBACK;
+use Kernel\Asyn\MQTT\Message\SUBSCRIBE;
+use Kernel\Asyn\MQTT\Message\UNSUBACK;
+use Kernel\Asyn\MQTT\Message\UNSUBSCRIBE;
+use Kernel\CoreBase\Controller;
+use Kernel\Pack\MqttPack;
 
 class MqttController extends Controller
 {

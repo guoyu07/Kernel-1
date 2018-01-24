@@ -6,7 +6,7 @@
  * Time: 上午9:15
  */
 
-namespace Server\Asyn\Mysql;
+namespace Kernel\Asyn\Mysql;
 
 
 use ArrayAccess;

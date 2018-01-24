@@ -4,10 +4,10 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT\Message;
+namespace Kernel\Asyn\MQTT\Message;
 
-use Server\Asyn\MQTT\Message;
-use Server\Asyn\MQTT\Utility;
+use Kernel\Asyn\MQTT\Message;
+use Kernel\Asyn\MQTT\Utility;
 
 /**
  * Message CONNECT

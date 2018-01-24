@@ -6,11 +6,11 @@
  * Time: 上午11:25
  */
 
-namespace Server\Components\Middleware;
+namespace Kernel\Components\Middleware;
 
 
-use Server\CoreBase\SwooleException;
-use Server\Memory\Pool;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Memory\Pool;
 
 class MiddlewareManager
 {

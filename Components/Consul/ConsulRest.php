@@ -6,10 +6,10 @@
  * Time: 下午1:52
  */
 
-namespace Server\Components\Consul;
+namespace Kernel\Components\Consul;
 
 
-use Server\Asyn\HttpClient\HttpClientPool;
+use Kernel\Asyn\HttpClient\HttpClientPool;
 
 class ConsulRest extends HttpClientPool
 {
@@ -82,7 +82,7 @@ class ConsulRest extends HttpClientPool
     /**
      * @param $name
      * @param $arguments
-     * @return \Server\Asyn\HttpClient\HttpClientRequestCoroutine
+     * @return \Kernel\Asyn\HttpClient\HttpClientRequestCoroutine
      */
     public function __call($name, $arguments)
     {

@@ -6,7 +6,7 @@
  * Time: 下午3:28
  */
 
-namespace Server\Asyn\MQTT;
+namespace Kernel\Asyn\MQTT;
 
 
 interface IMqtt

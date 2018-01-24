@@ -6,12 +6,12 @@
  * Time: 下午3:05
  */
 
-namespace Server\Components\Cluster;
+namespace Kernel\Components\Cluster;
 
 
-use Server\Coroutine\Coroutine;
-use Server\Memory\Pool;
-use Server\Pack\ClusterPack;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Memory\Pool;
+use Kernel\Pack\ClusterPack;
 
 class ClusterHelp
 {

@@ -6,14 +6,14 @@
  * Time: 上午10:59
  */
 
-namespace Server\Console;
+namespace Kernel\Console;
 
 
 use app\AppServer;
 use Noodlehaus\Config;
-use Server\CoreBase\PortManager;
-use Server\Start;
-use Server\SwooleServer;
+use Kernel\CoreBase\PortManager;
+use Kernel\Start;
+use Kernel\SwooleServer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

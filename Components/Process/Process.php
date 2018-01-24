@@ -6,12 +6,12 @@
  * Time: 上午9:41
  */
 
-namespace Server\Components\Process;
+namespace Kernel\Components\Process;
 
 
-use Server\Components\Event\EventDispatcher;
-use Server\Coroutine\Coroutine;
-use Server\SwooleMarco;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Coroutine\Coroutine;
+use Kernel\SwooleMarco;
 
 abstract class Process extends ProcessRPC
 {

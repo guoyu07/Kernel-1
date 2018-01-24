@@ -6,19 +6,19 @@
  * Time: 上午10:13
  */
 
-namespace Server\Asyn\TcpClient;
+namespace Kernel\Asyn\TcpClient;
 
 
-use Server\Asyn\AsynPool;
-use Server\CoreBase\PortManager;
-use Server\CoreBase\SwooleException;
-use Server\Memory\Pool;
-use Server\Pack\IPack;
+use Kernel\Asyn\AsynPool;
+use Kernel\CoreBase\PortManager;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Memory\Pool;
+use Kernel\Pack\IPack;
 
 /**
  * 连接池版
  * Class TcpClientPool
- * @package Server\Asyn\TcpClient
+ * @package Kernel\Asyn\TcpClient
  */
 class TcpClientPool extends AsynPool
 {

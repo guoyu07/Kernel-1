@@ -6,13 +6,13 @@
  * Time: 下午1:50
  */
 
-namespace Server\Components\Process;
+namespace Kernel\Components\Process;
 
 
-use Server\CoreBase\Child;
-use Server\Coroutine\Coroutine;
-use Server\SwooleMarco;
-use Server\Test\DocParser;
+use Kernel\CoreBase\Child;
+use Kernel\Coroutine\Coroutine;
+use Kernel\SwooleMarco;
+use Kernel\Test\DocParser;
 
 abstract class ProcessRPC extends Child
 {

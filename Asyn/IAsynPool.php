@@ -6,7 +6,7 @@
  * Time: 上午11:09
  */
 
-namespace Server\Asyn;
+namespace Kernel\Asyn;
 
 
 interface IAsynPool

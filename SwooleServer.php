@@ -1,6 +1,6 @@
 <?php
 
-namespace Server;
+namespace Kernel;
 
 use Monolog\ErrorHandler;
 use Monolog\Handler\MongoDBHandler;
@@ -9,16 +9,16 @@ use MongoDB\Client;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Noodlehaus\Config;
-use Server\Components\Backstage\BackstageHelp;
-use Server\Components\Event\EventDispatcher;
-use Server\Components\GrayLog\UdpTransport;
-use Server\Components\Middleware\MiddlewareManager;
-use Server\Components\Process\ProcessRPC;
-use Server\CoreBase\ControllerFactory;
-use Server\CoreBase\ILoader;
-use Server\CoreBase\Loader;
-use Server\CoreBase\PortManager;
-use Server\Coroutine\Coroutine;
+use Kernel\Components\Backstage\BackstageHelp;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\GrayLog\UdpTransport;
+use Kernel\Components\Middleware\MiddlewareManager;
+use Kernel\Components\Process\ProcessRPC;
+use Kernel\CoreBase\ControllerFactory;
+use Kernel\CoreBase\ILoader;
+use Kernel\CoreBase\Loader;
+use Kernel\CoreBase\PortManager;
+use Kernel\Coroutine\Coroutine;
 
 /**
  * Created by PhpStorm.

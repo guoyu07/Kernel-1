@@ -6,7 +6,7 @@
  * Time: 上午11:16
  */
 
-namespace Server\Coroutine;
+namespace Kernel\Coroutine;
 
 
 class CoroutineChangeToken

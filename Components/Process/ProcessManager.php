@@ -6,14 +6,14 @@
  * Time: 上午9:41
  */
 
-namespace Server\Components\Process;
+namespace Kernel\Components\Process;
 
-use Server\Memory\Pool;
+use Kernel\Memory\Pool;
 
 /**
  * 进程管理
  * Class ProcessManager
- * @package Server\Components\Process
+ * @package Kernel\Components\Process
  */
 class ProcessManager
 {

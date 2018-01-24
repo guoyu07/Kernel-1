@@ -6,10 +6,10 @@
  * Time: 下午5:07
  */
 
-namespace Server\Coroutine;
+namespace Kernel\Coroutine;
 
 
-use Server\Memory\Pool;
+use Kernel\Memory\Pool;
 
 class Coroutine
 {

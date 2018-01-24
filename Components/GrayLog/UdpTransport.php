@@ -1,6 +1,6 @@
 <?php
 
-namespace Server\Components\GrayLog;
+namespace Kernel\Components\GrayLog;
 use Gelf\Encoder\CompressedJsonEncoder as DefaultEncoder;
 use Gelf\MessageInterface as Message;
 use Gelf\Transport\AbstractTransport;

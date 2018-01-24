@@ -6,17 +6,17 @@
  * Time: 下午2:30
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
-use Server\Coroutine\Coroutine;
-use Server\Pack\IPack;
-use Server\Route\IRoute;
-use Server\SwooleServer;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Pack\IPack;
+use Kernel\Route\IRoute;
+use Kernel\SwooleServer;
 
 /**
  * 端口管理
  * Class PortManager
- * @package Server\CoreBase
+ * @package Kernel\CoreBase
  */
 class PortManager
 {
@@ -170,7 +170,7 @@ class PortManager
         if (class_exists($pack_class_name)) {
             $pack = new $pack_class_name;
         } else {
-            $pack_class_name = "Server\\Pack\\" . $pack_tool;
+            $pack_class_name = "Kernel\\Pack\\" . $pack_tool;
             if (class_exists($pack_class_name)) {
                 $pack = new $pack_class_name;
             } else {
@@ -195,7 +195,7 @@ class PortManager
         if (class_exists($route_class_name)) {
             $route = new $route_class_name;
         } else {
-            $route_class_name = "Server\\Route\\" . $route_tool;
+            $route_class_name = "Kernel\\Route\\" . $route_tool;
             if (class_exists($route_class_name)) {
                 $route = new $route_class_name;
             } else {
@@ -219,7 +219,7 @@ class PortManager
         if (class_exists($middleware_class_name)) {
             return $middleware_class_name;
         } else {
-            $middleware_class_name = "Server\\Middlewares\\" . $middleware_name;
+            $middleware_class_name = "Kernel\\Middlewares\\" . $middleware_name;
             if (class_exists($middleware_class_name)) {
                 return $middleware_class_name;
             } else {

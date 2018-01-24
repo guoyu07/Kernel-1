@@ -1,5 +1,5 @@
 <?php
-namespace Server\Route;
+namespace Kernel\Route;
 /**
  * Created by PhpStorm.
  * User: zhangjincheng

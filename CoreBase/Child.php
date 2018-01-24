@@ -6,11 +6,11 @@
  * Time: 上午11:05
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 
-use Server\Components\AOP\AOP;
-use Server\Components\AOP\Proxy;
+use Kernel\Components\AOP\AOP;
+use Kernel\Components\AOP\Proxy;
 
 class Child extends AOP
 {

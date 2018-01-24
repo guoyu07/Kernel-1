@@ -6,12 +6,12 @@
  * Time: 下午7:25
  */
 
-namespace Server\Components\Backstage;
+namespace Kernel\Components\Backstage;
 
-use Server\Components\Cluster\ClusterProcess;
-use Server\Components\Process\ProcessManager;
-use Server\CoreBase\Model;
-use Server\Start;
+use Kernel\Components\Cluster\ClusterProcess;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\CoreBase\Model;
+use Kernel\Start;
 
 class ConsoleModel extends Model
 {

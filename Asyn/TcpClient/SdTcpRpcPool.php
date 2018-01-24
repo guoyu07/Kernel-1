@@ -6,20 +6,20 @@
  * Time: 上午10:13
  */
 
-namespace Server\Asyn\TcpClient;
+namespace Kernel\Asyn\TcpClient;
 
 
-use Server\Asyn\AsynPool;
-use Server\CoreBase\PortManager;
-use Server\CoreBase\SwooleException;
-use Server\Memory\Pool;
-use Server\Pack\IPack;
+use Kernel\Asyn\AsynPool;
+use Kernel\CoreBase\PortManager;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Memory\Pool;
+use Kernel\Pack\IPack;
 
 /**
  * 主要用作SD的RPC，所以加上了rpc_token用于识别，这里并没有用到连接池！！
  * 如果和SD通讯推荐使用这个而不是TcpClientPool
  * Class TcpClientPool
- * @package Server\Asyn\TcpClient
+ * @package Kernel\Asyn\TcpClient
  */
 class SdTcpRpcPool extends AsynPool
 {

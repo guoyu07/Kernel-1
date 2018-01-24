@@ -6,12 +6,12 @@
  * Time: 上午11:23
  */
 
-namespace Server\Components\Event;
+namespace Kernel\Components\Event;
 
-use Server\Components\Cluster\ClusterProcess;
-use Server\Components\Process\ProcessManager;
-use Server\Memory\Pool;
-use Server\SwooleMarco;
+use Kernel\Components\Cluster\ClusterProcess;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Memory\Pool;
+use Kernel\SwooleMarco;
 
 /**
  * 事件派发器

@@ -6,9 +6,9 @@
  * Time: 下午6:19
  */
 
-namespace Server\Components\CatCache;
+namespace Kernel\Components\CatCache;
 
-use Server\Components\Process\ProcessManager;
+use Kernel\Components\Process\ProcessManager;
 
 class CatCacheRpc implements \ArrayAccess
 {

@@ -7,10 +7,10 @@
  * Time: 下午12:21
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
-use Server\Components\AOP\AOP;
-use Server\Memory\Pool;
+use Kernel\Components\AOP\AOP;
+use Kernel\Memory\Pool;
 
 class Loader implements ILoader
 {
@@ -69,7 +69,7 @@ class Loader implements ILoader
             $task = str_replace('/', '\\', $task);
             $task_class = "app\\Tasks\\" . $task;
             if (!class_exists($task_class)) {
-                $task_class = "Server\\Tasks\\" . $task;
+                $task_class = "Kernel\\Tasks\\" . $task;
                 if (!class_exists($task_class)) {
                     throw new SwooleException("class task_class not exists");
                 }

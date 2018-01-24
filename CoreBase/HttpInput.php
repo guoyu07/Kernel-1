@@ -6,7 +6,7 @@
  * Time: 上午11:02
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 
 class HttpInput

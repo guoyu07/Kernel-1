@@ -6,10 +6,10 @@
  * Time: 下午2:49
  */
 
-namespace Server\Components\Middleware;
+namespace Kernel\Components\Middleware;
 
 
-use Server\CoreBase\CoreBase;
+use Kernel\CoreBase\CoreBase;
 
 abstract class Middleware extends CoreBase implements IMiddleware
 {

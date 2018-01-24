@@ -6,9 +6,9 @@
  * Time: 下午2:43
  */
 
-namespace Server\Pack;
+namespace Kernel\Pack;
 
-use Server\CoreBase\SwooleException;
+use Kernel\CoreBase\SwooleException;
 
 class ClusterPack implements IPack
 {

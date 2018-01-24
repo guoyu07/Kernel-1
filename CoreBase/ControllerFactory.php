@@ -1,8 +1,8 @@
 <?php
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
-use Server\Components\AOP\AOP;
+use Kernel\Components\AOP\AOP;
 
 /**
  * 控制器工厂模式
@@ -76,7 +76,7 @@ class ControllerFactory
             if (!$this->allow_ServerController) {
                 return null;
             }
-            $class_name = "Server\\Controllers\\$controller_new";
+            $class_name = "Kernel\\Controllers\\$controller_new";
             if (class_exists($class_name)) {
                 $controller_instance = new $class_name;
                 $controller_instance->core_name = $controller;

@@ -1,7 +1,7 @@
 <?php
-namespace Server\Tasks;
+namespace Kernel\Tasks;
 
-use Server\CoreBase\Task;
+use Kernel\CoreBase\Task;
 
 /**
  * Created by PhpStorm.

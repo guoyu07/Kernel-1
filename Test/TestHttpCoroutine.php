@@ -6,10 +6,10 @@
  * Time: 下午4:37
  */
 
-namespace Server\Test;
+namespace Kernel\Test;
 
 
-use Server\Coroutine\CoroutineBase;
+use Kernel\Coroutine\CoroutineBase;
 
 class TestHttpCoroutine extends CoroutineBase
 {

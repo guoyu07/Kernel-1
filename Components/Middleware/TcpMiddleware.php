@@ -6,7 +6,7 @@
  * Time: 下午2:49
  */
 
-namespace Server\Components\Middleware;
+namespace Kernel\Components\Middleware;
 
 abstract class TcpMiddleware extends Middleware
 {

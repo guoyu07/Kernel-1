@@ -6,15 +6,15 @@
  * Time: 下午3:28
  */
 
-namespace Server\Coroutine;
+namespace Kernel\Coroutine;
 
 
-use Server\CoreBase\SwooleException;
+use Kernel\CoreBase\SwooleException;
 
 /**
  * 这里抛出异常之前请销毁自身
  * Class CoroutineBase
- * @package Server\Coroutine
+ * @package Kernel\Coroutine
  */
 abstract class CoroutineBase implements ICoroutineBase
 {

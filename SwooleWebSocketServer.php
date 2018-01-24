@@ -7,14 +7,13 @@
  * Time: 上午9:42
  */
 
-namespace Server;
+namespace Kernel;
 
-
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
-use Server\CoreBase\ControllerFactory;
-use Server\CoreBase\HttpInput;
-use Server\Coroutine\Coroutine;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\CoreBase\ControllerFactory;
+use Kernel\CoreBase\HttpInput;
+use Kernel\Coroutine\Coroutine;
 
 abstract class SwooleWebSocketServer extends SwooleHttpServer
 {
@@ -143,7 +142,9 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
             return;
         }
         $fdinfo = $this->server->connection_info($fd);
-        if (empty($fdinfo)) return;
+        if (empty($fdinfo)) {
+            return;
+        }
         $server_port = $fdinfo['server_port'];
         if ($ifPack) {
             $pack = $this->portManager->getPack($server_port);
@@ -227,12 +228,10 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
                     return;
                 }
             } catch (\Exception $e) {
-
             }
             try {
                 yield $this->middlewareManager->after($middlewares, $path);
             } catch (\Exception $e) {
-
             }
             $this->middlewareManager->destory($middlewares);
             if (Start::getDebug()) {
@@ -333,4 +332,3 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
         return $new_request;
     }
 }
-

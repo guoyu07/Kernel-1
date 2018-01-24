@@ -6,10 +6,10 @@
  * Time: 下午4:25
  */
 
-namespace Server\Components\Cluster;
+namespace Kernel\Components\Cluster;
 
-use Server\Coroutine\CoroutineBase;
-use Server\Memory\Pool;
+use Kernel\Coroutine\CoroutineBase;
+use Kernel\Memory\Pool;
 
 class ClusterCoroutine extends CoroutineBase
 {

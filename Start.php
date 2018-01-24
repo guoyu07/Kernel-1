@@ -6,8 +6,7 @@
  * Time: 上午10:29
  */
 
-namespace Server;
-
+namespace Kernel;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;

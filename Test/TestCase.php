@@ -6,9 +6,9 @@
  * Time: 上午11:49
  */
 
-namespace Server\Test;
+namespace Kernel\Test;
 
-use Server\CoreBase\CoreBase;
+use Kernel\CoreBase\CoreBase;
 
 /**
  * 用 @depends 标注来表达依赖关系
@@ -16,16 +16,16 @@ use Server\CoreBase\CoreBase;
  * 测试可以使用多个 @depends 标注。PHPUnit 不会更改测试的运行顺序，因此你需要自行保证某个测试所依赖的所有测试均出现于这个测试之前。
  * 拥有多个 @depends 标注的测试，其第一个参数是第一个生产者提供的基境，第二个参数是第二个生产者提供的基境，以此类推
  * Class TestCase
- * @package Server\CoreBase
+ * @package Kernel\CoreBase
  */
 abstract class TestCase extends CoreBase
 {
     /**
-     * @var \Server\DataBase\RedisAsynPool
+     * @var \Kernel\DataBase\RedisAsynPool
      */
     public $redis_pool;
     /**
-     * @var \Server\DataBase\MysqlAsynPool
+     * @var \Kernel\DataBase\MysqlAsynPool
      */
     public $mysql_pool;
 

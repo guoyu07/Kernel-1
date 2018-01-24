@@ -4,9 +4,9 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT\Message\Header;
-use Server\Asyn\MQTT\Exception;
-use Server\Asyn\MQTT\Message;
+namespace Kernel\Asyn\MQTT\Message\Header;
+use Kernel\Asyn\MQTT\Exception;
+use Kernel\Asyn\MQTT\Message;
 
 
 /**

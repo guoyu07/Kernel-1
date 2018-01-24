@@ -6,10 +6,10 @@
  * Time: 下午1:46
  */
 
-namespace Server\Components\Consul;
+namespace Kernel\Components\Consul;
 
 
-use Server\Asyn\TcpClient\SdTcpRpcPool;
+use Kernel\Asyn\TcpClient\SdTcpRpcPool;
 
 class ConsulRpc extends SdTcpRpcPool
 {
@@ -31,7 +31,7 @@ class ConsulRpc extends SdTcpRpcPool
     /**
      * @param $name
      * @param $arguments
-     * @return \Server\Asyn\TcpClient\TcpClientRequestCoroutine
+     * @return \Kernel\Asyn\TcpClient\TcpClientRequestCoroutine
      */
     public function __call($name, $arguments)
     {
@@ -44,7 +44,7 @@ class ConsulRpc extends SdTcpRpcPool
      * @param $name
      * @param $arguments
      * @param $oneway
-     * @return \Server\Asyn\TcpClient\TcpClientRequestCoroutine
+     * @return \Kernel\Asyn\TcpClient\TcpClientRequestCoroutine
      */
     public function call($name,$arguments,$oneway)
     {

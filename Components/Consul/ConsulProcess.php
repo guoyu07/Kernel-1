@@ -6,11 +6,11 @@
  * Time: 下午2:55
  */
 
-namespace Server\Components\Consul;
+namespace Kernel\Components\Consul;
 
-use Server\Components\Process\Process;
-use Server\CoreBase\PortManager;
-use Server\CoreBase\SwooleException;
+use Kernel\Components\Process\Process;
+use Kernel\CoreBase\PortManager;
+use Kernel\CoreBase\SwooleException;
 
 class ConsulProcess extends Process
 {

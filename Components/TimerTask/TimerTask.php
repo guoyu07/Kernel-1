@@ -6,20 +6,20 @@
  * Time: 下午1:16
  */
 
-namespace Server\Components\TimerTask;
+namespace Kernel\Components\TimerTask;
 
 
-use Server\Asyn\HttpClient\HttpClient;
-use Server\Asyn\HttpClient\HttpClientPool;
-use Server\Components\Event\Event;
-use Server\Components\Event\EventDispatcher;
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
-use Server\CoreBase\Child;
-use Server\CoreBase\CoreBase;
-use Server\CoreBase\SwooleException;
-use Server\Coroutine\Coroutine;
-use Server\Memory\Pool;
+use Kernel\Asyn\HttpClient\HttpClient;
+use Kernel\Asyn\HttpClient\HttpClientPool;
+use Kernel\Components\Event\Event;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\CoreBase\Child;
+use Kernel\CoreBase\CoreBase;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Memory\Pool;
 
 class TimerTask extends CoreBase
 {

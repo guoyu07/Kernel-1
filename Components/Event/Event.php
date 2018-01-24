@@ -6,7 +6,7 @@
  * Time: 上午11:23
  */
 
-namespace Server\Components\Event;
+namespace Kernel\Components\Event;
 
 class Event
 {

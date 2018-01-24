@@ -6,16 +6,16 @@
  * Time: 下午7:25
  */
 
-namespace Server\Components\Backstage;
+namespace Kernel\Components\Backstage;
 
-use Server\Components\CatCache\CatCacheRpcProxy;
-use Server\Components\Cluster\ClusterProcess;
-use Server\Components\Process\ProcessManager;
-use Server\Components\SDHelp\SDHelpProcess;
-use Server\CoreBase\Actor;
-use Server\CoreBase\Controller;
-use Server\Start;
-use Server\SwooleMarco;
+use Kernel\Components\CatCache\CatCacheRpcProxy;
+use Kernel\Components\Cluster\ClusterProcess;
+use Kernel\Components\Process\ProcessManager;
+use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\CoreBase\Actor;
+use Kernel\CoreBase\Controller;
+use Kernel\Start;
+use Kernel\SwooleMarco;
 
 class Console extends Controller
 {

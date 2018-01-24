@@ -5,7 +5,7 @@
  * Date: 16-7-15
  * Time: 上午11:35
  */
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 class SwooleException extends \Exception
 {
     public function __construct($message, $code = 0, \Exception $previous = null)

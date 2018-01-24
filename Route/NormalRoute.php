@@ -6,10 +6,10 @@
  * Time: 下午3:11
  */
 
-namespace Server\Route;
+namespace Kernel\Route;
 
 
-use Server\CoreBase\SwooleException;
+use Kernel\CoreBase\SwooleException;
 
 class NormalRoute implements IRoute
 {

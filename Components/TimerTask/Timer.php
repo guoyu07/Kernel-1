@@ -6,17 +6,17 @@
  * Time: 下午3:25
  */
 
-namespace Server\Components\TimerTask;
+namespace Kernel\Components\TimerTask;
 
-use Server\Components\Event\Event;
-use Server\Components\Event\EventDispatcher;
-use Server\CoreBase\Child;
-use Server\Coroutine\Coroutine;
-use Server\Memory\Pool;
+use Kernel\Components\Event\Event;
+use Kernel\Components\Event\EventDispatcher;
+use Kernel\CoreBase\Child;
+use Kernel\Coroutine\Coroutine;
+use Kernel\Memory\Pool;
 
 /**
  * Class Timer
- * @package Server\Components\TimerTask
+ * @package Kernel\Components\TimerTask
  */
 class Timer
 {

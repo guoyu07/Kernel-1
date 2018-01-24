@@ -6,14 +6,14 @@
  * Time: 下午1:24
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 
 use Monolog\Logger;
 use Noodlehaus\Config;
-use Server\Asyn\Mysql\MysqlAsynPool;
-use Server\Asyn\Redis\RedisRoute;
-use Server\Memory\Pool;
+use Kernel\Asyn\Mysql\MysqlAsynPool;
+use Kernel\Asyn\Redis\RedisRoute;
+use Kernel\Memory\Pool;
 
 class CoreBase extends Child
 {

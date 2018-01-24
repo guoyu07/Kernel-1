@@ -6,11 +6,11 @@
  * Time: 下午3:11
  */
 
-namespace Server\Route;
+namespace Kernel\Route;
 
 
-use Server\Components\Backstage\Console;
-use Server\CoreBase\SwooleException;
+use Kernel\Components\Backstage\Console;
+use Kernel\CoreBase\SwooleException;
 
 class ConsoleRoute implements IRoute
 {

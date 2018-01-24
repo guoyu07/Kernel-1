@@ -6,10 +6,10 @@
  * Time: 上午9:38
  */
 
-namespace Server\Asyn\Redis;
+namespace Kernel\Asyn\Redis;
 
 
-use Server\Memory\Pool;
+use Kernel\Memory\Pool;
 
 class CoroutineRedisHelp
 {

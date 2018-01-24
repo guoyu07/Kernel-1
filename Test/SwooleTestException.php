@@ -6,7 +6,7 @@
  * Time: 下午2:33
  */
 
-namespace Server\Test;
+namespace Kernel\Test;
 
 
 class SwooleTestException extends \Exception

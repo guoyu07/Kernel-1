@@ -6,16 +6,16 @@
  * Time: 上午9:48
  */
 
-namespace Server\Memory;
+namespace Kernel\Memory;
 
 
-use Server\CoreBase\SwooleException;
-use Server\Coroutine\CoroutineNull;
+use Kernel\CoreBase\SwooleException;
+use Kernel\Coroutine\CoroutineNull;
 
 /**
  * 跨进程的内存缓存系统
  * Class Cache
- * @package Server\Memory
+ * @package Kernel\Memory
  */
 class Cache
 {

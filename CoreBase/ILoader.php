@@ -7,7 +7,7 @@
  * Time: 下午12:21
  */
 
-namespace Server\CoreBase;
+namespace Kernel\CoreBase;
 
 interface ILoader
 {

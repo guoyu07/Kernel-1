@@ -4,12 +4,12 @@
  * MQTT Client
  */
 
-namespace Server\Asyn\MQTT;
+namespace Kernel\Asyn\MQTT;
 
 /**
  * Class CMDStore
  *
- * @package Server\Asyn\MQTT
+ * @package Kernel\Asyn\MQTT
  */
 class CMDStore
 {
