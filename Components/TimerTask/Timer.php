@@ -50,7 +50,7 @@ class Timer
     {
         EventDispatcher::getInstance()->add($this->flag, function (Event $object) {
             $data = self::$table->get($object->data);
-            if ($data['wid'] == get_instance()->getWorkerId()) {
+            if ($data['wid'] == getInstance()->getWorkerId()) {
                 self::$table->del($object->data);
                 \swoole_timer_clear($data['tid']);
             }
@@ -76,7 +76,7 @@ class Timer
                 Pool::getInstance()->push($child);
             });
         });
-        self::$table->set($name, ["wid" => get_instance()->getWorkerId(), "tid" => $tid]);
+        self::$table->set($name, ["wid" => getInstance()->getWorkerId(), "tid" => $tid]);
     }
 
     /**

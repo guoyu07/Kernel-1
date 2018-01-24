@@ -49,7 +49,7 @@ class RedisRoute
     protected function getRedisPoolFromKey($key)
     {
         $redis_pool_name = $this->route_map[$key]??'redisPool';
-        return get_instance()->getAsynPool($redis_pool_name);
+        return getInstance()->getAsynPool($redis_pool_name);
     }
 
     /**
@@ -58,7 +58,7 @@ class RedisRoute
      */
     public function getRedisPool($name='redisPool')
     {
-        return get_instance()->getAsynPool($name);
+        return getInstance()->getAsynPool($name);
     }
 
     /**

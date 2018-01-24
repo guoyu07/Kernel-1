@@ -25,7 +25,7 @@ class ConsulLeader
 
     public function __construct()
     {
-        $this->config = get_instance()->config;
+        $this->config = getInstance()->config;
         $this->leader_name = $this->config['consul']['leader_service_name'];
         $this->consul_leader = new HttpClient(null, 'http://127.0.0.1:8500');
         swoole_timer_after(1000, function () {

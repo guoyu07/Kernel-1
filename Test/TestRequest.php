@@ -25,7 +25,7 @@ class TestRequest
 
     public function __construct($path_info, $header = [], $get = [], $post = [], $cookie = [])
     {
-        $this->server_port = $this->getHttpPort(get_instance()->config);
+        $this->server_port = $this->getHttpPort(getInstance()->config);
         $this->setControllerName($path_info);
         $this->header = $header;
         $this->get = $get;

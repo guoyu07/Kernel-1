@@ -59,7 +59,7 @@ class RPCCall
                 if ($this->oneWay == 'auto') {
                     $this->oneWay = false;
                 }
-                $token = get_instance()->processRpcCall($name, $arguments, $this->oneWay, $this->workerId);
+                $token = getInstance()->processRpcCall($name, $arguments, $this->oneWay, $this->workerId);
                 break;
         }
         Pool::getInstance()->push($this);

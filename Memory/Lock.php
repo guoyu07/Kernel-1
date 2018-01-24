@@ -39,9 +39,9 @@ class Lock
     {
         $this->lock_id = $lock_id;
         if (empty($redisPoolName)) {
-            $this->redis_pool = get_instance()->redis_pool;
+            $this->redis_pool = getInstance()->redis_pool;
         } else {
-            $this->redis_pool = get_instance()->getAsynPool($redisPoolName);
+            $this->redis_pool = getInstance()->getAsynPool($redisPoolName);
         }
     }
 

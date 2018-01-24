@@ -74,7 +74,7 @@ abstract class Actor extends CoreBase
             $delimiter = $this->config->get("catCache.delimiter", ".");
             $path = self::SAVE_NAME . $delimiter . $name;
             $this->saveContext = Pool::getInstance()->get(ActorContext::class);
-            $this->saveContext->initialization($path, get_class($this), get_instance()->getWorkerId());
+            $this->saveContext->initialization($path, get_class($this), getInstance()->getWorkerId());
         } else {
             $this->saveContext = $saveContext;
         }
@@ -210,7 +210,7 @@ abstract class Actor extends CoreBase
      */
     protected function rpcBack($workerId, $token, $result, $node)
     {
-        if (!get_instance()->isCluster() || $node == getNodeName()) {//非集群或者就是自己机器直接发
+        if (!getInstance()->isCluster() || $node == getNodeName()) {//非集群或者就是自己机器直接发
             EventDispatcher::getInstance()->dispathToWorkerId($workerId, $token, $result);
         } else {
             ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->callActorBack($workerId, $token, $result, $node);
@@ -323,14 +323,14 @@ abstract class Actor extends CoreBase
         $data['bindId'] = $bindId;
         $data['oneWay'] = $oneWay;
         $data['node'] = getNodeName();
-        $data['worker_id'] = get_instance()->getWorkerId();
+        $data['worker_id'] = getInstance()->getWorkerId();
         self::$RPCtoken++;
-        $data['token'] = 'Actor-' . get_instance()->getWorkerId() . '-' . self::$RPCtoken;
+        $data['token'] = 'Actor-' . getInstance()->getWorkerId() . '-' . self::$RPCtoken;
         $result = null;
         if (!$oneWay) {
             $result = Pool::getInstance()->get(EventCoroutine::class)->init($data['token']);
         }
-        if (get_instance()->isCluster()) {//集群通过ClusterProcess进行分发
+        if (getInstance()->isCluster()) {//集群通过ClusterProcess进行分发
             ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->callActor($actorName, $data);
         } else {//非集群直接发
             EventDispatcher::getInstance()->dispatch(self::SAVE_NAME . $actorName, $data);
@@ -376,7 +376,7 @@ abstract class Actor extends CoreBase
     public static function recovery($worker_id)
     {
         $data = yield CatCacheRpcProxy::getRpc()[Actor::SAVE_NAME];
-        $delimiter = get_instance()->config->get("catCache.delimiter", ".");
+        $delimiter = getInstance()->config->get("catCache.delimiter", ".");
         if ($data != null) {
             foreach ($data as $key => $value) {
                 if ($value[ActorContext::WORKER_ID_KEY] == $worker_id) {

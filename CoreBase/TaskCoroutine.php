@@ -35,7 +35,7 @@ class TaskCoroutine extends CoroutineBase
 
     public function send($callback)
     {
-        $this->task_id = get_instance()->server->worker_id . get_instance()->server->task($this->task_proxy_data, $this->id, $callback);
+        $this->task_id = getInstance()->server->worker_id . getInstance()->server->task($this->task_proxy_data, $this->id, $callback);
     }
 
     public function destroy()
@@ -48,7 +48,7 @@ class TaskCoroutine extends CoroutineBase
     protected function onTimerOutHandle()
     {
         parent::onTimerOutHandle();
-        get_instance()->stopTask($this->task_id);
+        getInstance()->stopTask($this->task_id);
     }
 
     public function getResult()

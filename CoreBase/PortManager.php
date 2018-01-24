@@ -243,7 +243,7 @@ class PortManager
      */
     public function getPackFromFd($fd)
     {
-        $port = get_instance()->getServerPort($fd);
+        $port = getInstance()->getServerPort($fd);
         return $this->getPack($port);
     }
 
@@ -332,8 +332,8 @@ class PortManager
      */
     public function eventClose($fd)
     {
-        $server_port = get_instance()->getServerPort($fd);
-        $uid = get_instance()->getUidFromFd($fd);
+        $server_port = getInstance()->getServerPort($fd);
+        $uid = getInstance()->getUidFromFd($fd);
         try {
             $type = $this->getPortType($server_port);
         } catch (\Exception $e) {
@@ -343,8 +343,8 @@ class PortManager
             return;
         }
         $config = $this->portConfig[$server_port];
-        $controller_name = $config['event_controller_name'] ?? get_instance()->getEventControllerName();
-        $method_name = ($config['method_prefix'] ?? '') . ($config['close_method_name'] ?? get_instance()->getCloseMethodName());
+        $controller_name = $config['event_controller_name'] ?? getInstance()->getEventControllerName();
+        $method_name = ($config['method_prefix'] ?? '') . ($config['close_method_name'] ?? getInstance()->getCloseMethodName());
         $controller_instance = ControllerFactory::getInstance()
             ->getController($controller_name);
         Coroutine::startCoroutine(function () use ($controller_instance, $uid, $fd, $controller_name, $method_name) {
@@ -362,10 +362,10 @@ class PortManager
      */
     public function eventConnect($fd, $request = null)
     {
-        $server_port = get_instance()->getServerPort($fd);
+        $server_port = getInstance()->getServerPort($fd);
         $config = $this->portConfig[$server_port];
-        $controller_name = $config['event_controller_name'] ?? get_instance()->getEventControllerName();
-        $method_name = ($config['method_prefix'] ?? '') . ($config['connect_method_name'] ?? get_instance()->getConnectMethodName());
+        $controller_name = $config['event_controller_name'] ?? getInstance()->getEventControllerName();
+        $method_name = ($config['method_prefix'] ?? '') . ($config['connect_method_name'] ?? getInstance()->getConnectMethodName());
         $controller_instance = ControllerFactory::getInstance()
             ->getController($controller_name);
         if ($request != null) {
@@ -385,8 +385,8 @@ class PortManager
         foreach ($status as &$value) {
             $value['fdcount'] = 0;
         }
-        foreach (get_instance()->server->connections as $fd) {
-            $port = get_instance()->getServerPort($fd);
+        foreach (getInstance()->server->connections as $fd) {
+            $port = getInstance()->getServerPort($fd);
             if (array_key_exists($port, $status)) {
                 $status[$port]['fdcount']++;
             }

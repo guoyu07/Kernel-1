@@ -39,7 +39,7 @@ class Coroutine
         swoole_timer_tick(self::TICK_INTERVAL, function ($timerId) {
             $this->tickTime++;
             $this->tickId = $timerId;
-            get_instance()->tickTime = $this->getTickTime();
+            getInstance()->tickTime = $this->getTickTime();
         });
     }
 
@@ -114,7 +114,7 @@ class Coroutine
             secho("EX", "---------------------[协程同步模式异常警告]---------------------" . date("Y-m-d h:i:s"));
             $message = "[" . $function_name . "]" . $e->getMessage();
             secho("EX", $message);
-            get_instance()->log->addWarning($message);
+            getInstance()->log->addWarning($message);
             $result = new CoroutineTaskException($e->getMessage(), $e->getCode());
             return $result;
         }
@@ -136,7 +136,7 @@ class Coroutine
                             secho("EX", "---------------------[协程同步模式异常警告]---------------------" . date("Y-m-d h:i:s"));
                             $message = "[" . $function_name . "]" . $e->getMessage();
                             secho("EX", $message);
-                            get_instance()->log->addWarning($message);
+                            getInstance()->log->addWarning($message);
                             $result = new CoroutineTaskException($e->getMessage(), $e->getCode());
                         }
                         $corotineTask->destroy();

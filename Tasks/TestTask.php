@@ -18,7 +18,7 @@ class TestTask extends Task
 
     public function testsend()
     {
-        get_instance()->sendToAll(1);
+        getInstance()->sendToAll(1);
     }
 
     public function test()

@@ -25,12 +25,12 @@ abstract class TcpMiddleware extends Middleware
      */
     protected function send($data)
     {
-        get_instance()->send($this->fd, $data, true);
+        getInstance()->send($this->fd, $data, true);
     }
 
     protected function close()
     {
-        get_instance()->close($this->fd);
+        getInstance()->close($this->fd);
         throw new \Exception('close');
     }
 }

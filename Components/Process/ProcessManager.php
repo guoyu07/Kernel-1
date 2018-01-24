@@ -41,7 +41,7 @@ class ProcessManager
      */
     public function addProcess($class_name, $needCoroutine = true, $name = '')
     {
-        $worker_id = get_instance()->worker_num + get_instance()->task_num + $this->atomic->get();
+        $worker_id = getInstance()->worker_num + getInstance()->task_num + $this->atomic->get();
         $this->atomic->add();
         $names = explode("\\", $class_name);
         $process = new $class_name(getServerName() . "-" . $names[count($names) - 1], $worker_id, $needCoroutine);

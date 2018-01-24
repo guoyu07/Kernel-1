@@ -141,13 +141,13 @@ class EventDispatcher
     {
         if (!$onlyMyWorker) {
             if ($fromDispatch) {//来自集群的请求
-                get_instance()->sendToAllAsynWorks(SwooleMarco::DISPATCHER_NAME, [$type, $data], EventDispatcher::class . "::workerDispatchEventWith");
+                getInstance()->sendToAllAsynWorks(SwooleMarco::DISPATCHER_NAME, [$type, $data], EventDispatcher::class . "::workerDispatchEventWith");
                 return;
             }
-            if (get_instance()->isCluster()) {
+            if (getInstance()->isCluster()) {
                 ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_dispatchEvent($type, $data);
             }
-            get_instance()->sendToAllAsynWorks(SwooleMarco::DISPATCHER_NAME, [$type, $data], EventDispatcher::class . "::workerDispatchEventWith");
+            getInstance()->sendToAllAsynWorks(SwooleMarco::DISPATCHER_NAME, [$type, $data], EventDispatcher::class . "::workerDispatchEventWith");
         } else {//仅仅发布自己的进程
             self::workerDispatchEventWith([$type, $data]);
         }
@@ -161,7 +161,7 @@ class EventDispatcher
      */
     public function dispathToWorkerId($workerId, $type, $data = null)
     {
-        get_instance()->sendToOneWorker($workerId, SwooleMarco::DISPATCHER_NAME, [$type, $data], EventDispatcher::class . "::workerDispatchEventWith");
+        getInstance()->sendToOneWorker($workerId, SwooleMarco::DISPATCHER_NAME, [$type, $data], EventDispatcher::class . "::workerDispatchEventWith");
     }
 
     /**
@@ -170,7 +170,7 @@ class EventDispatcher
      */
     public function randomDispatch($type, $data = null)
     {
-        get_instance()->sendToRandomWorker(SwooleMarco::DISPATCHER_NAME, [$type, $data], EventDispatcher::class . "::workerDispatchEventWith");
+        getInstance()->sendToRandomWorker(SwooleMarco::DISPATCHER_NAME, [$type, $data], EventDispatcher::class . "::workerDispatchEventWith");
     }
 
     /**

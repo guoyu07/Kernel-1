@@ -34,13 +34,13 @@ class Cache
     {
         $this->taskName = $taskName;
         $this->db = $db;
-        if ($db >= get_instance()->task_num) {
+        if ($db >= getInstance()->task_num) {
             throw new SwooleException('db的范围为0->(taskNum-1)');
         }
         if (array_key_exists($taskName, self::$caches)) {
             throw new SwooleException("$taskName cache名已存在，请通过getCache方法创建");
         }
-        $this->task = get_instance()->loader->task($this->taskName);
+        $this->task = getInstance()->loader->task($this->taskName);
         self::$caches[$taskName] = $this;
     }
 

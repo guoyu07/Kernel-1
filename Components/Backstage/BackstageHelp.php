@@ -20,12 +20,12 @@ class BackstageHelp
         if (self::$set) {
             return;
         }
-        if (!get_instance()->config->get('backstage.enable', false)) {
+        if (!getInstance()->config->get('backstage.enable', false)) {
             return;
         }
-        $name = get_instance()->config->get('backstage.socket');
-        $port = get_instance()->config->get('backstage.websocket_port');
-        $ports = get_instance()->config["ports"];
+        $name = getInstance()->config->get('backstage.socket');
+        $port = getInstance()->config->get('backstage.websocket_port');
+        $ports = getInstance()->config["ports"];
         $ports[] = [
             'socket_type' => PortManager::SOCK_WS,
             'socket_name' => $name,
@@ -39,14 +39,14 @@ class BackstageHelp
             'method_prefix' => 'back_',
             'middlewares' => ['MonitorMiddleware', 'NormalHttpMiddleware']
         ];
-        get_instance()->config->set("ports", $ports);
-        $timerTask = get_instance()->config["timerTask"];
+        getInstance()->config->set("ports", $ports);
+        $timerTask = getInstance()->config["timerTask"];
         $timerTask[] = [
             'model_name' => ConsoleModel::class,
             'method_name' => 'getNodeStatus',
             'interval_time' => '1',
         ];
-        get_instance()->config->set("timerTask", $timerTask);
+        getInstance()->config->set("timerTask", $timerTask);
         self::$set = true;
     }
 }

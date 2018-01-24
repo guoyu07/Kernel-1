@@ -127,7 +127,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      * 获取实例
      * @return SwooleDistributedServer
      */
-    public static function &get_instance()
+    public static function &getInstance()
     {
         return self::$instance;
     }
@@ -260,13 +260,13 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      */
     public function sendToRandomWorker($type, $uns_data, string $callStaticFuc)
     {
-        $send_data = get_instance()->packServerMessageBody($type, $uns_data, $callStaticFuc);
-        $id = rand(0, get_instance()->worker_num - 1);
+        $send_data = getInstance()->packServerMessageBody($type, $uns_data, $callStaticFuc);
+        $id = rand(0, getInstance()->worker_num - 1);
         if ($this->server->worker_id == $id) {
             //自己的进程是收不到消息的所以这里执行下
             call_user_func($callStaticFuc, $uns_data);
         } else {
-            get_instance()->server->sendMessage($send_data, $id);
+            getInstance()->server->sendMessage($send_data, $id);
         }
     }
 
@@ -279,12 +279,12 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      */
     public function sendToOneWorker($workerId, $type, $uns_data, string $callStaticFuc)
     {
-        $send_data = get_instance()->packServerMessageBody($type, $uns_data, $callStaticFuc);
+        $send_data = getInstance()->packServerMessageBody($type, $uns_data, $callStaticFuc);
         if ($this->server->worker_id == $workerId) {
             //自己的进程是收不到消息的所以这里执行下
             call_user_func($callStaticFuc, $uns_data);
         } else {
-            get_instance()->server->sendMessage($send_data, $workerId);
+            getInstance()->server->sendMessage($send_data, $workerId);
         }
     }
 
@@ -684,7 +684,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         if ($this->isCluster()) {
             ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_addUid($uid);
         } else {
-            get_instance()->pub('$SYS/uidcount', count($this->uid_fd_table));
+            getInstance()->pub('$SYS/uidcount', count($this->uid_fd_table));
         }
         $this->uid_fd_table->set($uid, ['fd' => $fd]);
         $this->fd_uid_table->set($fd, ['uid' => $uid]);
@@ -757,10 +757,10 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      */
     public function stopTask($task_id)
     {
-        $task_pid = get_instance()->tid_pid_table->get($task_id)['pid'];
+        $task_pid = getInstance()->tid_pid_table->get($task_id)['pid'];
         if ($task_pid != null) {
             posix_kill($task_pid, SIGKILL);
-            get_instance()->tid_pid_table->del($task_id);
+            getInstance()->tid_pid_table->del($task_id);
         }
     }
 
@@ -810,7 +810,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      */
     public function getStatus()
     {
-        $status = get_instance()->server->stats();
+        $status = getInstance()->server->stats();
         $now_time = getMillisecond();
         $exTime = $now_time - $this->lastTime;
         if ($exTime == 0) {

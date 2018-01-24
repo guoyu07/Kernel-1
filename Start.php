@@ -158,7 +158,7 @@ class Start
     public static function setLeader($bool)
     {
         self::$leader->set($bool ? 1 : 0);
-        if (get_instance()->isCluster()) {
+        if (getInstance()->isCluster()) {
             if ($bool) {
                 secho("CONSUL", "Leader变更，被选举为Leader");
             } else {

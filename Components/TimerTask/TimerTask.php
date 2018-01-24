@@ -36,7 +36,7 @@ class TimerTask extends CoreBase
     {
         parent::__construct();
         $this->leader_name = $this->config['consul']['leader_service_name'];
-        if (get_instance()->isConsul()) {
+        if (getInstance()->isConsul()) {
             $this->consul = new HttpClient(null, 'http://127.0.0.1:8500');
             swoole_timer_after(1000, function () {
                 $this->updateFromConsul();
@@ -189,7 +189,7 @@ class TimerTask extends CoreBase
             $child = Pool::getInstance()->get(Child::class);
             $child->setContext($context);
             if (!empty($timer_task['task_name'])) {
-                $task = get_instance()->loader->task($timer_task['task_name'], $child);
+                $task = getInstance()->loader->task($timer_task['task_name'], $child);
                 call_user_func([$task, $timer_task['method_name']]);
                 $startTime = getMillisecond();
                 $path = "[TimerTask] " . $timer_task['task_name'] . "::" . $timer_task['method_name'];
@@ -199,7 +199,7 @@ class TimerTask extends CoreBase
                     ProcessManager::getInstance()->getRpcCall(SDHelpProcess::class, true)->addStatistics($path, getMillisecond() - $startTime);
                 });
             } else {
-                $model = get_instance()->loader->model($timer_task['model_name'], $child);
+                $model = getInstance()->loader->model($timer_task['model_name'], $child);
                 $startTime = getMillisecond();
                 $path = "[TimerTask] " . $timer_task['model_name'] . "::" . $timer_task['method_name'];
                 Coroutine::startCoroutine(function () use (&$child, &$model, &$timer_task, $path, $startTime) {

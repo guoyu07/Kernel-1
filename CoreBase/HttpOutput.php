@@ -100,7 +100,7 @@ class HttpOutput
      */
     public function end($output = '', $gzip = true, $destroy = true)
     {
-        if (!get_instance()->config->get('http.gzip_off', false)) {
+        if (!getInstance()->config->get('http.gzip_off', false)) {
             //低版本swoole的gzip方法存在效率问题
             if ($gzip) {
                 $this->response->gzip(1);

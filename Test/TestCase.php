@@ -32,8 +32,8 @@ abstract class TestCase extends CoreBase
     public function __construct()
     {
         parent::__construct();
-        $this->redis_pool = get_instance()->redis_pool;
-        $this->mysql_pool = get_instance()->mysql_pool;
+        $this->redis_pool = getInstance()->redis_pool;
+        $this->mysql_pool = getInstance()->mysql_pool;
     }
 
     /**

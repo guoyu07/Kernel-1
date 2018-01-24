@@ -37,10 +37,10 @@ class ClusterProcess extends Process
         $this->actorMap[$this->node_name] = new Set();
         //通知所有Actor恢复注册
         Actor::call(Actor::ALL_COMMAND, 'recoveryRegister', null, true);
-        if (get_instance()->isCluster()) {
+        if (getInstance()->isCluster()) {
             $this->map[$this->node_name] = new Set();
-            foreach (get_instance()->server->connections as $fd) {
-                $fdinfo = get_instance()->server->connection_info($fd);
+            foreach (getInstance()->server->connections as $fd) {
+                $fdinfo = getInstance()->server->connection_info($fd);
                 $uid = $fdinfo['uid'] ?? null;
                 if ($uid != null) {
                     $this->map[$this->node_name]->add($uid);
@@ -170,7 +170,7 @@ class ClusterProcess extends Process
             $client->addNodeUid($this->node_name, $uid);
         }
         if (Start::isLeader()) {
-            get_instance()->pub('$SYS/uidcount', $this->countOnline());
+            getInstance()->pub('$SYS/uidcount', $this->countOnline());
         }
     }
 
@@ -180,7 +180,7 @@ class ClusterProcess extends Process
      */
     public function my_removeUid($uid)
     {
-        if (get_instance()->isCluster()) {
+        if (getInstance()->isCluster()) {
             $this->map[$this->node_name]->remove($uid);
             foreach ($this->client as $client) {
                 $client->removeNodeUid($this->node_name, $uid);
@@ -188,7 +188,7 @@ class ClusterProcess extends Process
         }
         $this->my_clearUidSub($uid);
         if (Start::isLeader()) {
-            get_instance()->pub('$SYS/uidcount', $this->countOnline());
+            getInstance()->pub('$SYS/uidcount', $this->countOnline());
         }
     }
 
@@ -380,7 +380,7 @@ class ClusterProcess extends Process
         foreach ($tree as $one) {
             if (isset($this->subArr[$one])) {
                 foreach ($this->subArr[$one] as $uid) {
-                    get_instance()->pubToUid($uid, $data, $topic);
+                    getInstance()->pubToUid($uid, $data, $topic);
                 }
             }
         }
@@ -398,7 +398,7 @@ class ClusterProcess extends Process
         }
         $this->map[$node_name]->add($uid);
         if (Start::isLeader()) {
-            get_instance()->pub('$SYS/uidcount', $this->countOnline());
+            getInstance()->pub('$SYS/uidcount', $this->countOnline());
         }
     }
 
@@ -413,7 +413,7 @@ class ClusterProcess extends Process
             $this->map[$node_name]->remove($uid);
         }
         if (Start::isLeader()) {
-            get_instance()->pub('$SYS/uidcount', $this->countOnline());
+            getInstance()->pub('$SYS/uidcount', $this->countOnline());
         }
     }
 
@@ -529,7 +529,7 @@ class ClusterProcess extends Process
             }
             $this->client[$node_name] = $client;
             if (Start::isLeader()) {
-                get_instance()->pub('$SYS/nodes', array_keys($this->map));
+                getInstance()->pub('$SYS/nodes', array_keys($this->map));
             }
         });
     }
@@ -544,7 +544,7 @@ class ClusterProcess extends Process
         $this->client[$node_name]->close();
         unset($this->client[$node_name]);
         if (Start::isLeader()) {
-            get_instance()->pub('$SYS/nodes', array_keys($this->map));
+            getInstance()->pub('$SYS/nodes', array_keys($this->map));
         }
     }
 
@@ -760,7 +760,7 @@ class ClusterProcess extends Process
     public function my_reload($node_name)
     {
         if ($node_name == getNodeName()) {
-            get_instance()->server->reload();
+            getInstance()->server->reload();
         } else {
             if (array_key_exists($node_name, $this->client)) {
                 $this->client[$node_name]->reload();
@@ -773,7 +773,7 @@ class ClusterProcess extends Process
      */
     public function my_status()
     {
-        yield get_instance()->getStatus();
+        yield getInstance()->getStatus();
         foreach ($this->client as $client) {
             $client->status();
         }
@@ -784,7 +784,7 @@ class ClusterProcess extends Process
      */
     public function th_status()
     {
-        yield get_instance()->getStatus();
+        yield getInstance()->getStatus();
     }
 
     /**

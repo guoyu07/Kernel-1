@@ -40,7 +40,7 @@ class Task extends TaskProxy
     {
         $this->task_id = $task_id;
         $this->from_id = $from_id;
-        get_instance()->tid_pid_table->set($this->from_id . $this->task_id, ['pid' => $worker_pid, 'des' => "$task_name::$method_name", 'start_time' => time()]);
+        getInstance()->tid_pid_table->set($this->from_id . $this->task_id, ['pid' => $worker_pid, 'des' => "$task_name::$method_name", 'start_time' => time()]);
         $this->setContext($context);
         $this->start_run_time = microtime(true);
         $this->context['task_name'] = "$task_name:$method_name";
@@ -55,7 +55,7 @@ class Task extends TaskProxy
         if (self::$efficiency_monitor_enable) {
             $this->log('Monitor');
         }
-        get_instance()->tid_pid_table->del($this->from_id . $this->task_id);
+        getInstance()->tid_pid_table->del($this->from_id . $this->task_id);
         parent::destroy();
         $this->task_id = 0;
         Pool::getInstance()->push($this);
@@ -68,7 +68,7 @@ class Task extends TaskProxy
      */
     protected function sendToUid($uid, $data)
     {
-        get_instance()->sendToUid($uid, $data);
+        getInstance()->sendToUid($uid, $data);
     }
 
     /**
@@ -78,7 +78,7 @@ class Task extends TaskProxy
      */
     protected function sendToUids($uids, $data)
     {
-        get_instance()->sendToUids($uids, $data);
+        getInstance()->sendToUids($uids, $data);
     }
 
     /**
@@ -87,7 +87,7 @@ class Task extends TaskProxy
      */
     protected function sendToAll($data)
     {
-        get_instance()->sendToAll($data);
+        getInstance()->sendToAll($data);
     }
 }
 

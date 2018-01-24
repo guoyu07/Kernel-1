@@ -56,22 +56,22 @@ class ClusterController extends Child
 
     public function sendToUid($uid, $data)
     {
-        get_instance()->sendToUid($uid, $data, true);
+        getInstance()->sendToUid($uid, $data, true);
     }
 
     public function sendToUids($uids, $data)
     {
-        get_instance()->sendToUids($uids, $data, true);
+        getInstance()->sendToUids($uids, $data, true);
     }
 
     public function sendToAll($data)
     {
-        get_instance()->sendToAll($data, true);
+        getInstance()->sendToAll($data, true);
     }
 
     public function kickUid($uid)
     {
-        get_instance()->kickUid($uid, true);
+        getInstance()->kickUid($uid, true);
     }
 
     public function pub($sub, $data)
@@ -91,7 +91,7 @@ class ClusterController extends Child
 
     public function reload()
     {
-        get_instance()->server->reload();
+        getInstance()->server->reload();
     }
 
     public function status()
@@ -105,9 +105,9 @@ class ClusterController extends Child
      */
     public function getUidInfo($uid)
     {
-        $fd = get_instance()->getFdFromUid($uid);
+        $fd = getInstance()->getFdFromUid($uid);
         if (!empty($fd)) {
-            $fdInfo = get_instance()->getFdInfo($fd);
+            $fdInfo = getInstance()->getFdInfo($fd);
             $fdInfo['node'] = getNodeName();
             return $fdInfo;
         } else {

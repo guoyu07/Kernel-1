@@ -23,7 +23,7 @@ class ConsulServices
         self::$instance = $this;
         $this->http_services = [];
         $this->tcp_services = [];
-        $this->config = get_instance()->config;
+        $this->config = getInstance()->config;
     }
 
     public static function getInstance()
@@ -157,13 +157,13 @@ class ConsulServices
                     $config_name = 'consul';
                 }
                 $this->tcp_services[$name][$address] = new ConsulRpc($this->config, $config_name, "$address:$port");
-                if (get_instance()->server->worker_id == 0) {
+                if (getInstance()->server->worker_id == 0) {
                     secho("CONSUL", "发现$name($address:$port) TCP服务，应用配置$config_name");
                 }
                 break;
             case "http":
                 $this->http_services[$name][$address] = new ConsulRest($this->config, "http://$address:$port");
-                if (get_instance()->server->worker_id == 0) {
+                if (getInstance()->server->worker_id == 0) {
                     secho("CONSUL", "发现$name($address:$port) HTTP服务");
                 }
                 break;

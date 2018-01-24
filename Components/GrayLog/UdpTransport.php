@@ -53,8 +53,8 @@ class UdpTransport extends AbstractTransport
 
     public function write($data)
     {
-        if(get_instance()->server!=null){
-            get_instance()->server->sendto($this->ip, $this->port, $data);
+        if(getInstance()->server!=null){
+            getInstance()->server->sendto($this->ip, $this->port, $data);
         }
     }
 

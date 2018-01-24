@@ -83,10 +83,10 @@ abstract class AMQPTaskProcess extends Process
     protected function initAsynPools()
     {
         if ($this->config->get('redis.enable', true)) {
-            get_instance()->addAsynPool('redisPool', new RedisAsynPool($this->config, $this->config->get('redis.active')));
+            getInstance()->addAsynPool('redisPool', new RedisAsynPool($this->config, $this->config->get('redis.active')));
         }
         if ($this->config->get('mysql.enable', true)) {
-            get_instance()->addAsynPool('mysqlPool', new MysqlAsynPool($this->config, $this->config->get('mysql.active')));
+            getInstance()->addAsynPool('mysqlPool', new MysqlAsynPool($this->config, $this->config->get('mysql.active')));
         }
     }
 

@@ -14,9 +14,9 @@ class GrayLogHelp
     public static function init()
     {
         //开启一个UDP用于发graylog
-        if (get_instance()->config->get('log.active') == 'graylog') {
-            $socket = get_instance()->portManager->getFirstTypePort()['socket_name'];
-            $udp_port = get_instance()->server->listen($socket, get_instance()->config['log']['graylog']['udp_send_port'], SWOOLE_SOCK_UDP);
+        if (getInstance()->config->get('log.active') == 'graylog') {
+            $socket = getInstance()->portManager->getFirstTypePort()['socket_name'];
+            $udp_port = getInstance()->server->listen($socket, getInstance()->config['log']['graylog']['udp_send_port'], SWOOLE_SOCK_UDP);
             $udp_port->on('packet', function () {
             });
         }

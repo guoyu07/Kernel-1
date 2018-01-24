@@ -25,8 +25,8 @@ class Status extends Controller
 
     public function defaultMethod()
     {
-        $status = get_instance()->server->stats();
-        $status['now_task'] = get_instance()->getServerAllTaskMessage();
+        $status = getInstance()->server->stats();
+        $status['now_task'] = getInstance()->getServerAllTaskMessage();
         if ($this->config['consul']['enable']) {
             $data = yield ProcessManager::getInstance()->getRpcCall(SDHelpProcess::class)->getData(ConsulHelp::DISPATCH_KEY);
             if (!empty($data)) {

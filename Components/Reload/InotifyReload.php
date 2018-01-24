@@ -21,7 +21,7 @@ class InotifyReload
     public function __construct()
     {
         secho("SYS", "已开启代码热重载");
-        $this->server = get_instance()->server;
+        $this->server = getInstance()->server;
         $this->monitor_dir = realpath(MYROOT);
         if (!extension_loaded('inotify')) {
             swoole_timer_after(1000, [$this, 'unUseInotify']);

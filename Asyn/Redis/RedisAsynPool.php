@@ -425,7 +425,7 @@ class RedisAsynPool extends AsynPool
      */
     public function coroutineSend($name, ...$arg)
     {
-        if (get_instance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
+        if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             try {
                 $value = call_user_func_array([$this->getSync(), $name], $arg);
             }catch (\RedisException $e){

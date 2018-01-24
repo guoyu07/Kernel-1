@@ -26,7 +26,7 @@ class Console extends Controller
     public function back_onConnect()
     {
         $this->bindUid("#bs:" . getNodeName() . $this->fd);
-        get_instance()->protect($this->fd);
+        getInstance()->protect($this->fd);
         $this->addSub('$SYS/#');
         $this->destroy();
     }
@@ -46,7 +46,7 @@ class Console extends Controller
      */
     public function back_setDebug($node_name, $bool)
     {
-        if (get_instance()->isCluster()) {
+        if (getInstance()->isCluster()) {
             ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_setDebug($node_name, $bool);
         } else {
             Start::setDebug($bool);
@@ -60,10 +60,10 @@ class Console extends Controller
      */
     public function back_reload($node_name)
     {
-        if (get_instance()->isCluster()) {
+        if (getInstance()->isCluster()) {
             ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_reload($node_name);
         } else {
-            get_instance()->server->reload();
+            getInstance()->server->reload();
         }
         $this->autoSend("ok");
     }
@@ -82,7 +82,7 @@ class Console extends Controller
      */
     public function back_getUidInfo($uid)
     {
-        $uidInfo = yield get_instance()->getUidInfo($uid);
+        $uidInfo = yield getInstance()->getUidInfo($uid);
         $this->autoSend($uidInfo);
     }
 
@@ -91,7 +91,7 @@ class Console extends Controller
      */
     public function back_getAllUids()
     {
-        $uids = yield get_instance()->coroutineGetAllUids();
+        $uids = yield getInstance()->coroutineGetAllUids();
         $this->autoSend($uids);
     }
 
@@ -101,7 +101,7 @@ class Console extends Controller
      */
     public function back_getSubUid($topic)
     {
-        $uids = yield get_instance()->getSubMembersCoroutine($topic);
+        $uids = yield getInstance()->getSubMembersCoroutine($topic);
         $this->autoSend($uids);
     }
 
@@ -111,7 +111,7 @@ class Console extends Controller
      */
     public function back_getUidTopics($uid)
     {
-        $topics = yield get_instance()->getUidTopicsCoroutine($uid);
+        $topics = yield getInstance()->getUidTopicsCoroutine($uid);
         $this->autoSend($topics);
     }
 
@@ -123,7 +123,7 @@ class Console extends Controller
      */
     public function back_getStatistics($node_name, $index, $num)
     {
-        if (!get_instance()->isCluster() || $node_name == getNodeName()) {
+        if (!getInstance()->isCluster() || $node_name == getNodeName()) {
             $map = yield ProcessManager::getInstance()->getRpcCall(SDHelpProcess::class)->getStatistics($index, $num);
         } else {
             $map = yield ProcessManager::getInstance()->getRpcCall(ClusterProcess::class)->my_getStatistics($node_name, $index, $num);

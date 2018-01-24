@@ -27,7 +27,7 @@ class ConsulHelp
      */
     public static function start()
     {
-        if (get_instance()->config->get('consul.enable', false)) {
+        if (getInstance()->config->get('consul.enable', false)) {
             //提取SDHelpProcess中的services
             Coroutine::startCoroutine(function () {
                 $result = yield ProcessManager::getInstance()

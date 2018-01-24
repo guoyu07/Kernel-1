@@ -52,7 +52,7 @@ class TimerCallBack
         EventDispatcher::getInstance()->add(TimerCallBack::KEY, function (Event $event) {
             Coroutine::startCoroutine(function () use ($event) {
                 $child = Pool::getInstance()->get(Child::class);
-                $model = get_instance()->loader->model($event->data['model_name'], $child);
+                $model = getInstance()->loader->model($event->data['model_name'], $child);
                 yield call_user_func_array([$model, $event->data['model_fuc']], $event->data['param_arr']);
                 $child->destroy();
                 Pool::getInstance()->push($child);

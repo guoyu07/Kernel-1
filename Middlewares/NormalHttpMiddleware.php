@@ -18,7 +18,7 @@ class NormalHttpMiddleware extends HttpMiddleware
     {
         parent::__construct();
         if (NormalHttpMiddleware::$cache404 == null) {
-            $template = get_instance()->loader->view('server::error_404');
+            $template = getInstance()->loader->view('server::error_404');
             NormalHttpMiddleware::$cache404 = $template->render();
         }
     }

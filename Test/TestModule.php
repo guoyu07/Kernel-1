@@ -83,7 +83,7 @@ class TestModule
                     break;
                 }
             }
-            get_instance()->server->shutdown();
+            getInstance()->server->shutdown();
             exit();
         }
     }
@@ -241,7 +241,7 @@ class TestModule
         }
         print_r("└───总共$this->totalCount,忽略$this->ignoreCount,成功$this->successCount,失败$this->failCount\n");
         if ($this->asyn) {//异步完了再执行同步的测试
-            $unitTestTask = get_instance()->loader->task('UnitTestTask');
+            $unitTestTask = getInstance()->loader->task('UnitTestTask');
             $unitTestTask->startTest($this->dir);
             $unitTestTask->startTask(null);
         }

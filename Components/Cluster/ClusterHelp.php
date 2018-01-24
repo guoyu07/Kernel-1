@@ -40,15 +40,15 @@ class ClusterHelp
 
     public function __construct()
     {
-        $this->config = get_instance()->config;
+        $this->config = getInstance()->config;
         $this->pack = new ClusterPack();
     }
 
     public function buildPort()
     {
-        if (!get_instance()->isCluster()) return;
+        if (!getInstance()->isCluster()) return;
         //创建dispatch端口用于连接dispatch
-        $this->port = get_instance()->server->listen('0.0.0.0', $this->config['cluster']['port'], SWOOLE_SOCK_TCP);
+        $this->port = getInstance()->server->listen('0.0.0.0', $this->config['cluster']['port'], SWOOLE_SOCK_TCP);
         if ($this->port == false) {
             $port = $this->config['cluster']['port'];
             throw new \Exception("$port 端口被占用");
@@ -80,7 +80,7 @@ class ClusterHelp
                     $data['t'] = $token;
                     $data['r'] = $real;
                     $serialize_data = $this->pack->pack($data);
-                    get_instance()->send($fd, $serialize_data);
+                    getInstance()->send($fd, $serialize_data);
                     $controller->destroy();
                     Pool::getInstance()->push($controller);
                 });
@@ -89,7 +89,7 @@ class ClusterHelp
                 $data['t'] = $token;
                 $data['r'] = $result;
                 $serialize_data = $this->pack->pack($data);
-                get_instance()->send($fd, $serialize_data);
+                getInstance()->send($fd, $serialize_data);
 
                 $controller->destroy();
                 Pool::getInstance()->push($controller);

@@ -76,8 +76,8 @@ class ConsoleRoute implements IRoute
 
     public function errorHandle(\Exception $e, $fd)
     {
-        get_instance()->send($fd, "Error:" . $e->getMessage(), true);
-        get_instance()->close($fd);
+        getInstance()->send($fd, "Error:" . $e->getMessage(), true);
+        getInstance()->close($fd);
     }
 
     public function errorHttpHandle(\Exception $e, $request, $response)

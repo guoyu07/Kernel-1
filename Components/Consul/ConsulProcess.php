@@ -23,7 +23,7 @@ class ConsulProcess extends Process
         $this->jsonFormatHandler();
         if (!is_file(BIN_DIR . "/exec/consul")) {
             secho("[CONSUL]", "consul没有安装,请下载最新的consul安装至bin/exec目录,或者在config/consul.php中取消使能");
-            get_instance()->server->shutdown();
+            getInstance()->server->shutdown();
             exit();
         }
 
@@ -35,7 +35,7 @@ class ConsulProcess extends Process
      */
     public function jsonFormatHandler()
     {
-        $config = get_instance()->config->get('consul');
+        $config = getInstance()->config->get('consul');
         if (isset($config['datacenter'])) {
             $newConfig['datacenter'] = $config['datacenter'];
         }
@@ -51,7 +51,7 @@ class ConsulProcess extends Process
                 list($service_name, $service_port) = explode(":", $service);
                 $service_port = (int)$service_port;
                 try {
-                    $port_type = get_instance()->portManager->getPortType($service_port);
+                    $port_type = getInstance()->portManager->getPortType($service_port);
                 } catch (\Exception $e) {
                     throw new \Exception("consul.php中['consul']['services']配置端口有误");
                 }

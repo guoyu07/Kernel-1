@@ -38,11 +38,11 @@ abstract class Process extends ProcessRPC
         $this->name = $name;
         $this->worker_id = $worker_id;
         $this->coroutine_need = $coroutine_need;
-        $this->config = get_instance()->config;
-        $this->log = get_instance()->log;
-        if (get_instance()->server != null) {
+        $this->config = getInstance()->config;
+        $this->log = getInstance()->log;
+        if (getInstance()->server != null) {
             $this->process = new \swoole_process([$this, '__start'], false, 2);
-            get_instance()->server->addProcess($this->process);
+            getInstance()->server->addProcess($this->process);
         }
     }
 
@@ -50,13 +50,13 @@ abstract class Process extends ProcessRPC
     {
         \swoole_process::signal(SIGTERM, [$this, "__shutDown"]);
 
-        get_instance()->workerId = $this->worker_id;
+        getInstance()->workerId = $this->worker_id;
         if (!isDarwin()) {
             $process->name($this->name);
         }
         swoole_event_add($process->pipe, [$this, 'onRead']);
-        get_instance()->server->worker_id = $this->worker_id;
-        get_instance()->server->taskworker = false;
+        getInstance()->server->worker_id = $this->worker_id;
+        getInstance()->server->taskworker = false;
         if ($this->coroutine_need) {
             //协成支持
             Coroutine::init();

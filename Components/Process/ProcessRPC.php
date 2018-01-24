@@ -49,7 +49,7 @@ abstract class ProcessRPC extends Child
             $info = DocParser::getInstance()->parse($doc);
             $method_name = $method->getName();
             if (isset($info['oneWay'])) {
-                get_instance()->processManager->oneWayFucName[$method_name] = $method_name;
+                getInstance()->processManager->oneWayFucName[$method_name] = $method_name;
             }
         }
     }
@@ -73,7 +73,7 @@ abstract class ProcessRPC extends Child
     public function processRpcCall($name, $arguments, $oneWay, $worker_id)
     {
         $this->token++;
-        $my_worker_id = get_instance()->getWorkerId();
+        $my_worker_id = getInstance()->getWorkerId();
         $message['worker_id'] = $my_worker_id;
         $message['arg'] = $arguments;
         $message['func'] = $name;
@@ -85,7 +85,7 @@ abstract class ProcessRPC extends Child
             });
             return $message['token'];
         }
-        $this->sendMessage(get_instance()->packServerMessageBody(SwooleMarco::PROCESS_RPC, $message), $worker_id);
+        $this->sendMessage(getInstance()->packServerMessageBody(SwooleMarco::PROCESS_RPC, $message), $worker_id);
         return $message['token'];
     }
 
@@ -108,7 +108,7 @@ abstract class ProcessRPC extends Child
                 if (!$message['oneWay']) {
                     $newMessage['result'] = $result;
                     $newMessage['token'] = $message['token'];
-                    $data = get_instance()->packServerMessageBody(SwooleMarco::PROCESS_RPC_RESULT, $newMessage);
+                    $data = getInstance()->packServerMessageBody(SwooleMarco::PROCESS_RPC_RESULT, $newMessage);
                     $this->sendMessage($data, $message['worker_id']);
                 }
             });
@@ -116,7 +116,7 @@ abstract class ProcessRPC extends Child
             if (!$message['oneWay']) {
                 $newMessage['result'] = $result;
                 $newMessage['token'] = $message['token'];
-                $data = get_instance()->packServerMessageBody(SwooleMarco::PROCESS_RPC_RESULT, $newMessage);
+                $data = getInstance()->packServerMessageBody(SwooleMarco::PROCESS_RPC_RESULT, $newMessage);
                 $this->sendMessage($data, $message['worker_id']);
             }
         }
@@ -128,19 +128,19 @@ abstract class ProcessRPC extends Child
      */
     protected function sendMessage($data, $worker_id)
     {
-        if (get_instance()->isUserProcess($worker_id)) {
+        if (getInstance()->isUserProcess($worker_id)) {
             $process = ProcessManager::getInstance()->getProcessFromID($worker_id);
             if ($process == null) return;
-            if ($worker_id == get_instance()->workerId) {
+            if ($worker_id == getInstance()->workerId) {
                 $process->readData($data);
             } else {
                 $process->process->write(\swoole_serialize::pack($data));
             }
         } else {
-            if ($worker_id == get_instance()->workerId) {
-                get_instance()->onSwoolePipeMessage(get_instance()->server, $worker_id, $data);
+            if ($worker_id == getInstance()->workerId) {
+                getInstance()->onSwoolePipeMessage(getInstance()->server, $worker_id, $data);
             } else {
-                get_instance()->server->sendMessage($data, $worker_id);
+                getInstance()->server->sendMessage($data, $worker_id);
             }
         }
     }

@@ -36,7 +36,7 @@ class MqttController extends Controller
     public function initialization($controller_name, $method_name)
     {
         parent::initialization($controller_name, $method_name);
-        $this->pack = get_instance()->portManager->getPackFromFd($this->fd);
+        $this->pack = getInstance()->portManager->getPackFromFd($this->fd);
     }
 
     /**

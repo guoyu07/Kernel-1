@@ -1856,7 +1856,7 @@ class Miner
         if ($sql == null) {
             $sql = $this->getStatement(false);
         }
-        if (get_instance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
+        if (getInstance()->isTaskWorker()) {//如果是task进程自动转换为同步模式
             $this->mergeInto($this->mysql_pool->getSync());
             $this->clear();
             $data = [];

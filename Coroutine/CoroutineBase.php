@@ -63,7 +63,7 @@ abstract class CoroutineBase implements ICoroutineBase
 
     public function __construct()
     {
-        $this->MAX_TIMERS = get_instance()->config->get('coroution.timerOut', 1000);
+        $this->MAX_TIMERS = getInstance()->config->get('coroution.timerOut', 1000);
         $this->result = CoroutineNull::getInstance();
         $this->getCount = getTickTime();
         $this->noException = false;
@@ -159,7 +159,7 @@ abstract class CoroutineBase implements ICoroutineBase
             }
         }
         $this->result = CoroutineNull::getInstance();
-        $this->MAX_TIMERS = get_instance()->config->get('coroution.timerOut', 1000);
+        $this->MAX_TIMERS = getInstance()->config->get('coroution.timerOut', 1000);
         $this->getCount = 0;
         $this->coroutineTask = null;
         $this->request = null;

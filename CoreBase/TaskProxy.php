@@ -67,7 +67,7 @@ class TaskProxy extends CoreBase
      */
     public function startTask($dst_worker_id = -1, $callback = null)
     {
-        get_instance()->server->task($this->task_proxy_data, $dst_worker_id, $callback);
+        getInstance()->server->task($this->task_proxy_data, $dst_worker_id, $callback);
     }
 
     /**
@@ -88,6 +88,6 @@ class TaskProxy extends CoreBase
      */
     public function startTaskWait($timeOut = 0.5, $dst_worker_id = -1)
     {
-        return get_instance()->server->taskwait($this->task_proxy_data, $timeOut, $dst_worker_id);
+        return getInstance()->server->taskwait($this->task_proxy_data, $timeOut, $dst_worker_id);
     }
 }

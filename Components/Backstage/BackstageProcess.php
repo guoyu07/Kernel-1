@@ -27,7 +27,7 @@ class BackstageProcess extends Process
         }
         if (!is_file($path)) {
             secho("Backstage", "后台监控没有安装,如需要请联系白猫获取（需VIP客户）,或者将backstage.php配置中enable关闭");
-            get_instance()->server->shutdown();
+            getInstance()->server->shutdown();
             exit();
         }
 

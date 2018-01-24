@@ -262,7 +262,7 @@ class Controller extends CoreBase
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'send', 'fd' => $this->fd, 'data' => $data];
         } else {
-            get_instance()->send($this->fd, $data, true);
+            getInstance()->send($this->fd, $data, true);
         }
         if ($destroy) {
             $this->getProxy()->destroy();
@@ -326,7 +326,7 @@ class Controller extends CoreBase
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'sendToUid', 'uid' => $this->uid, 'data' => $data];
         } else {
-            get_instance()->sendToUid($uid, $data);
+            getInstance()->sendToUid($uid, $data);
         }
         if ($destroy) {
             $this->getProxy()->destroy();
@@ -348,7 +348,7 @@ class Controller extends CoreBase
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'sendToUids', 'uids' => $uids, 'data' => $data];
         } else {
-            get_instance()->sendToUids($uids, $data);
+            getInstance()->sendToUids($uids, $data);
         }
         if ($destroy) {
             $this->getProxy()->destroy();
@@ -369,7 +369,7 @@ class Controller extends CoreBase
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'sendToAll', 'data' => $data];
         } else {
-            get_instance()->sendToAll($data);
+            getInstance()->sendToAll($data);
         }
         if ($destroy) {
             $this->getProxy()->destroy();
@@ -385,7 +385,7 @@ class Controller extends CoreBase
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'kickUid', 'uid' => $uid];
         } else {
-            get_instance()->kickUid($uid);
+            getInstance()->kickUid($uid);
         }
     }
 
@@ -403,7 +403,7 @@ class Controller extends CoreBase
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'bindUid', 'fd' => $this->fd, 'uid' => $uid];
         } else {
-            get_instance()->bindUid($this->fd, $uid, $isKick);
+            getInstance()->bindUid($this->fd, $uid, $isKick);
         }
         $this->uid = $uid;
     }
@@ -417,7 +417,7 @@ class Controller extends CoreBase
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'unBindUid', 'uid' => $this->uid];
         } else {
-            get_instance()->unBindUid($this->uid, $this->fd);
+            getInstance()->unBindUid($this->uid, $this->fd);
         }
     }
 
@@ -430,7 +430,7 @@ class Controller extends CoreBase
         if (Start::$testUnity) {
             $this->testUnitSendStack[] = ['action' => 'close', 'fd' => $this->fd];
         } else {
-            get_instance()->close($this->fd);
+            getInstance()->close($this->fd);
         }
         if ($autoDestroy) {
             $this->getProxy()->destroy();
@@ -481,7 +481,7 @@ class Controller extends CoreBase
      */
     protected function getFdInfo()
     {
-        return get_instance()->getFdInfo($this->fd);
+        return getInstance()->getFdInfo($this->fd);
     }
 
     /**
@@ -490,7 +490,7 @@ class Controller extends CoreBase
     protected function addSub($topic)
     {
         if (empty($this->uid)) return;
-        get_instance()->addSub($topic, $this->uid);
+        getInstance()->addSub($topic, $this->uid);
     }
 
     /**
@@ -499,7 +499,7 @@ class Controller extends CoreBase
     protected function removeSub($topic)
     {
         if (empty($this->uid)) return;
-        get_instance()->removeSub($topic, $this->uid);
+        getInstance()->removeSub($topic, $this->uid);
     }
 
     /**
@@ -509,7 +509,7 @@ class Controller extends CoreBase
      */
     protected function sendPub($topic, $data, $destroy = true)
     {
-        get_instance()->pub($topic, $data);
+        getInstance()->pub($topic, $data);
         if ($destroy) {
             $this->getProxy()->destroy();
         }

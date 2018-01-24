@@ -75,7 +75,7 @@ class Loader implements ILoader
                 }
             }
         }
-        if (!get_instance()->server->taskworker) {//工作进程返回taskproxy
+        if (!getInstance()->server->taskworker) {//工作进程返回taskproxy
             $this->_task_proxy->core_name = $task_class;
             if ($parent != null) {
                 $this->_task_proxy->setContext($parent->getContext());
@@ -94,7 +94,7 @@ class Loader implements ILoader
      */
     public function view($template)
     {
-        $template = get_instance()->templateEngine->make($template);
+        $template = getInstance()->templateEngine->make($template);
         return $template;
     }
 

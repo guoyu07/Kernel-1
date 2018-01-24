@@ -57,13 +57,13 @@ class CoreBase extends Child
     public function __construct($proxy = ChildProxy::class)
     {
         parent::__construct($proxy);
-        if (!empty(get_instance())) {
-            $this->loader = get_instance()->loader;
-            $this->logger = get_instance()->log;
-            $this->server = get_instance()->server;
-            $this->config = get_instance()->config;
+        if (!empty(getInstance())) {
+            $this->loader = getInstance()->loader;
+            $this->logger = getInstance()->log;
+            $this->server = getInstance()->server;
+            $this->config = getInstance()->config;
             $this->redis_pool = RedisRoute::getInstance();
-            $this->mysql_pool = get_instance()->getAsynPool('mysqlPool');
+            $this->mysql_pool = getInstance()->getAsynPool('mysqlPool');
         }
     }
 
