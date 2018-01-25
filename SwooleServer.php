@@ -196,7 +196,7 @@ abstract class SwooleServer extends ProcessRPC
         $this->masterPid = ServerPid::getMasterPid($this->pidFilePath);
         $this->managerPid = ServerPid::getManagerPid($this->pidFilePath);
         ServerPid::init($this->pidFilePath);
-        $this->monitor = new Monitor(getServerName(), $this->pidFilePath);
+        $this->monitor = new Monitor(getServerName().":", $this->pidFilePath);
 
 
 
@@ -319,7 +319,10 @@ abstract class SwooleServer extends ProcessRPC
     public function onSwooleStart($serv)
     {
         setTimezone();
-        Start::setProcessTitle(getServerName() . '-Master');
+        $processName = Start::setProcessTitle(getServerName() . ':master');
+        //刷新进程文件
+        $pidList = SwoolePid::makePidList('master', $serv->master_pid, $processName);
+        $this->putPidList($pidList);
     }
 
     /**
@@ -344,10 +347,17 @@ abstract class SwooleServer extends ProcessRPC
             if ($this->needCoroutine) {//启动协程调度器
                 Coroutine::init();
             }
-            Start::setProcessTitle(getServerName() . "-Worker");
+            $workerProcessName = ":work-num-:{$serv->worker_id}";
+            $processName = Start::setProcessTitle(getServerName() . $workerProcessName);
+            $pidList = SwoolePid::makePidList('work', $serv->worker_pid, $processName);
         } else {
-            Start::setProcessTitle(getServerName() . "-Tasker");
+            $taskId = $serv->worker_id - $this->worker_num;
+            $taskProcessName = ":task-num-:{$taskId}";
+
+            $processName = Start::setProcessTitle(getServerName() . $taskProcessName);
+            $pidList = SwoolePid::makePidList('task', $swoole->worker_pid, $processName);
         }
+        $this->putPidList($pidList);
     }
 
     /**
@@ -530,7 +540,9 @@ abstract class SwooleServer extends ProcessRPC
      */
     public function onSwooleManagerStart($serv)
     {
-        Start::setProcessTitle(getServerName() . '-Manager');
+        $processName = Start::setProcessTitle(getServerName() . ':manager');
+        $pidList = SwoolePid::makePidList('manager', $serv->manager_pid, $processName);
+        $this->putPidList($pidList);
     }
 
     /**
@@ -791,23 +803,14 @@ abstract class SwooleServer extends ProcessRPC
         return $this->fd_uid_table->get($fd, 'uid');
     }
 
-
-
     /**
-     * 设置进程的名称
-     *
-     * @param $name
+     * 输入 Pid
+     * @param  array $pidList
+     * @return void
      */
-    public function setProcessName($name)
+    public function putPidList($pidList)
     {
-        if (isDarwin()) {
-            return;
-        }
-        if (function_exists('\cli_set_process_title')) {
-            @cli_set_process_title($title);
-        } else {
-            // Need proctitle when php<=5.5 .
-            @swoole_set_process_name($title);
-        }
+        $pidList = empty($pidList)?[]:$pidList;
+        SwoolePid::putPidList($pidList);
     }
 }

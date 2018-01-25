@@ -57,18 +57,18 @@ class Monitor
 
     public function outputStatus($pidDetail, $explode = "\n")
     {
-        echo "Welcome ".$this->monitorname." !".$explode;
-        $pidStatic = [];
-        foreach ($pidDetail as $key => $value) {
-            if (empty($pidStatic[$value[11]])) {
-                $pidStatic[$value[11]] = 1;
-            } else {
-                $pidStatic[$value[11]] ++;
-            }
-        }
-        foreach ($pidStatic as $key => $value) {
-            echo ucfirst($key)." Process Num:".$value.$explode;
-        }
+        // echo "Welcome ".$this->monitorname." !".$explode;
+        // $pidStatic = [];
+        // foreach ($pidDetail as $key => $value) {
+        //     if (empty($pidStatic[$value[11]])) {
+        //         $pidStatic[$value[11]] = 1;
+        //     } else {
+        //         $pidStatic[$value[11]] ++;
+        //     }
+        // }
+        // foreach ($pidStatic as $key => $value) {
+        //     echo ucfirst($key)." Process Num:".$value.$explode;
+        // }
 
         echo "------------------------------PROCESS STATUS----------------------------------".$explode;
         echo "Type        Pid         %CPU        %MEM        MEM         Start                   Name ".$explode;

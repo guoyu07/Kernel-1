@@ -49,15 +49,16 @@ class Start
      *
      * @return void
      */
-    public static function run()
+    public static function run($daemonize = false)
     {
         self::$leader = new \swoole_atomic(0);
         self::$startTime = date('Y-m-d H:i:s');
+        self::$daemonize = $daemonize;
         self::checkSapiEnv();
         self::init();
         self::parseCommand();
         self::initWorkers();
-        self::displayUI();
+        // self::displayUI();
         self::startSwoole();
     }
 
@@ -103,6 +104,7 @@ class Start
         else {
             @swoole_set_process_name($title);
         }
+        return $title;
     }
 
     /**
@@ -117,22 +119,26 @@ class Start
         // Check argv;
         $start_file = $argv[0];
         if (!isset($argv[1])) {
-            exit("Usage: php yourfile.php {start|stop|kill|reload|restart}\n");
+            exit("Usage: php yourfile.php {start|stop|kill|reload|restart|status}\n");
         }
-
         // Get command.
         $command = trim($argv[1]);
-        $command2 = $argv[2] ?? '';
-        $command3 = $argv[3] ?? '';
+        //主进程
+        $master_pid = SwoolePid::getMasterPid(self::$_worker->pidFilePath);
+        //管理进程
+        $manager_pid = SwoolePid::getManagerPid(self::$_worker->pidFilePath);
+
+
         $server_name = getServerName();
-        $master_pid = exec("ps -ef | grep $server_name-Master | grep -v 'grep ' | awk '{print $2}'");
-        $manager_pid = exec("ps -ef | grep $server_name-Manager | grep -v 'grep ' | awk '{print $2}'");
-        if (empty($master_pid)) {
-            $master_is_alive = false;
-        } else {
-            $master_is_alive = true;
+        if (!$master_pid) {
+            $master_pid = exec("ps -ef | grep $server_name:master | grep -v 'grep ' | awk '{print $2}'");
         }
-        // Master is still alive?
+        if (!$manager_pid) {
+            $manager_pid = exec("ps -ef | grep $server_name:manager | grep -v 'grep ' | awk '{print $2}'");
+        }
+
+        $master_is_alive = $master_pid && @posix_kill($master_pid, 0);
+
         if ($master_is_alive) {
             if ($command === 'start') {
                 secho("STA", "Swoole[$start_file] already running");
@@ -146,9 +152,7 @@ class Start
         // execute command.
         switch ($command) {
             case 'start':
-                if ($command2 === '-d') {
-                    self::$daemonize = true;
-                }
+                secho("STA", "Swoole[$start_file] stop success");
                 break;
             case 'kill':
                 exec("ps -ef|grep $server_name|grep -v grep|cut -c 9-15|xargs kill -9");
@@ -207,11 +211,13 @@ class Start
                     secho("STA", "Swoole[$start_file] stop success");
                     break;
                 }
-                self::$daemonize = true;
                 break;
-
+            case 'status':
+                self::displayUI();
+                self::$_worker->monitor->outPutNowStatus();
+                break;
             default:
-                exit("Usage: php yourfile.php {start|stop|kill|reload|restart}\n");
+                exit("Usage: php yourfile.php {start|stop|kill|reload|restart|status}\n");
         }
     }
 
@@ -321,13 +327,6 @@ class Start
                 break;
         }
         echo "-----------------------------------------------\n";
-        if (self::$daemonize) {
-            global $argv;
-            $start_file = $argv[0];
-            secho("STA", "Input \"php $start_file stop\" to quit. Start success.");
-        } else {
-            secho("STA", "Press Ctrl-C to quit. Start success.");
-        }
     }
 
     /**
