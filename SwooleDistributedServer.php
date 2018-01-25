@@ -26,7 +26,6 @@ use Kernel\CoreBase\ModelFactory;
 use Kernel\CoreBase\SwooleException;
 use Kernel\Coroutine\Coroutine;
 use Kernel\Memory\Pool;
-use Kernel\Test\TestModule;
 
 /**
  * Created by PhpStorm.
@@ -533,9 +532,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         if (!$this->isTaskWorker() && $this->initLock->trylock()) {
             //进程启动后进行开服的初始化
             Coroutine::startCoroutine([$this, 'onOpenServiceInitialization']);
-            if (Start::$testUnity) {
-                new TestModule(Start::$testUnityDir);
-            }
             $this->initLock->lock_read();
         }
         //向SDHelp進程取數據
@@ -799,7 +795,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         }
         $this->lastTime = $now_time;
         $this->lastReqTimes = $status['request_count'];
-        $status['isDebug'] = Start::getDebug();
         $status['isLeader'] = Start::isLeader();
         $status['qps'] = $qps;
         $status['system'] = PHP_OS;

@@ -39,20 +39,7 @@ class Console extends Controller
         $this->destroy();
     }
 
-    /**
-     * 设置debug
-     * @param $node_name
-     * @param $bool
-     */
-    public function back_setDebug($node_name, $bool)
-    {
-        if (getInstance()->isCluster()) {
-            ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_setDebug($node_name, $bool);
-        } else {
-            Start::setDebug($bool);
-        }
-        $this->autoSend("ok");
-    }
+
 
     /**
      * reload

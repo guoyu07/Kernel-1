@@ -234,9 +234,7 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
             } catch (\Exception $e) {
             }
             $this->middlewareManager->destory($middlewares);
-            if (Start::getDebug()) {
-                secho("DEBUG", $context);
-            }
+
             unset($context);
         });
     }

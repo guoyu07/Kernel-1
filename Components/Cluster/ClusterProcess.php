@@ -616,21 +616,6 @@ class ClusterProcess extends Process
         return $data;
     }
 
-    /**
-     * 设置debug模式
-     * @param $node_name
-     * @param $bool
-     */
-    public function my_setDebug($node_name, $bool)
-    {
-        if ($node_name == getNodeName()) {
-            Start::setDebug($bool);
-        } else {
-            if (array_key_exists($node_name, $this->client)) {
-                $this->client[$node_name]->setDebug($bool);
-            }
-        }
-    }
 
     /**
      * reload

@@ -42,6 +42,14 @@ class PortManager
 
     public function __construct($portConfig)
     {
+
+        $tmp = [];
+        foreach ($portConfig as $key => $value) {
+            $tmp[$value['weight']] = $value;
+        }
+        $portConfig = $tmp;
+        ksort($portConfig);
+        unset($tmp, $key, $value);
         foreach ($portConfig as $key => $value) {
             $this->portConfig[$value['socket_port']] = $value;
             if ($value['socket_type'] == self::SOCK_WS) {
@@ -166,18 +174,14 @@ class PortManager
             $pack = new $pack_tool;
             return $pack;
         }
-        //pack class
-        $pack_class_name = "app\\Pack\\" . $pack_tool;
+
+        $pack_class_name = "Kernel\\Pack\\" . $pack_tool;
         if (class_exists($pack_class_name)) {
             $pack = new $pack_class_name;
         } else {
-            $pack_class_name = "Kernel\\Pack\\" . $pack_tool;
-            if (class_exists($pack_class_name)) {
-                $pack = new $pack_class_name;
-            } else {
-                throw new SwooleException("class $pack_tool is not exist.");
-            }
+            throw new SwooleException("class $pack_tool is not exist.");
         }
+
         return $pack;
     }
 
@@ -192,17 +196,14 @@ class PortManager
             $route = new $route_tool;
             return $route;
         }
-        $route_class_name = "app\\Route\\" . $route_tool;
+
+        $route_class_name = "Kernel\\Route\\" . $route_tool;
         if (class_exists($route_class_name)) {
             $route = new $route_class_name;
         } else {
-            $route_class_name = "Kernel\\Route\\" . $route_tool;
-            if (class_exists($route_class_name)) {
-                $route = new $route_class_name;
-            } else {
-                throw new SwooleException("class $route_tool is not exist.");
-            }
+            throw new SwooleException("class $route_tool is not exist.");
         }
+
         return $route;
     }
 
@@ -216,16 +217,12 @@ class PortManager
         if (class_exists($middleware_name)) {
             return $middleware_name;
         }
-        $middleware_class_name = "app\\Middlewares\\" . $middleware_name;
+
+        $middleware_class_name = "Kernel\\Middlewares\\" . $middleware_name;
         if (class_exists($middleware_class_name)) {
             return $middleware_class_name;
         } else {
-            $middleware_class_name = "Kernel\\Middlewares\\" . $middleware_name;
-            if (class_exists($middleware_class_name)) {
-                return $middleware_class_name;
-            } else {
-                throw new SwooleException("class $middleware_name is not exist.");
-            }
+            throw new SwooleException("class $middleware_name is not exist.");
         }
     }
 

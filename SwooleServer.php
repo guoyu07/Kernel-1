@@ -118,6 +118,30 @@ abstract class SwooleServer extends ProcessRPC
      */
     protected $max_connection;
 
+
+
+    /**
+     * PID文件路径
+     * @var string
+     */
+    public $pidFilePath;
+    /**
+     * 主进程进程号
+     * @var integer
+     */
+    public $masterPid = 0;
+    /**
+     * 管理进程号
+     * @var integer
+     */
+    public $managerPid = 0;
+
+    /**
+     * 监控
+     * @var monitor
+     */
+    public $monitor;
+
     /**
      * 设置monolog的loghandler
      */
@@ -166,6 +190,16 @@ abstract class SwooleServer extends ProcessRPC
         register_shutdown_function(array($this, 'checkErrors'));
         set_error_handler(array($this, 'displayErrorHandler'));
         $this->portManager = new PortManager($this->config['ports']);
+
+
+        $this->pidFilePath = $this->config->get('server.set.pid_file');
+        $this->masterPid = ServerPid::getMasterPid($this->pidFilePath);
+        $this->managerPid = ServerPid::getManagerPid($this->pidFilePath);
+        ServerPid::init($this->pidFilePath);
+        $this->monitor = new Monitor(getServerName(), $this->pidFilePath);
+
+
+
         if ($this->loader == null) {
             $this->loader = new Loader();
         }
@@ -286,9 +320,6 @@ abstract class SwooleServer extends ProcessRPC
     {
         setTimezone();
         Start::setProcessTitle(getServerName() . '-Master');
-        if (Start::getDebug()) {
-            secho("SYS", "工作在DEBUG模式");
-        }
     }
 
     /**
@@ -340,13 +371,10 @@ abstract class SwooleServer extends ProcessRPC
      */
     public function onSwooleReceive($serv, $fd, $from_id, $data, $server_port = null)
     {
-        if (!Start::$testUnity) {
-            $server_port = $this->getServerPort($fd);
-            $uid = $this->getUidFromFd($fd);
-        } else {
-            $fd = 'self';
-            $uid = $fd;
-        }
+
+        $server_port = $this->getServerPort($fd);
+        $uid = $this->getUidFromFd($fd);
+
         $pack = $this->portManager->getPack($server_port);
         //反序列化，出现异常断开连接
         try {
@@ -386,9 +414,7 @@ abstract class SwooleServer extends ProcessRPC
             } catch (\Exception $e) {
             }
             $this->middlewareManager->destory($middlewares);
-            if (Start::getDebug()) {
-                secho("DEBUG", $context);
-            }
+
             unset($context);
         });
     }
@@ -763,5 +789,25 @@ abstract class SwooleServer extends ProcessRPC
     public function getUidFromFd($fd)
     {
         return $this->fd_uid_table->get($fd, 'uid');
+    }
+
+
+
+    /**
+     * 设置进程的名称
+     *
+     * @param $name
+     */
+    public function setProcessName($name)
+    {
+        if (isDarwin()) {
+            return;
+        }
+        if (function_exists('\cli_set_process_title')) {
+            @cli_set_process_title($title);
+        } else {
+            // Need proctitle when php<=5.5 .
+            @swoole_set_process_name($title);
+        }
     }
 }

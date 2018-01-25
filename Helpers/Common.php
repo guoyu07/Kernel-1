@@ -285,17 +285,9 @@ function secho($tile, $message)
     print_r($message);
     $content = ob_get_contents();
     ob_end_clean();
-    $could = false;
-    if (empty(\Kernel\Start::getDebugFilter())) {
-        $could = true;
-    } else {
-        foreach (\Kernel\Start::getDebugFilter() as $filter) {
-            if (strpos($tile, $filter) !== false || strpos($content, $filter) !== false) {
-                $could = true;
-                break;
-            }
-        }
-    }
+
+    $could = true;
+
 
     $content = explode("\n", $content);
     $send = "";

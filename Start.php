@@ -19,15 +19,6 @@ class Start
      */
     protected static $daemonize = false;
 
-    /**
-     * @var array
-     */
-    protected static $debug_filter;
-
-    /**
-     * @var
-     */
-    protected static $debug;
 
     /**
      * @var string
@@ -39,16 +30,6 @@ class Start
      */
     protected static $leader;
 
-    /**
-     * 单元测试
-     * @var bool
-     */
-    public static $testUnity = false;
-    /**
-     * 单元测试文件目录
-     * @var string
-     */
-    public static $testUnityDir = '';
 
     /**
      * worker instance.
@@ -70,7 +51,6 @@ class Start
      */
     public static function run()
     {
-        self::$debug = new \swoole_atomic(0);
         self::$leader = new \swoole_atomic(0);
         self::$startTime = date('Y-m-d H:i:s');
         self::checkSapiEnv();
@@ -137,7 +117,7 @@ class Start
         // Check argv;
         $start_file = $argv[0];
         if (!isset($argv[1])) {
-            exit("Usage: php yourfile.php {start|stop|kill|reload|restart|test}\n");
+            exit("Usage: php yourfile.php {start|stop|kill|reload|restart}\n");
         }
 
         // Get command.
@@ -154,11 +134,11 @@ class Start
         }
         // Master is still alive?
         if ($master_is_alive) {
-            if ($command === 'start' || $command === 'test') {
+            if ($command === 'start') {
                 secho("STA", "Swoole[$start_file] already running");
                 exit;
             }
-        } elseif ($command !== 'start' && $command !== 'test') {
+        } elseif ($command !== 'start') {
             secho("STA", "Swoole[$start_file] not run");
             exit;
         }
@@ -168,15 +148,6 @@ class Start
             case 'start':
                 if ($command2 === '-d') {
                     self::$daemonize = true;
-                } elseif ($command2 === '-debug' || $command2 === '-de') {
-                    self::setDebug(true);
-                    if (!empty($command3)) {
-                        if ($command3 === "--f") {
-                            self::$debug_filter = array_slice($argv, 4);
-                        } else {
-                            exit("Usage: php yourfile.php start -de {--f}\n");
-                        }
-                    }
                 }
                 break;
             case 'kill':
@@ -238,12 +209,9 @@ class Start
                 }
                 self::$daemonize = true;
                 break;
-            case 'test':
-                self::$testUnity = true;
-                self::$testUnityDir = $command2;
-                break;
+
             default:
-                exit("Usage: php yourfile.php {start|stop|kill|reload|restart|test}\n");
+                exit("Usage: php yourfile.php {start|stop|kill|reload|restart}\n");
         }
     }
 
@@ -382,20 +350,6 @@ class Start
         return self::$daemonize ? 1 : 0;
     }
 
-    public static function getDebug()
-    {
-        return self::$debug->get() == 1 ? true : false;
-    }
-
-    public static function setDebug($debug)
-    {
-        self::$debug->set($debug ? 1 : 0);
-        if ($debug) {
-            secho("SYS", "DEBUG开启");
-        } else {
-            secho("SYS", "DEBUG关闭");
-        }
-    }
 
     public static function isLeader()
     {
@@ -412,11 +366,6 @@ class Start
                 secho("CONSUL", "Leader变更，本机不是Leader");
             }
         }
-    }
-
-    public static function getDebugFilter()
-    {
-        return self::$debug_filter ?? [];
     }
 
     public static function getStartTime()

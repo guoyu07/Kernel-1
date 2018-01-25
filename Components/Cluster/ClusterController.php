@@ -82,11 +82,6 @@ class ClusterController extends Child
         EventDispatcher::getInstance()->dispatch($type, $data, false, true);
     }
 
-    public function setDebug($bool)
-    {
-        Start::setDebug($bool);
-    }
-
     public function reload()
     {
         getInstance()->server->reload();

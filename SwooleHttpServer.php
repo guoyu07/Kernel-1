@@ -105,11 +105,9 @@ abstract class SwooleHttpServer extends SwooleServer
      */
     public function onSwooleRequest($request, $response)
     {
-        if (Start::$testUnity) {
-            $server_port = $request->server_port;
-        } else {
-            $server_port = $this->getServerPort($request->fd);
-        }
+
+        $server_port = $this->getServerPort($request->fd);
+
 
         Coroutine::startCoroutine(function () use ($request, $response, $server_port) {
             $middleware_names = $this->portManager->getMiddlewares($server_port);
@@ -149,9 +147,7 @@ abstract class SwooleHttpServer extends SwooleServer
             } catch (\Exception $e) {
             }
             $this->middlewareManager->destory($middlewares);
-            if (Start::getDebug()) {
-                secho("DEBUG", $context);
-            }
+
             unset($context);
         });
     }
