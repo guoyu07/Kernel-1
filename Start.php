@@ -337,6 +337,8 @@ class Start
     protected static function startSwoole()
     {
         self::$_worker->start();
+        self::displayUI();
+        self::$_worker->monitor->outPutNowStatus();
     }
 
     public static function initServer($swooleServer)

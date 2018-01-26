@@ -7,7 +7,6 @@ use Kernel\Asyn\Mysql\Miner;
 use Kernel\Asyn\Mysql\MysqlAsynPool;
 use Kernel\Asyn\Redis\RedisAsynPool;
 use Kernel\Asyn\Redis\RedisLuaManager;
-use Kernel\Components\Backstage\BackstageProcess;
 use Kernel\Components\CatCache\CatCacheProcess;
 use Kernel\Components\CatCache\TimerCallBack;
 use Kernel\Components\Cluster\ClusterHelp;
@@ -190,9 +189,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         //consul进程
         if ($this->config->get('consul.enable', false)) {
             ProcessManager::getInstance()->addProcess(ConsulProcess::class, false);
-        }
-        if ($this->config->get('backstage.enable', false)) {
-            ProcessManager::getInstance()->addProcess(BackstageProcess::class, false);
         }
         //Cluster进程
         ProcessManager::getInstance()->addProcess(ClusterProcess::class);

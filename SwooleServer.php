@@ -9,7 +9,6 @@ use MongoDB\Client;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Noodlehaus\Config;
-use Kernel\Components\Backstage\BackstageHelp;
 use Kernel\Components\Event\EventDispatcher;
 use Kernel\Components\GrayLog\UdpTransport;
 use Kernel\Components\Middleware\MiddlewareManager;
@@ -211,7 +210,6 @@ abstract class SwooleServer extends ProcessRPC
     protected function setConfig()
     {
         $this->config = new Config(getConfigDir());
-        BackstageHelp::init();
     }
 
     /**
