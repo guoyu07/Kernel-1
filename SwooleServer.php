@@ -10,7 +10,6 @@ use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Noodlehaus\Config;
 use Kernel\Components\Event\EventDispatcher;
-use Kernel\Components\GrayLog\UdpTransport;
 use Kernel\Components\Middleware\MiddlewareManager;
 use Kernel\Components\Process\ProcessRPC;
 use Kernel\CoreBase\ControllerFactory;
@@ -811,5 +810,46 @@ abstract class SwooleServer extends ProcessRPC
     {
         $pidList = empty($pidList)?[]:$pidList;
         SwoolePid::putPidList($pidList);
+    }
+
+
+
+    public function settle()
+    {
+        setTimezone();
+        $ps_name =  getServerName();
+        exec("ps -ef | grep $ps_name | grep -v 'grep' | awk '{print $2,$8}'", $pidList);
+        $data = [];
+        foreach ($pidList as $key => $item) {
+            $tmp = explode(" ", $item);
+            if (strpos($tmp[1], 'work') !== false) {
+                $data['work'][$tmp[1]] = [
+                    'pid' => $tmp[0],
+                    'datetime' => date('Y-m-d H:i:s'),
+                ];
+            } elseif (strpos($tmp[1], 'master') !== false) {
+                $data['master'][$tmp[1]] = [
+                    'pid' => $tmp[0],
+                    'datetime' => date('Y-m-d H:i:s'),
+                ];
+            } elseif (strpos($tmp[1], 'task') !== false) {
+                $data['task'][$tmp[1]] = [
+                    'pid' => $tmp[0],
+                    'datetime' => date('Y-m-d H:i:s'),
+                ];
+            } elseif (strpos($tmp[1], 'manager') !== false) {
+                $data['manager'][$tmp[1]] = [
+                    'pid' => $tmp[0],
+                    'datetime' => date('Y-m-d H:i:s'),
+                ];
+            } else {
+            }
+        }
+        $this->reSavePid($data);
+    }
+
+    public function reSavePid($data)
+    {
+        SwoolePid::reSavePid($data);
     }
 }

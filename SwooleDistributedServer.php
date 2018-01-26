@@ -14,7 +14,6 @@ use Kernel\Components\Cluster\ClusterProcess;
 use Kernel\Components\Consul\ConsulHelp;
 use Kernel\Components\Consul\ConsulProcess;
 use Kernel\Components\Event\EventDispatcher;
-use Kernel\Components\GrayLog\GrayLogHelp;
 use Kernel\Components\Process\ProcessManager;
 use Kernel\Components\SDHelp\SDHelpProcess;
 use Kernel\Components\TimerTask\Timer;
@@ -169,8 +168,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         $this->task_lock = new \swoole_lock(SWOOLE_MUTEX);
         //开启用户进程
         $this->startProcess();
-        //开启一个UDP用于发graylog
-        GrayLogHelp::init();
         //开启Cluster端口
         ClusterHelp::getInstance()->buildPort();
         //Timer
