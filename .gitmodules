@@ -61,3 +61,6 @@
 [submodule "Library/voku/anti-xss"]
 	path = Library/voku/anti-xss
 	url = https://github.com/voku/anti-xss.git
+[submodule "Library/voku/portable-utf8"]
+	path = Library/voku/portable-utf8
+	url = https://github.com/voku/portable-utf8.git
