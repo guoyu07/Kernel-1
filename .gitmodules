@@ -64,3 +64,6 @@
 [submodule "Library/voku/portable-utf8"]
 	path = Library/voku/portable-utf8
 	url = https://github.com/voku/portable-utf8.git
+[submodule "Library/ircmaxell/password_compat"]
+	path = Library/ircmaxell/password_compat
+	url = https://github.com/ircmaxell/password_compat.git
