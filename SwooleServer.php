@@ -751,6 +751,7 @@ abstract class SwooleServer extends ProcessRPC
     {
         secho("ERROR", $msg);
         secho("ERROR", $log);
+        $this->log->error($log);
     }
 
     /**
