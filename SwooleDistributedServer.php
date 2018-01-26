@@ -18,7 +18,6 @@ use Kernel\Components\Process\ProcessManager;
 use Kernel\Components\SDHelp\SDHelpProcess;
 use Kernel\Components\TimerTask\Timer;
 use Kernel\Components\TimerTask\TimerTask;
-use Kernel\CoreBase\Actor;
 use Kernel\CoreBase\ControllerFactory;
 use Kernel\CoreBase\ModelFactory;
 use Kernel\CoreBase\SwooleException;
@@ -535,7 +534,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
                 TimerCallBack::init();
                 Coroutine::startCoroutine(function () use ($workerId) {
                     yield EventDispatcher::getInstance()->addOnceCoroutine(CatCacheProcess::READY);
-                    yield Actor::recovery($workerId);
                 });
             }
         }
@@ -847,28 +845,6 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
             $status['coroutine_num'] += $result['coroutine_num'];
         }
         return $status;
-    }
-
-    public function getOneActor()
-    {
-        return Actor::getActors();
-    }
-
-    /**
-     * 获取所有的Actors
-     * @return array|void
-     */
-    public function getAllActors()
-    {
-        $data = [];
-        for ($i = 0; $i < $this->worker_num; $i++) {
-            $result = yield ProcessManager::getInstance()->getRpcCallWorker($i)->getOneActor();
-            if (empty($result)) {
-                continue;
-            }
-            $data = array_merge($data, $result);
-        }
-        return $data;
     }
 
     /**
