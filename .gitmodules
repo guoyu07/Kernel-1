@@ -58,3 +58,6 @@
 [submodule "Library/php-ds/polyfill"]
 	path = Library/php-ds/polyfill
 	url = https://github.com/php-ds/polyfill.git
+[submodule "Library/voku/anti-xss"]
+	path = Library/voku/anti-xss
+	url = https://github.com/voku/anti-xss.git
