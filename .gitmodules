@@ -67,3 +67,15 @@
 [submodule "Library/ircmaxell/password_compat"]
 	path = Library/ircmaxell/password_compat
 	url = https://github.com/ircmaxell/password_compat.git
+[submodule "Library/thephpleague/plates"]
+	path = Library/thephpleague/plates
+	url = https://github.com/thephpleague/plates.git
+[submodule "Library/paragonie/random_compat"]
+	path = Library/paragonie/random_compat
+	url = https://github.com/paragonie/random_compat.git
+[submodule "Library/symfony/intl"]
+	path = Library/symfony/intl
+	url = https://github.com/symfony/intl.git
+[submodule "Library/symfony/polyfill"]
+	path = Library/symfony/polyfill
+	url = https://github.com/symfony/polyfill.git

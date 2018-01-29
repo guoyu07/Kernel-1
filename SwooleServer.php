@@ -17,6 +17,7 @@ use Kernel\CoreBase\ILoader;
 use Kernel\CoreBase\Loader;
 use Kernel\CoreBase\PortManager;
 use Kernel\Coroutine\Coroutine;
+use Kernel\Container\Container;
 
 /**
  * Created by PhpStorm.
@@ -140,6 +141,13 @@ abstract class SwooleServer extends ProcessRPC
      */
     public $monitor;
 
+
+    /**
+     * 容器
+     * @var  obj
+     */
+    public $container;
+
     /**
      * 设置monolog的loghandler
      */
@@ -195,6 +203,8 @@ abstract class SwooleServer extends ProcessRPC
         $this->managerPid = ServerPid::getManagerPid($this->pidFilePath);
         ServerPid::init($this->pidFilePath);
         $this->monitor = new Monitor(getServerName().":", $this->pidFilePath);
+
+        $this->container = new Container;
 
 
 

@@ -105,10 +105,9 @@ abstract class SwooleHttpServer extends SwooleServer
      */
     public function onSwooleRequest($request, $response)
     {
-
+        //规整 URL 数据
+        $request = $this->beforeSwooleHttpRequest($request);
         $server_port = $this->getServerPort($request->fd);
-
-
         Coroutine::startCoroutine(function () use ($request, $response, $server_port) {
             $middleware_names = $this->portManager->getMiddlewares($server_port);
             $context = [];
@@ -150,5 +149,31 @@ abstract class SwooleHttpServer extends SwooleServer
 
             unset($context);
         });
+    }
+
+
+
+    /**
+     * 规整数据
+     * @param  SwooleHttpRequest $swooleHttpRequest
+     * @return
+     */
+    private function beforeSwooleHttpRequest($swooleHttpRequest)
+    {
+        $request_uri = $swooleHttpRequest->server['request_uri'];
+        $path_info = $swooleHttpRequest->server['path_info'];
+        $request_uri = preg_replace('/\/{2,}/', '/', $request_uri);
+        $path_info = preg_replace('/\/{2,}/', '/', $path_info);
+        $request_uri = preg_replace('#/$#', '', $request_uri);
+        $path_info = preg_replace('#/$#', '', $path_info);
+        if (empty($request_uri)) {
+            $request_uri = '/';
+        }
+        if (empty($path_info)) {
+            $path_info = '/';
+        }
+        $swooleHttpRequest->server['request_uri'] = $request_uri;
+        $swooleHttpRequest->server['path_info'] = $path_info;
+        return $swooleHttpRequest;
     }
 }
