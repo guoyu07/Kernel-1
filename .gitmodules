@@ -49,21 +49,12 @@
 [submodule "Library/elastic/elasticsearch-php"]
 	path = Library/elastic/elasticsearch-php
 	url = https://github.com/elastic/elasticsearch-php.git
-[submodule "Library/pda/flexihash"]
-	path = Library/pda/flexihash
-	url = https://github.com/pda/flexihash.git
 [submodule "Library/php-amqplib/php-amqplib"]
 	path = Library/php-amqplib/php-amqplib
 	url = https://github.com/php-amqplib/php-amqplib.git
 [submodule "Library/php-ds/polyfill"]
 	path = Library/php-ds/polyfill
 	url = https://github.com/php-ds/polyfill.git
-[submodule "Library/voku/anti-xss"]
-	path = Library/voku/anti-xss
-	url = https://github.com/voku/anti-xss.git
-[submodule "Library/voku/portable-utf8"]
-	path = Library/voku/portable-utf8
-	url = https://github.com/voku/portable-utf8.git
 [submodule "Library/ircmaxell/password_compat"]
 	path = Library/ircmaxell/password_compat
 	url = https://github.com/ircmaxell/password_compat.git
