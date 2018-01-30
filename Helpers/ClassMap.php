@@ -24,10 +24,8 @@ return [
         'Symfony\Component\Intl'=>dirname(__DIR__).DS.'Library'.DS.'symfony'.DS.'intl',
         'Symfony\Polyfill'=>dirname(__DIR__).DS.'Library'.DS.'symfony'.DS.'polyfill'.DS.'src',
         'PhpAmqpLib'=>dirname(__DIR__).DS.'Library'.DS.'php-amqplib'.DS.'php-amqplib'.DS.'PhpAmqpLib',
-        'Ds'=>dirname(__DIR__).DS.'Library'.DS.'php-ds'.DS.'polyfill'.DS.'src','.DS.'/need ext-ds
+        'Ds'=>dirname(__DIR__).DS.'Library'.DS.'php-ds'.DS.'polyfill'.DS.'src',//'.DS.'//need ext-ds
         'League\Plates'=>dirname(__DIR__).DS.'Library'.DS.'thephpleague'.DS.'plates'.DS.'src',
-        'voku\helper' => dirname(__DIR__).DS.'Library'.DS.'voku'.DS.'anti-xss'.DS.'src'.DS.'voku'.DS.'helper',
-        'voku' => dirname(__DIR__).DS.'Library'.DS.'voku'.DS.'portable-utf8'.DS.'src'.DS.'voku',
         'Kernel'=>dirname(__DIR__),
     ],
     'files' => [
@@ -56,7 +54,6 @@ return [
         dirname(__DIR__).DS.'Library'.DS.'symfony'.DS.'polyfill'.DS.'src'.'Php70'.DS.'Resources'.DS.'stubs'.DS.'Error.php',
         dirname(__DIR__).DS.'Library'.DS.'symfony'.DS.'polyfill'.DS.'src'.'Php70'.DS.'Resources'.DS.'stubs'.DS.'ParseError.php',
         dirname(__DIR__).DS.'Library'.DS.'symfony'.DS.'polyfill'.DS.'src'.'Php70'.DS.'Resources'.DS.'stubs'.DS.'TypeError.php',
-        dirname(__DIR__).DS.'Library'.DS.'voku'.DS.'portable-utf8'.DS.'bootstrap.php',
 
     ],
     ];
