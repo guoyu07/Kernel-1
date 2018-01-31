@@ -38,11 +38,11 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function postGet($index, $xss_clean = true)
+    public function postGet($index, $default = null)
     {
         return isset($this->request->post[$index])
-            ? $this->post($index, $xss_clean)
-            : $this->get($index, $xss_clean);
+            ? $this->post($index, $default)
+            : $this->get($index, $default);
     }
 
     /**
@@ -51,13 +51,9 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function post($index, $xss_clean = true)
+    public function post($index, $default = null)
     {
-        if ($xss_clean) {
-            return XssClean::getXssClean()->xss_clean($this->request->post[$index]??'');
-        } else {
-            return $this->request->post[$index]??'';
-        }
+        return $this->request->post[$index]??$default;
     }
 
     /**
@@ -66,13 +62,9 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function get($index, $xss_clean = true)
+    public function get($index, $default = null)
     {
-        if ($xss_clean) {
-            return XssClean::getXssClean()->xss_clean($this->request->get[$index]??'');
-        } else {
-            return $this->request->get[$index]??'';
-        }
+        return $this->request->get[$index]??$default;
     }
 
     /**
@@ -81,11 +73,11 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function getPost($index, $xss_clean = true)
+    public function getPost($index, $default = null)
     {
         return isset($this->request->get[$index])
-            ? $this->get($index, $xss_clean)
-            : $this->post($index, $xss_clean);
+            ? $this->get($index, $default)
+            : $this->post($index, $default);
     }
 
     /**
@@ -116,13 +108,9 @@ class HttpInput
      * @param bool $xss_clean
      * @return array|bool|string
      */
-    public function header($index, $xss_clean = true)
+    public function header($index, $default = null)
     {
-        if ($xss_clean) {
-            return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
-        } else {
-            return $this->request->header[$index]??'';
-        }
+        return $this->request->header[$index]??$default;
     }
 
     /**
@@ -149,13 +137,9 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function cookie($index, $xss_clean = true)
+    public function cookie($index, $default = null)
     {
-        if ($xss_clean) {
-            return XssClean::getXssClean()->xss_clean($this->request->cookie[$index]??'');
-        } else {
-            return $this->request->cookie[$index]??'';
-        }
+        return $this->request->cookie[$index]??$default;
     }
 
     /**
@@ -164,13 +148,9 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function getRequestHeader($index, $xss_clean = true)
+    public function getRequestHeader($index, $default = null)
     {
-        if ($xss_clean) {
-            return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
-        } else {
-            return $this->request->header[$index]??'';
-        }
+        return $this->request->header[$index]??$default;
     }
 
     /**
@@ -179,13 +159,9 @@ class HttpInput
      * @param bool $xss_clean
      * @return array|bool|string
      */
-    public function server($index, $xss_clean = true)
+    public function server($index, $default = null)
     {
-        if ($xss_clean) {
-            return XssClean::getXssClean()->xss_clean($this->request->server[$index]??'');
-        } else {
-            return $this->request->server[$index]??'';
-        }
+        return $this->request->server[$index]??$default;
     }
 
     /**
@@ -213,7 +189,7 @@ class HttpInput
      */
     public function getPathInfo()
     {
-        return $this->request->server['path_info'];
+        return $this->request->server['request_uri'];
     }
 
     /**

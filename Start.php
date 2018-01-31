@@ -9,6 +9,7 @@
 namespace Kernel;
 
 use Kernel\CoreBase\PortManager;
+use FastRoute;
 
 class Start
 {
@@ -95,7 +96,7 @@ class Start
     public static function setProcessTitle($title)
     {
         if (isDarwin()) {
-            return;
+            return $title;
         }
         // >=php 5.5
         if (function_exists('cli_set_process_title')) {
@@ -124,9 +125,9 @@ class Start
         // Get command.
         $command = trim($argv[1]);
         //主进程
-        $master_pid = SwoolePid::getMasterPid(self::$_worker->pidFilePath);
+        $master_pid = ServerPid::getMasterPid(self::$_worker->pidFilePath);
         //管理进程
-        $manager_pid = SwoolePid::getManagerPid(self::$_worker->pidFilePath);
+        $manager_pid = ServerPid::getManagerPid(self::$_worker->pidFilePath);
 
 
         $server_name = getServerName();
@@ -152,7 +153,7 @@ class Start
         // execute command.
         switch ($command) {
             case 'start':
-                secho("STA", "Swoole[$start_file] stop success");
+                secho("STA", "Swoole[$start_file] start success");
                 break;
             case 'kill':
                 exec("ps -ef|grep $server_name|grep -v grep|cut -c 9-15|xargs kill -9");

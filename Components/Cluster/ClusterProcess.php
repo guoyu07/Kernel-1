@@ -37,7 +37,7 @@ class ClusterProcess extends Process
                     $this->map[$this->node_name]->add($uid);
                 }
             }
-            $this->consul = new HttpClient(null, 'http://127.0.0.1:8500');
+            $this->consul = new HttpClient(null, 'http://0.0.0.0:8500');
             $this->port = $this->config['cluster']['port'];
             swoole_timer_after(1000, function () {
                 $this->updateFromConsul();
@@ -350,19 +350,22 @@ class ClusterProcess extends Process
                 }
                 $body = json_decode($data['body'], true);
                 //寻找增加的
-                foreach ($body as $value) {
-                    $node_name = $value['Node'];
-                    $ips = $value['TaggedAddresses'];
-                    if (!isset($ips['lan'])) {
-                        continue;
-                    }
-                    if ($ips['lan'] == getBindIp()) {
-                        continue;
-                    }
-                    if (!isset($this->client[$node_name])) {
-                        $this->addNode($node_name, $ips['lan']);
+                if (is_array($body) && $body) {
+                    foreach ($body as $value) {
+                        $node_name = $value['Node'];
+                        $ips = $value['TaggedAddresses'];
+                        if (!isset($ips['lan'])) {
+                            continue;
+                        }
+                        if ($ips['lan'] == getBindIp()) {
+                            continue;
+                        }
+                        if (!isset($this->client[$node_name])) {
+                            $this->addNode($node_name, $ips['lan']);
+                        }
                     }
                 }
+
                 //寻找减少的
                 foreach ($this->client as $node_name => $client) {
                     $find = false;
@@ -377,7 +380,7 @@ class ClusterProcess extends Process
                         $this->removeNode($node_name);
                     }
                 }
-                $index = $data['headers']['x-consul-index'];
+                $index = $data['headers']['x-consul-index']??0;
                 $this->updateFromConsul($index);
             });
     }

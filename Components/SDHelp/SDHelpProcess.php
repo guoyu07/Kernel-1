@@ -28,7 +28,7 @@ class SDHelpProcess extends Process
         if (getInstance()->config->get('auto_reload_enable', false)) {//代表启动单独进程进行reload管理,代码更新时候自动重启
             new InotifyReload();
         }
-        if (getInstance()->config->get('restart_enable', false)) {//定时重启服务
+        if (getInstance()->config->get('auto_restart_enable', false)) {//定时重启服务
             new Restart();
         }
     }

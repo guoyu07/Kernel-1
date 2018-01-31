@@ -37,7 +37,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      * 实例
      * @var SwooleServer
      */
-    private static $instance;
+    protected static $instance;
     /**
      * @var RedisAsynPool
      */
@@ -124,14 +124,14 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
 
     public function start()
     {
-        if ($this->config->get('redis.enable', true)) {
-            //加载redis的lua脚本
-            $redis_pool = new RedisAsynPool($this->config, $this->config->get('redis.active'));
-            $redisLuaManager = new RedisLuaManager($redis_pool->getSync());
-            $redisLuaManager->registerFile(LUA_DIR);
-            $redis_pool->getSync()->close();
-            $redis_pool = null;
-        }
+        // if ($this->config->get('redis.enable', true)) {
+        //     //加载redis的lua脚本
+        //     $redis_pool = new RedisAsynPool($this->config, $this->config->get('redis.active'));
+        //     // $redisLuaManager = new RedisLuaManager($redis_pool->getSync());
+        //     // $redisLuaManager->registerFile(LUA_DIR);
+        //     $redis_pool->getSync()->close();
+        //     $redis_pool = null;
+        // }
         //非集群默认是leader
         if (!$this->isCluster()) {
             Start::setLeader(true);

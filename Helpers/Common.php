@@ -129,10 +129,10 @@ function checkExtension()
         $check = false;
     }
 
-    if (SWOOLE_VERSION[0] == 2) {
-        secho("STA", "[版本错误]不支持2.0版本swoole，请安装1.9版本");
-        $check = false;
-    }
+    // if (SWOOLE_VERSION[0] == 2) {
+    //     secho("STA", "[版本错误]不支持2.0版本swoole，请安装1.9版本");
+    //     $check = false;
+    // }
     if (!class_exists('swoole_redis')) {
         secho("STA", "[编译错误]swoole编译缺少--enable-async-redis");
         $check = false;
@@ -217,10 +217,10 @@ function getBindIp()
  */
 function getNodeName()
 {
-    global $node_name;
-    if (!empty($node_name)) {
-        return $node_name;
-    }
+    // global $node_name;
+    // if (!empty($node_name)) {
+    //     return $node_name;
+    // }
     $env_SD_NODE_NAME = getenv("SD_NODE_NAME");
     if (!empty($env_SD_NODE_NAME)) {
         $node_name = $env_SD_NODE_NAME;

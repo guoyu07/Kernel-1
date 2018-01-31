@@ -26,7 +26,7 @@ class ConsulLeader
     {
         $this->config = getInstance()->config;
         $this->leader_name = $this->config['consul']['leader_service_name'];
-        $this->consul_leader = new HttpClient(null, 'http://127.0.0.1:8500');
+        $this->consul_leader = new HttpClient(null, 'http://0.0.0.0:8500');
         swoole_timer_after(1000, function () {
             $this->leader();
             $this->serviceHealthCheck();
@@ -41,7 +41,7 @@ class ConsulLeader
     {
         $watches = $this->config->get('consul.watches', []);
         foreach ($watches as $watch) {
-            $this->consul_service_client[$watch] = new HttpClient(null, 'http://127.0.0.1:8500');
+            $this->consul_service_client[$watch] = new HttpClient(null, 'http://0.0.0.0:8500');
             $this->help_serviceHealthCheck($watch, 0);
         }
     }
@@ -64,7 +64,7 @@ class ConsulLeader
             //分发到进程中去
             EventDispatcher::getInstance()->dispatch(ConsulHelp::DISPATCH_KEY, $result);
             //继续监听
-            $index = $data['headers']['x-consul-index'];
+            $index = $data['headers']['x-consul-index']??0;
             $this->help_serviceHealthCheck($watch, $index);
         });
     }
@@ -124,7 +124,7 @@ class ConsulLeader
                     return;
                 }
                 $body = json_decode($data['body'], true)[0];
-                $index = $data['headers']['x-consul-index'];
+                $index = $data['headers']['x-consul-index'] ?? 0;
                 if (!isset($body['Session'])) {//代表没有Leader
                     $this->leader($index);
                 } else {

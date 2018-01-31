@@ -158,7 +158,7 @@ abstract class SwooleServer extends ProcessRPC
         switch ($this->config->get('log.active', 'file')) {
             case 'file':
                 $logHandle->pushHandler(new RotatingFileHandler(
-                    STORAGE_LOG_PATH . DS . $this->name . '.log',
+                    STORAGE_LOG_PATH . DS . $this->name .getNodeName(). '.log',
                     $this->config->get('log.file.log_max_files', 15),
                     $this->config->get('log.log_level', \Monolog\Logger::DEBUG)
                 ));
@@ -198,7 +198,7 @@ abstract class SwooleServer extends ProcessRPC
         $this->portManager = new PortManager($this->config['ports']);
 
 
-        $this->pidFilePath = $this->config->get('server.set.pid_file');
+        $this->pidFilePath = $this->config->get('server.set.pid_file').getNodeName().'.pid';
         $this->masterPid = ServerPid::getMasterPid($this->pidFilePath);
         $this->managerPid = ServerPid::getManagerPid($this->pidFilePath);
         ServerPid::init($this->pidFilePath);
@@ -243,7 +243,11 @@ abstract class SwooleServer extends ProcessRPC
         $this->worker_num = $set['worker_num'];
         $this->task_num = $set['task_worker_num'];
         $set['daemonize'] = Start::getDaemonize();
+        $set['pid_file'] = $set['pid_file'].getNodeName().'.pid';
+        $set['log_file'] = $set['log_file'].getNodeName().'.log';
+
         $this->server->set($set);
+
         swoole_async_set([
             'aio_mode' => SWOOLE_AIO_BASE,
             'thread_num' => 100,
@@ -328,7 +332,7 @@ abstract class SwooleServer extends ProcessRPC
         setTimezone();
         $processName = Start::setProcessTitle(getServerName() . ':master');
         //刷新进程文件
-        $pidList = SwoolePid::makePidList('master', $serv->master_pid, $processName);
+        $pidList = ServerPid::makePidList('master', $serv->master_pid, $processName);
         $this->putPidList($pidList);
     }
 
@@ -350,19 +354,20 @@ abstract class SwooleServer extends ProcessRPC
         }
         // 重新加载配置
         $this->config = $this->config->load(getConfigDir());
+        // $this->container = new Container;
         if (!$serv->taskworker) {//worker进程
             if ($this->needCoroutine) {//启动协程调度器
                 Coroutine::init();
             }
             $workerProcessName = ":work-num-:{$serv->worker_id}";
             $processName = Start::setProcessTitle(getServerName() . $workerProcessName);
-            $pidList = SwoolePid::makePidList('work', $serv->worker_pid, $processName);
+            $pidList = ServerPid::makePidList('work', $serv->worker_pid, $processName);
         } else {
             $taskId = $serv->worker_id - $this->worker_num;
             $taskProcessName = ":task-num-:{$taskId}";
 
             $processName = Start::setProcessTitle(getServerName() . $taskProcessName);
-            $pidList = SwoolePid::makePidList('task', $swoole->worker_pid, $processName);
+            $pidList = ServerPid::makePidList('task', $serv->worker_pid, $processName);
         }
         $this->putPidList($pidList);
     }
@@ -548,7 +553,7 @@ abstract class SwooleServer extends ProcessRPC
     public function onSwooleManagerStart($serv)
     {
         $processName = Start::setProcessTitle(getServerName() . ':manager');
-        $pidList = SwoolePid::makePidList('manager', $serv->manager_pid, $processName);
+        $pidList = ServerPid::makePidList('manager', $serv->manager_pid, $processName);
         $this->putPidList($pidList);
     }
 
@@ -819,7 +824,7 @@ abstract class SwooleServer extends ProcessRPC
     public function putPidList($pidList)
     {
         $pidList = empty($pidList)?[]:$pidList;
-        SwoolePid::putPidList($pidList);
+        ServerPid::putPidList($pidList);
     }
 
 
@@ -860,6 +865,6 @@ abstract class SwooleServer extends ProcessRPC
 
     public function reSavePid($data)
     {
-        SwoolePid::reSavePid($data);
+        ServerPid::reSavePid($data);
     }
 }
