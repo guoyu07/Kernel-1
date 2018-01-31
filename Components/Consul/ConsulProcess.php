@@ -28,7 +28,6 @@ class ConsulProcess extends Process
         }
 
         $this->exec(BIN_DIR . "/exec/consul", ['agent', '-ui', '-config-dir', BIN_DIR . '/exec/consul.d/'.getNodeName()]);
-        secho("[CONSUL]", "consul没有安装,请下载最新的consul安装至bin/exec目录,或者在config/consul.php中取消使能");
     }
 
     /**
@@ -85,7 +84,9 @@ class ConsulProcess extends Process
                 }
             }
         }
-        file_put_contents(BIN_DIR . "/exec/consul.d/".getNodeName()."/consul_config.json", json_encode($newConfig));
+        $dir = BIN_DIR . "/exec/consul.d/".getNodeName();
+        @mkdir($dir, 0777);
+        file_put_contents($dir."/consul_config.json", json_encode($newConfig));
     }
 
     protected function onShutDown()
