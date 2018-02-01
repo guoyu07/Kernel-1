@@ -154,6 +154,7 @@ class Start
         switch ($command) {
             case 'start':
                 secho("STA", "Swoole[$start_file] start success");
+
                 break;
             case 'kill':
                 exec("ps -ef|grep $server_name|grep -v grep|cut -c 9-15|xargs kill -9");
@@ -216,6 +217,7 @@ class Start
             case 'status':
                 self::displayUI();
                 self::$_worker->monitor->outPutNowStatus();
+                exit;
                 break;
             default:
                 exit("Usage: php yourfile.php {start|stop|kill|reload|restart|status}\n");
@@ -274,6 +276,9 @@ class Start
         echo "\033[47;30mS_TYPE\033[0m", str_pad(
             '',
             self::$_maxShowLength - strlen('S_TYPE')
+        ), "\033[47;30mS_STAT\033[0m", str_pad(
+            '',
+            self::$_maxShowLength - strlen('S_NAME')
         ), "\033[47;30mS_NAME\033[0m", str_pad(
             '',
             self::$_maxShowLength - strlen('S_NAME')
@@ -292,8 +297,18 @@ class Start
                     foreach ($value['middlewares'] ?? [] as $m) {
                         $middleware .= '[' . $m . ']';
                     }
+
+                    $active = exec("netstat -nlp|grep ':".$value['socket_port']."'| grep -v 'grep' | awk '{print $4}'");
+                    if ($active) {
+                        $active = 'active';
+                    } else {
+                        $active = 'inactive';
+                    }
                     echo str_pad(
                         PortManager::getTypeName($value['socket_type']),
+                        self::$_maxShowLength
+                    ), str_pad(
+                        $active,
                         self::$_maxShowLength
                     ), str_pad(
                         $value['socket_name'],
@@ -310,8 +325,18 @@ class Start
                     );
                     echo "\n";
                 }
+
+                $active = exec("netstat -nlp|grep ':".self::$_worker->config->get('cluster.port', '--')."'| grep -v 'grep' | awk '{print $4}'");
+                if ($active) {
+                    $active = 'active';
+                } else {
+                    $active = 'inactive';
+                }
                 echo str_pad(
                     'CLUSTER',
+                    self::$_maxShowLength
+                ), str_pad(
+                    $active,
                     self::$_maxShowLength
                 ), str_pad(
                     '0.0.0.0',

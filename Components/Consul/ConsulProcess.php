@@ -84,9 +84,9 @@ class ConsulProcess extends Process
                 }
             }
         }
-        $dir = BIN_DIR . "/exec/consul.d/".getNodeName();
-        @mkdir($dir, 0777, true);
-        file_put_contents($dir."/consul_config.json", json_encode($newConfig));
+        // $dir =;
+        @mkdir(BIN_DIR . "/exec/consul.d/".getNodeName(), 0777, true);
+        file_put_contents(BIN_DIR . "/exec/consul.d/".getNodeName()."/consul_config.json", json_encode($newConfig));
     }
 
     protected function onShutDown()
