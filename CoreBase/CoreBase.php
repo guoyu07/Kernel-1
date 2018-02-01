@@ -61,8 +61,8 @@ class CoreBase extends Child
             $this->logger = getInstance()->log;
             $this->server = getInstance()->server;
             $this->config = getInstance()->config;
-            $this->redis_pool = RedisRoute::getInstance();
-            $this->mysql_pool = getInstance()->getAsynPool('mysqlPool');
+            // $this->redis_pool = RedisRoute::getInstance();
+            // $this->mysql_pool = getInstance()->getAsynPool('mysqlPool');
         }
     }
 

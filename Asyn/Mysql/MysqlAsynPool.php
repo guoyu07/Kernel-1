@@ -15,7 +15,7 @@ use Kernel\Memory\Pool;
 
 class MysqlAsynPool extends AsynPool
 {
-    const AsynName = 'mysql';
+    const AsynName = 'mysql.';
     /**
      * @var Miner
      */
@@ -58,7 +58,7 @@ class MysqlAsynPool extends AsynPool
      */
     public function getAsynName()
     {
-        return self::AsynName . ":" . $this->active;
+        return self::AsynName  . $this->active;
     }
 
     /**

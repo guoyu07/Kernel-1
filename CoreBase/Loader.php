@@ -66,14 +66,7 @@ class Loader implements ILoader
         if (class_exists($task)) {
             $task_class = $task;
         } else {
-            $task = str_replace('/', '\\', $task);
-            $task_class = "app\\Tasks\\" . $task;
-            if (!class_exists($task_class)) {
-                $task_class = "Kernel\\Tasks\\" . $task;
-                if (!class_exists($task_class)) {
-                    throw new SwooleException("class task_class not exists");
-                }
-            }
+            throw new SwooleException("class task_class not exists");
         }
         if (!getInstance()->server->taskworker) {//工作进程返回taskproxy
             $this->_task_proxy->core_name = $task_class;
