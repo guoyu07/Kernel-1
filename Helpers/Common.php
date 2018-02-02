@@ -258,6 +258,7 @@ function getConfigDir()
 function create_uuid($prefix = "")
 {
     //可以指定前缀
+    mt_srand();
     $str = md5(uniqid(mt_rand(), true));
     $uuid = substr($str, 0, 8) . '-';
     $uuid .= substr($str, 8, 4) . '-';

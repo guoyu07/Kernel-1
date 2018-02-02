@@ -315,6 +315,9 @@ abstract class SwooleHttpServer extends SwooleServer
         }
         $swooleHttpRequest->server['request_uri'] = $request_uri;
         $swooleHttpRequest->server['path_info'] = $path_info;
+        //记录客户端的 ID
+        $client_id = $swooleHttpRequest->cookie['client_id']??create_uuid();
+        $swooleHttpRequest->cookie['client_id'] = $client_id;
         return $swooleHttpRequest;
     }
 }
