@@ -22,8 +22,8 @@ return [
         'React\Promise'=>dirname(__DIR__).DS.'Library'.DS.'reactphp'.DS.'promise'.DS.'src',
         'Elasticsearch'=>dirname(__DIR__).DS.'Library'.DS.'elastic'.DS.'elasticsearch-php'.DS.'src'.DS.'Elasticsearch',
         'PhpAmqpLib'=>dirname(__DIR__).DS.'Library'.DS.'php-amqplib'.DS.'php-amqplib'.DS.'PhpAmqpLib',
-        'Ds'=>dirname(__DIR__).DS.'Library'.DS.'php-ds'.DS.'polyfill'.DS.'src',//'.DS.'//need ext-ds
-        'League\Plates'=>dirname(__DIR__).DS.'Library'.DS.'thephpleague'.DS.'plates'.DS.'src',
+        // 'Ds'=>dirname(__DIR__).DS.'Library'.DS.'php-ds'.DS.'polyfill'.DS.'src',//'.DS.'//need ext-ds
+        // 'League\Plates'=>dirname(__DIR__).DS.'Library'.DS.'thephpleague'.DS.'plates'.DS.'src',
         'Kernel'=>dirname(__DIR__),
     ],
     'files' => [

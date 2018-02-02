@@ -25,6 +25,7 @@ class RedisProxy
 
     public function getRedisPool($arguments)
     {
+        // var_dump($arguments);
         $val = $arguments[0];
 
         $n = sprintf('%u', crc32($val)) % count($this->proxy_config);
@@ -36,7 +37,8 @@ class RedisProxy
 
     public function __call($method, $arguments)
     {
+        // var_dump($method);
         $redis_pool = $this->getRedisPool($arguments);
-        return $redis_pool->coroutineSend($method, ...$arguments);
+        return $redis_pool->getCoroutine()->coroutineSend($method, ...$arguments);
     }
 }

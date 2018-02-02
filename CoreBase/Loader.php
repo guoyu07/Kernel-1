@@ -83,7 +83,7 @@ class Loader implements ILoader
     /**
      * view 返回一个模板
      * @param $template
-     * @return \League\Plates\Template\Template
+     * @return
      */
     public function view($template)
     {
