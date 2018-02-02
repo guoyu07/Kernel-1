@@ -186,10 +186,10 @@ class Controller extends CoreBase
         if (!empty($this->uid)) {
             $this->context['uid'] = $this->uid;
         }
-        if ($this->mysql_pool != null) {
-            $this->installMysqlPool($this->mysql_pool);
-            $this->db = $this->mysql_pool->dbQueryBuilder;
-        }
+        // if ($this->mysql_pool != null) {
+        //     $this->installMysqlPool($this->mysql_pool);
+        //     $this->db = $this->mysql_pool->dbQueryBuilder;
+        // }
     }
 
     /**

@@ -8,6 +8,8 @@
 
 namespace Kernel\CoreBase;
 
+use Kernel\Components\Session\Session;
+
 class HttpInput
 {
     /**
@@ -16,12 +18,15 @@ class HttpInput
      */
     public $request;
 
+    public $session;
+
     /**
      * @param $request
      */
     public function set($request)
     {
         $this->request = $request;
+        $this->session = new Session($this->request->cookie['client_id']);
     }
 
     /**

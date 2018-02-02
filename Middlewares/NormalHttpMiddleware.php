@@ -18,7 +18,7 @@ class NormalHttpMiddleware extends HttpMiddleware
     {
         parent::__construct();
         if (NormalHttpMiddleware::$cache404 == null) {
-            $template = getInstance()->loader->view('server::error_404');
+            $template = getInstance()->loader->view(KERNEL_PATH.DS.'Views'.DS.'error_404');
             NormalHttpMiddleware::$cache404 = $template->render();
         }
     }
@@ -26,7 +26,7 @@ class NormalHttpMiddleware extends HttpMiddleware
     public function before_handle()
     {
         list($host) = explode(':', $this->request->header['host'] ?? '');
-        $path = $this->request->server['path_info'];
+        $path = $this->request->server['request_uri'];
         if ($path == '/404') {
             $this->response->status(400);
             $this->response->header('HTTP/1.1', '404 Not Found');

@@ -41,11 +41,11 @@ class CoreBase extends Child
     /**
      * @var RedisRoute
      */
-    public $redis_pool;
+    // public $redis_pool;
     /**
      * @var MysqlAsynPool
      */
-    public $mysql_pool;
+    // public $mysql_pool;
 
     protected $dbQueryBuilders = [];
 
@@ -61,8 +61,8 @@ class CoreBase extends Child
             $this->logger = getInstance()->log;
             $this->server = getInstance()->server;
             $this->config = getInstance()->config;
-            $this->redis_pool = RedisRoute::getInstance();
-            $this->mysql_pool = getInstance()->getAsynPool('mysqlPool');
+            // $this->redis_pool = RedisRoute::getInstance();
+            // $this->mysql_pool = getInstance()->getAsynPool('mysqlPool');
         }
     }
 
@@ -74,6 +74,39 @@ class CoreBase extends Child
     {
         $this->dbQueryBuilders[] = $mysqlPool->installDbBuilder();
     }
+
+
+    /**
+     * 获取一个 redis 连接池
+     * @param
+     * @return
+     */
+    public function getRedisPool($name)
+    {
+        return getInstance()->getRedisPool($name);
+    }
+
+    public function getMysqlPool($name)
+    {
+        return getInstance()->getMysqlPool($name);
+    }
+
+    /**
+     * 获取一个代理链接
+     * @param  [type] $name [description]
+     * @return [type]       [description]
+     */
+    public function getMysqlProxy($name)
+    {
+        return getInstance()->getMysqlProxy($name);
+    }
+
+
+    public function getRedisProxy($name)
+    {
+        return getInstance()->getRedisProxy($name);
+    }
+
 
     /**
      * 销毁，解除引用

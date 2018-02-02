@@ -35,14 +35,10 @@ class Lock
      * @param $lock_id
      * @param null $redisPoolName
      */
-    public function __construct($lock_id, $redisPoolName = null)
+    public function __construct($lock_id, $redisPoolName)
     {
         $this->lock_id = $lock_id;
-        if (empty($redisPoolName)) {
-            $this->redis_pool = getInstance()->redis_pool;
-        } else {
-            $this->redis_pool = getInstance()->getAsynPool($redisPoolName);
-        }
+        $this->redis_pool = getInstance()->getAsynPool($redisPoolName);
     }
 
     /**

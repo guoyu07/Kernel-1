@@ -9,7 +9,7 @@
 
 namespace Kernel;
 
-use League\Plates\Engine;
+use Kernel\Layout\Engine;
 use Kernel\Components\Consul\ConsulHelp;
 use Kernel\CoreBase\ControllerFactory;
 use Kernel\Coroutine\Coroutine;
@@ -228,7 +228,7 @@ abstract class SwooleHttpServer extends SwooleServer
     {
         parent::onSwooleWorkerStart($serv, $workerId);
         $this->setTemplateEngine();
-        $template = $this->loader->view('server::error_404');
+        $template = $this->loader->view(KERNEL_PATH.DS.'Views'.DS.'error_404');
         $this->cache404 = $template->render();
     }
 
@@ -238,8 +238,6 @@ abstract class SwooleHttpServer extends SwooleServer
     public function setTemplateEngine()
     {
         $this->templateEngine = new Engine();
-        $this->templateEngine->addFolder('server', KERNEL_PATH . '/Views');
-        // $this->templateEngine->addFolder('app', APP_DIR . '/Views');
     }
 
     /**
@@ -317,6 +315,9 @@ abstract class SwooleHttpServer extends SwooleServer
         }
         $swooleHttpRequest->server['request_uri'] = $request_uri;
         $swooleHttpRequest->server['path_info'] = $path_info;
+        //记录客户端的 ID
+        $client_id = $swooleHttpRequest->cookie['client_id']??create_uuid();
+        $swooleHttpRequest->cookie['client_id'] = $client_id;
         return $swooleHttpRequest;
     }
 }

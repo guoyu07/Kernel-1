@@ -552,6 +552,7 @@ abstract class SwooleServer extends ProcessRPC
      */
     public function onSwooleManagerStart($serv)
     {
+        setTimezone();
         $processName = Start::setProcessTitle(getServerName() . ':manager');
         $pidList = ServerPid::makePidList('manager', $serv->manager_pid, $processName);
         $this->putPidList($pidList);
