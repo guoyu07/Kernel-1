@@ -25,6 +25,7 @@ use Kernel\CoreBase\ModelFactory;
 use Kernel\CoreBase\SwooleException;
 use Kernel\Coroutine\Coroutine;
 use Kernel\Memory\Pool;
+use Kernel\Components\Backstage\BackstageProcess;
 
 /**
  * Created by PhpStorm.
@@ -35,6 +36,7 @@ use Kernel\Memory\Pool;
 abstract class SwooleDistributedServer extends SwooleWebSocketServer
 {
     const SERVER_NAME = "SERVER";
+
     /**
      * 实例
      * @var SwooleServer
@@ -200,6 +202,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         //consul进程
         if ($this->config->get('consul.enable', false)) {
             ProcessManager::getInstance()->addProcess(ConsulProcess::class, false);
+        }
+        if ($this->config->get('backstage.enable', false)) {
+            ProcessManager::getInstance()->addProcess(BackstageProcess::class, false);
         }
         //Cluster进程
         ProcessManager::getInstance()->addProcess(ClusterProcess::class);
