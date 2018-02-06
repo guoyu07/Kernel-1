@@ -45,7 +45,8 @@ class Session
     public function del($key)
     {
         $value = yield  $this->sessionHandler->get($this->sessionId);
-        @unset($value[$key]);
+
+        unset($value[$key]);
         $result = yield  $this->sessionHandler->set($this->sessionId, $value, 1800);
         return $result;
     }

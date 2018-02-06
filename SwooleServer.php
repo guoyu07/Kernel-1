@@ -18,6 +18,7 @@ use Kernel\CoreBase\Loader;
 use Kernel\CoreBase\PortManager;
 use Kernel\Coroutine\Coroutine;
 use Kernel\Container\Container;
+use Kernel\Components\Backstage\BackstageHelp;
 
 /**
  * Created by PhpStorm.
@@ -219,6 +220,7 @@ abstract class SwooleServer extends ProcessRPC
     protected function setConfig()
     {
         $this->config = new Config(getConfigDir());
+        BackstageHelp::init();
     }
 
     /**
