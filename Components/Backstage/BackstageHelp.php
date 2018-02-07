@@ -36,6 +36,7 @@ class BackstageHelp
             'connect_method_name' => "onConnect",
             'close_method_name' => "onClose",
             'method_prefix' => 'back_',
+            'weight'=>100,
             'middlewares' => ['MonitorMiddleware', 'NormalHttpMiddleware']
         ];
         getInstance()->config->set("ports", $ports);

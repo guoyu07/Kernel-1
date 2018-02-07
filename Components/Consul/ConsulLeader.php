@@ -64,7 +64,8 @@ class ConsulLeader
             //分发到进程中去
             EventDispatcher::getInstance()->dispatch(ConsulHelp::DISPATCH_KEY, $result);
             //继续监听
-            $index = $data['headers']['x-consul-index']??0;
+            // $index = $data['headers']['x-consul-index']??0;
+            $index = $data['headers']['x-consul-index'];
             $this->help_serviceHealthCheck($watch, $index);
         });
     }
