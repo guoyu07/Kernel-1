@@ -151,7 +151,6 @@ class RedisAsynPool extends AsynPool
                             $arguments[] = $harray;
                         }
                     }
-                    // var_dump($arguments);
                     break;
                 case 'lpush':
                 case 'srem':
@@ -366,20 +365,39 @@ class RedisAsynPool extends AsynPool
             if (!$result) {
                 throw new SwooleException($client->errMsg);
             }
-            if ($this->config->get('redis.' . $this->active . '.password', false)) {
+            if (!empty($this->config->get('redis.' . $this->active . '.password', ""))) {//存在验证
                 $client->auth($this->config['redis'][$this->active]['password'], function ($client, $result) {
                     if (!$result) {
                         $errMsg = $client->errMsg;
                         unset($client);
                         throw new SwooleException($errMsg);
+                    }
+                    if ($this->config->has('redis.' . $this->active . '.select')) {//存在select
+                        $client->select($this->config['redis'][$this->active]['select'], function ($client, $result) {
+                            if (!$result) {
+                                throw new SwooleException($client->errMsg);
+                            }
+                            $client->isClose = false;
+                            $this->pushToPool($client);
+                        });
                     } else {
                         $client->isClose = false;
                         $this->pushToPool($client);
                     }
                 });
             } else {
-                $client->isClose = false;
-                $this->pushToPool($client);
+                if ($this->config->has('redis.' . $this->active . '.select')) {//存在select
+                    $client->select($this->config['redis'][$this->active]['select'], function ($client, $result) {
+                        if (!$result) {
+                            throw new SwooleException($client->errMsg);
+                        }
+                        $client->isClose = false;
+                        $this->pushToPool($client);
+                    });
+                } else {
+                    $client->isClose = false;
+                    $this->pushToPool($client);
+                }
             }
         };
 
@@ -441,7 +459,9 @@ class RedisAsynPool extends AsynPool
                 $this->redis_client = null;
             }
         }
-
+        if ($this->config->has('redis.' . $this->active . '.select')) {//存在select
+            $this->redis_client->select($this->config['redis'][$this->active]['select']);
+        }
         return $this->redis_client;
     }
 
