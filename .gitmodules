@@ -52,3 +52,6 @@
 [submodule "Library/php-amqplib/php-amqplib"]
 	path = Library/php-amqplib/php-amqplib
 	url = https://github.com/php-amqplib/php-amqplib.git
+[submodule "Library/php-ds/polyfill"]
+	path = Library/php-ds/polyfill
+	url = https://github.com/php-ds/polyfill.git
