@@ -3,6 +3,7 @@
 namespace Kernel\CoreBase;
 
 use Kernel\Components\AOP\Proxy;
+use Kernel\Coroutine\Coroutine;
 use Kernel\Coroutine\CoroutineNull;
 use Kernel\Memory\Pool;
 
@@ -44,9 +45,9 @@ class Task extends TaskProxy
         $this->setContext($context);
         $this->start_run_time = microtime(true);
         $this->context['task_name'] = "$task_name:$method_name";
-        // if ($this->mysql_pool != null) {
-            // $this->installMysqlPool($this->mysql_pool);
-        // }
+        if ($this->mysql_pool != null) {
+            $this->installMysqlPool($this->mysql_pool);
+        }
     }
 
     public function destroy()
@@ -104,7 +105,7 @@ class TheTaskProxy extends Proxy
 
     public function __call($name, $arguments)
     {
-        $result = call_user_func_array([$this->own, $name], $arguments);
+        $result = Coroutine::startCoroutine([$this->own, $name], $arguments);
         if ($result == null) {
             $result = CoroutineNull::getInstance();
         }

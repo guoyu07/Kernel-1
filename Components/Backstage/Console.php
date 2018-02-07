@@ -12,6 +12,7 @@ use Kernel\Components\CatCache\CatCacheRpcProxy;
 use Kernel\Components\Cluster\ClusterProcess;
 use Kernel\Components\Process\ProcessManager;
 use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\CoreBase\Actor;
 use Kernel\CoreBase\Controller;
 use Kernel\Start;
 use Kernel\SwooleMarco;
@@ -160,7 +161,34 @@ class Console extends Controller
         $this->autoSend("ok");
     }
 
+    /**
+     * 获取Actor信息
+     * @param $name
+     */
+    public function back_getActorInfo($name)
+    {
+        $result = yield CatCacheRpcProxy::getRpc()["@Actor.$name"];
+        $this->autoSend($result);
+    }
 
+    /**
+     * 销毁Actor
+     * @param $name
+     */
+    public function back_destroyActor($name)
+    {
+        Actor::destroyActor($name);
+        $this->autoSend("ok");
+    }
+
+    /**
+     * 销毁全部Actor
+     */
+    public function back_destroyAllActor()
+    {
+        Actor::destroyAllActor();
+        $this->autoSend("ok");
+    }
 
     /**
      * @param $data

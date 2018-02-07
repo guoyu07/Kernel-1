@@ -37,7 +37,6 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
             parent::start();
             return;
         }
-        echo 'asdasd';
         $first_config = $this->portManager->getFirstTypePort();
         $set = $this->portManager->getProbufSet($first_config['socket_port']);
         if (array_key_exists('ssl_cert_file', $first_config)) {
@@ -82,7 +81,9 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
     public function onSwooleWorkerStop($serv, $workerId)
     {
         parent::onSwooleWorkerStart($serv, $workerId);
-        ProcessManager::getInstance()->getRpcCall(SDHelpProcess::class, true)->setData("wsRequest:$workerId", $this->fdRequest);
+        if (!$this->isTaskWorker()) {
+            ProcessManager::getInstance()->getRpcCall(SDHelpProcess::class, true)->setData("wsRequest:$workerId", $this->fdRequest);
+        }
     }
 
     /**
@@ -235,7 +236,9 @@ abstract class SwooleWebSocketServer extends SwooleHttpServer
             } catch (\Exception $e) {
             }
             $this->middlewareManager->destory($middlewares);
-
+            if (Start::getDebug()) {
+                secho("DEBUG", $context);
+            }
             unset($context);
         });
     }

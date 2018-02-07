@@ -27,7 +27,7 @@ class ControllerFactory
     public function __construct()
     {
         self::$instance = $this;
-        $this->allow_ServerController = getInstance()->config->get('allow_ServerController', true);
+        $this->allow_ServerController = getInstance()->config->get('allow_ServerController', "true");
     }
 
     /**
@@ -67,27 +67,27 @@ class ControllerFactory
             $this->addNewCount($controller);
             return AOP::getAOP($controller_instance);
         }
-        // $controller_new = str_replace('/', '\\', $controller);
-        // $class_name = "app\\Controllers\\$controller_new";
-        // if (class_exists($class_name)) {
-        //     $controller_instance = new $class_name;
-        //     $controller_instance->core_name = $controller;
-        //     $this->addNewCount($controller);
-        //     return AOP::getAOP($controller_instance);
-        // } else {
-        //     if (!$this->allow_ServerController) {
-        //         return null;
-        //     }
-        //     $class_name = "Kernel\\Controllers\\$controller_new";
-        //     if (class_exists($class_name)) {
-        //         $controller_instance = new $class_name;
-        //         $controller_instance->core_name = $controller;
-        //         $this->addNewCount($controller);
-        //         return AOP::getAOP($controller_instance);
-        //     } else {
-        //         return null;
-        //     }
-        // }
+        $controller_new = str_replace('/', '\\', $controller);
+        $class_name = "app\\Controllers\\$controller_new";
+        if (class_exists($class_name)) {
+            $controller_instance = new $class_name;
+            $controller_instance->core_name = $controller;
+            $this->addNewCount($controller);
+            return AOP::getAOP($controller_instance);
+        } else {
+            if (!$this->allow_ServerController) {
+                return null;
+            }
+            $class_name = "Kernel\\Controllers\\$controller_new";
+            if (class_exists($class_name)) {
+                $controller_instance = new $class_name;
+                $controller_instance->core_name = $controller;
+                $this->addNewCount($controller);
+                return AOP::getAOP($controller_instance);
+            } else {
+                return null;
+            }
+        }
     }
 
     /**

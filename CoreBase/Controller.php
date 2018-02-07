@@ -57,6 +57,11 @@ class Controller extends CoreBase
      */
     protected $response;
 
+    /**
+     * 用于单元测试模拟捕获服务器发出的消息
+     * @var array
+     */
+    protected $testUnitSendStack = [];
 
     /**
      * 判断是不是RPC
@@ -186,10 +191,10 @@ class Controller extends CoreBase
         if (!empty($this->uid)) {
             $this->context['uid'] = $this->uid;
         }
-        // if ($this->mysql_pool != null) {
-        //     $this->installMysqlPool($this->mysql_pool);
-        //     $this->db = $this->mysql_pool->dbQueryBuilder;
-        // }
+        if ($this->mysql_pool != null) {
+            $this->installMysqlPool($this->mysql_pool);
+            $this->db = $this->mysql_pool->dbQueryBuilder;
+        }
     }
 
     /**
@@ -254,9 +259,11 @@ class Controller extends CoreBase
             $rpc_data['rpc_result'] = $data;
             $data = $rpc_data;
         }
-
-        getInstance()->send($this->fd, $data, true);
-
+        if (Start::$testUnity) {
+            $this->testUnitSendStack[] = ['action' => 'send', 'fd' => $this->fd, 'data' => $data];
+        } else {
+            getInstance()->send($this->fd, $data, true);
+        }
         if ($destroy) {
             $this->getProxy()->destroy();
         }
@@ -281,7 +288,16 @@ class Controller extends CoreBase
         ControllerFactory::getInstance()->revertController($this);
     }
 
-
+    /**
+     * 获取单元测试捕获的数据
+     * @return array
+     */
+    public function getTestUnitResult()
+    {
+        $stack = $this->testUnitSendStack;
+        $this->testUnitSendStack = [];
+        return $stack;
+    }
 
     /**
      * 当控制器方法不存在的时候的默认方法
@@ -307,9 +323,11 @@ class Controller extends CoreBase
         if ($this->is_destroy) {
             throw new SwooleException('controller is destroy can not send data');
         }
-
-        getInstance()->sendToUid($uid, $data);
-
+        if (Start::$testUnity) {
+            $this->testUnitSendStack[] = ['action' => 'sendToUid', 'uid' => $this->uid, 'data' => $data];
+        } else {
+            getInstance()->sendToUid($uid, $data);
+        }
         if ($destroy) {
             $this->getProxy()->destroy();
         }
@@ -327,9 +345,11 @@ class Controller extends CoreBase
         if ($this->is_destroy) {
             throw new SwooleException('controller is destroy can not send data');
         }
-
-        getInstance()->sendToUids($uids, $data);
-
+        if (Start::$testUnity) {
+            $this->testUnitSendStack[] = ['action' => 'sendToUids', 'uids' => $uids, 'data' => $data];
+        } else {
+            getInstance()->sendToUids($uids, $data);
+        }
         if ($destroy) {
             $this->getProxy()->destroy();
         }
@@ -346,8 +366,11 @@ class Controller extends CoreBase
         if ($this->is_destroy) {
             throw new SwooleException('controller is destroy can not send data');
         }
-        getInstance()->sendToAll($data);
-
+        if (Start::$testUnity) {
+            $this->testUnitSendStack[] = ['action' => 'sendToAll', 'data' => $data];
+        } else {
+            getInstance()->sendToAll($data);
+        }
         if ($destroy) {
             $this->getProxy()->destroy();
         }
@@ -359,8 +382,11 @@ class Controller extends CoreBase
      */
     protected function kickUid($uid)
     {
-
-        getInstance()->kickUid($uid);
+        if (Start::$testUnity) {
+            $this->testUnitSendStack[] = ['action' => 'kickUid', 'uid' => $uid];
+        } else {
+            getInstance()->kickUid($uid);
+        }
     }
 
     /**
@@ -374,8 +400,11 @@ class Controller extends CoreBase
         if (!empty($this->uid)) {
             throw new \Exception("已经绑定过uid");
         }
-        getInstance()->bindUid($this->fd, $uid, $isKick);
-
+        if (Start::$testUnity) {
+            $this->testUnitSendStack[] = ['action' => 'bindUid', 'fd' => $this->fd, 'uid' => $uid];
+        } else {
+            getInstance()->bindUid($this->fd, $uid, $isKick);
+        }
         $this->uid = $uid;
     }
 
@@ -387,8 +416,11 @@ class Controller extends CoreBase
         if (empty($this->uid)) {
             return;
         }
-
-        getInstance()->unBindUid($this->uid, $this->fd);
+        if (Start::$testUnity) {
+            $this->testUnitSendStack[] = ['action' => 'unBindUid', 'uid' => $this->uid];
+        } else {
+            getInstance()->unBindUid($this->uid, $this->fd);
+        }
     }
 
     /**
@@ -397,9 +429,11 @@ class Controller extends CoreBase
      */
     protected function close($autoDestroy = true)
     {
-
-        getInstance()->close($this->fd);
-
+        if (Start::$testUnity) {
+            $this->testUnitSendStack[] = ['action' => 'close', 'fd' => $this->fd];
+        } else {
+            getInstance()->close($this->fd);
+        }
         if ($autoDestroy) {
             $this->getProxy()->destroy();
         }

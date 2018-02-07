@@ -76,36 +76,6 @@ class CoreBase extends Child
     }
 
 
-    /**
-     * 获取一个 redis 连接池
-     * @param
-     * @return
-     */
-    public function getRedisPool($name)
-    {
-        return getInstance()->getRedisPool($name);
-    }
-
-    public function getMysqlPool($name)
-    {
-        return getInstance()->getMysqlPool($name);
-    }
-
-    /**
-     * 获取一个代理链接
-     * @param  [type] $name [description]
-     * @return [type]       [description]
-     */
-    public function getMysqlProxy($name)
-    {
-        return getInstance()->getMysqlProxy($name);
-    }
-
-
-    public function getRedisProxy($name)
-    {
-        return getInstance()->getRedisProxy($name);
-    }
 
 
     /**

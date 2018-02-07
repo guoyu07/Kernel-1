@@ -10,12 +10,18 @@ namespace Kernel\Components\Cluster;
 
 use Ds\Set;
 use Kernel\Asyn\HttpClient\HttpClient;
+use Kernel\Components\Event\EventDispatcher;
 use Kernel\Components\Process\Process;
+use Kernel\CoreBase\Actor;
 use Kernel\Start;
 
 class ClusterProcess extends Process
 {
+    const TYPE_UID = "type_uid";
+    const TYPE_ACTOR = "type_actor";
+
     protected $map = [];
+    protected $actorMap = [];
     protected $client = [];
     protected $node_name;
     protected $port;
@@ -27,8 +33,11 @@ class ClusterProcess extends Process
 
     public function start($process)
     {
+        $this->node_name = getNodeName();
+        $this->actorMap[$this->node_name] = new Set();
+        //通知所有Actor恢复注册
+        Actor::call(Actor::ALL_COMMAND, 'recoveryRegister', null, true);
         if (getInstance()->isCluster()) {
-            $this->node_name = getNodeName();
             $this->map[$this->node_name] = new Set();
             foreach (getInstance()->server->connections as $fd) {
                 $fdinfo = getInstance()->server->connection_info($fd);
@@ -37,12 +46,125 @@ class ClusterProcess extends Process
                     $this->map[$this->node_name]->add($uid);
                 }
             }
-            $this->consul = new HttpClient(null, 'http://0.0.0.0:8500');
+            $this->consul = new HttpClient(null, 'http://127.0.0.1:8500');
             $this->port = $this->config['cluster']['port'];
             swoole_timer_after(1000, function () {
                 $this->updateFromConsul();
             });
         }
+    }
+
+    /**
+     *恢复注册Actor
+     * @param $actor
+     */
+    public function recoveryRegisterActor($actor)
+    {
+        $this->th_addActor($this->node_name, $actor);
+    }
+
+    /**
+     * 添加Actor
+     * @param $actor
+     * @return bool
+     */
+    public function my_addActor($actor)
+    {
+        $node = $this->searchActor($actor);
+        if ($node) {
+            return false;
+        }
+        $this->th_addActor($this->node_name, $actor);
+        foreach ($this->client as $client) {
+            $client->addNodeActor($this->node_name, $actor);
+        }
+        return true;
+    }
+
+    public function th_addActor($node_name, $actor)
+    {
+        if (!isset($this->actorMap[$node_name])) {
+            $this->actorMap[$node_name] = new Set();
+        }
+        $this->actorMap[$node_name]->add($actor);
+    }
+
+    /**
+     * 移除Actor
+     * @param $actor
+     */
+    public function my_removeActor($actor)
+    {
+        $this->actorMap[$this->node_name]->remove($actor);
+        foreach ($this->client as $client) {
+            $client->removeNodeActor($this->node_name, $actor);
+        }
+    }
+
+    public function th_removeActor($node_name, $actor)
+    {
+        if (isset($this->actorMap[$node_name])) {
+            $this->actorMap[$node_name]->remove($actor);
+        }
+    }
+
+    /**
+     * 与Actor通讯
+     * @param $actor
+     * @param $data
+     */
+    public function callActor($actor, $data)
+    {
+        $node_name = $this->searchActor($actor);
+        if ($node_name) {
+            if ($node_name == $this->node_name) {//本机
+                EventDispatcher::getInstance()->dispatch(Actor::SAVE_NAME . $actor, $data, false, true);
+                return;
+            }
+            if (!isset($this->client[$node_name])) {
+                return;
+            }
+            $this->client[$node_name]->callActor($actor, $data);
+        }
+    }
+
+    /**
+     * 通讯的返回值
+     * @param $workerId
+     * @param $token
+     * @param $result
+     * @param $node_name
+     */
+    public function callActorBack($workerId, $token, $result, $node_name)
+    {
+        if ($node_name) {
+            if ($node_name == $this->node_name) {//本机
+                EventDispatcher::getInstance()->dispathToWorkerId($workerId, $token, $result);
+                return;
+            }
+            if (!isset($this->client[$node_name])) {
+                return;
+            }
+            $this->client[$node_name]->callActorBack($workerId, $token, $result);
+        }
+    }
+
+    /**
+     * 查找Actor在哪个node
+     * @param $actor
+     * @return bool|int|string
+     */
+    protected function searchActor($actor)
+    {
+        if (empty($actor)) {
+            return false;
+        }
+        foreach ($this->actorMap as $node_name => $set) {
+            if ($set->contains($actor)) {
+                return $node_name;
+            }
+        }
+        return false;
     }
 
     /**
@@ -71,11 +193,11 @@ class ClusterProcess extends Process
             foreach ($this->client as $client) {
                 $client->removeNodeUid($this->node_name, $uid);
             }
+            if (Start::isLeader()) {
+                getInstance()->pub('$SYS/uidcount', $this->countOnline());
+            }
         }
         $this->my_clearUidSub($uid);
-        if (Start::isLeader()) {
-            getInstance()->pub('$SYS/uidcount', $this->countOnline());
-        }
     }
 
     /**
@@ -171,6 +293,9 @@ class ClusterProcess extends Process
         }
         if (isset($this->subArr[$topic])) {
             $this->subArr[$topic]->remove($uid);
+            if ($this->subArr[$topic]->count()==0) {
+                unset($this->subArr[$topic]);
+            }
         }
     }
 
@@ -324,16 +449,29 @@ class ClusterProcess extends Process
     /**
      * 同步
      * @param $node_name
-     * @param $uids
+     * @param $datas
+     * @param $type
      */
-    public function th_syncData($node_name, $uids)
+    public function th_syncData($node_name, $datas, $type)
     {
-        if (!isset($this->map[$node_name])) {
-            $this->map[$node_name] = new Set($uids);
-        } else {
-            $this->map[$node_name]->add(...$uids);
+        switch ($type) {
+            case ClusterProcess::TYPE_UID:
+                if (!isset($this->map[$node_name])) {
+                    $this->map[$node_name] = new Set($datas);
+                } else {
+                    $this->map[$node_name]->add(...$datas);
+                }
+                secho("CLUSTER", "同步$node_name uid信息");
+                break;
+            case ClusterProcess::TYPE_ACTOR:
+                if (!isset($this->actorMap[$node_name])) {
+                    $this->actorMap[$node_name] = new Set($datas);
+                } else {
+                    $this->actorMap[$node_name]->add(...$datas);
+                }
+                secho("CLUSTER", "同步$node_name actor信息");
+                break;
         }
-        secho("CLUSTER", "同步$node_name 信息");
     }
 
     /**
@@ -350,22 +488,19 @@ class ClusterProcess extends Process
                 }
                 $body = json_decode($data['body'], true);
                 //寻找增加的
-                if (is_array($body) && $body) {
-                    foreach ($body as $value) {
-                        $node_name = $value['Node'];
-                        $ips = $value['TaggedAddresses'];
-                        if (!isset($ips['lan'])) {
-                            continue;
-                        }
-                        if ($ips['lan'] == getBindIp()) {
-                            continue;
-                        }
-                        if (!isset($this->client[$node_name])) {
-                            $this->addNode($node_name, $ips['lan']);
-                        }
+                foreach ($body as $value) {
+                    $node_name = $value['Node'];
+                    $ips = $value['TaggedAddresses'];
+                    if (!isset($ips['lan'])) {
+                        continue;
+                    }
+                    if ($ips['lan'] == getBindIp()) {
+                        continue;
+                    }
+                    if (!isset($this->client[$node_name])) {
+                        $this->addNode($node_name, $ips['lan']);
                     }
                 }
-
                 //寻找减少的
                 foreach ($this->client as $node_name => $client) {
                     $find = false;
@@ -380,7 +515,6 @@ class ClusterProcess extends Process
                         $this->removeNode($node_name);
                     }
                 }
-                // $index = $data['headers']['x-consul-index']??0;
                 $index = $data['headers']['x-consul-index'];
                 $this->updateFromConsul($index);
             });
@@ -394,21 +528,38 @@ class ClusterProcess extends Process
     protected function addNode($node_name, $ip)
     {
         new ClusterClient($ip, $this->port, function (ClusterClient $client) use ($node_name) {
+            //同步uid
             $content = [];
             foreach ($this->map[$this->node_name] as $value) {
                 $content[] = $value;
                 if (count($content) >= 10000) {
-                    $client->syncNodeData($this->node_name, $content);
+                    $client->syncNodeData($this->node_name, $content, ClusterProcess::TYPE_UID);
                     $content = [];
                 }
             }
             if (count($content) > 0) {
-                $client->syncNodeData($this->node_name, $content);
+                $client->syncNodeData($this->node_name, $content, ClusterProcess::TYPE_UID);
             }
-            $this->client[$node_name] = $client;
+
             if (!isset($this->map[$node_name])) {
                 $this->map[$node_name] = new Set();
             }
+            //同步Actor
+            $content = [];
+            foreach ($this->actorMap[$this->node_name] as $value) {
+                $content[] = $value;
+                if (count($content) >= 10000) {
+                    $client->syncNodeData($this->node_name, $content, ClusterProcess::TYPE_ACTOR);
+                    $content = [];
+                }
+            }
+            if (count($content) > 0) {
+                $client->syncNodeData($this->node_name, $content, ClusterProcess::TYPE_ACTOR);
+            }
+            if (!isset($this->actorMap[$node_name])) {
+                $this->actorMap[$node_name] = new Set();
+            }
+            $this->client[$node_name] = $client;
             if (Start::isLeader()) {
                 getInstance()->pub('$SYS/nodes', array_keys($this->map));
             }
@@ -538,6 +689,7 @@ class ClusterProcess extends Process
         }
         return $arr;
     }
+
     /**
      * 获取所有的Sub
      * @return array
@@ -620,6 +772,21 @@ class ClusterProcess extends Process
         return $data;
     }
 
+    /**
+     * 设置debug模式
+     * @param $node_name
+     * @param $bool
+     */
+    public function my_setDebug($node_name, $bool)
+    {
+        if ($node_name == getNodeName()) {
+            Start::setDebug($bool);
+        } else {
+            if (array_key_exists($node_name, $this->client)) {
+                $this->client[$node_name]->setDebug($bool);
+            }
+        }
+    }
 
     /**
      * reload

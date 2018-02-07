@@ -9,11 +9,10 @@
 
 namespace Kernel;
 
-use Kernel\Layout\Engine;
+use League\Plates\Engine;
 use Kernel\Components\Consul\ConsulHelp;
 use Kernel\CoreBase\ControllerFactory;
 use Kernel\Coroutine\Coroutine;
-use FastRoute;
 
 abstract class SwooleHttpServer extends SwooleServer
 {
@@ -24,158 +23,15 @@ abstract class SwooleHttpServer extends SwooleServer
     public $templateEngine;
     protected $cache404;
 
-
-
-    public $router = null;
-    public $routes = [];
-    public $routeAlias = [];
-    public $middleware = [];
-
-
-
-
     public function __construct()
     {
         parent::__construct();
-
-        $this->initializeRoute();
-    }
-
-
-
-    public function initializeRoute()
-    {
-        $this->router = $this->createRouter();
-        $this->registerRoutes();
-        $this->registerMiddleware();
-    }
-
-
-
-    /**
-     * FastRoute
-     * @return FastRoute
-     */
-    protected function createRouter()
-    {
-        return getInstance()->container->make(
-            'FastRoute\RouteCollector',
-            [
-                new FastRoute\RouteParser\Std(),
-                new FastRoute\DataGenerator\GroupCountBased()
-            ]
-        );
-
-
-        // return  new FastRoute\RouteCollector(
-        //     new FastRoute\RouteParser\Std(),
-        //     new FastRoute\DataGenerator\GroupCountBased()
-        // );
-    }
-
-
-
-    public function getDispatcher()
-    {
-        return getInstance()->container->make(
-            'FastRoute\Dispatcher\GroupCountBased',
-            [
-                $this->router->getData()
-            ]
-        );
-
-        // return new FastRoute\Dispatcher\GroupCountBased(
-        //     $this->router->getData()
-        // );
-    }
-
-
-
-
-    /**
-     * Middleware.php
-     * @return Middleware
-     */
-    protected function registerMiddleware()
-    {
-        $files = glob(MIDDLEWARE_PATH.DS."*.middleware.php");
-        foreach ($files as $file) {
-            $middleware = is_file($file) ? include_once $file : array();
-            $this->middleware = array_merge($this->middleware, $middleware);
+        //view dir
+        $view_dir = APP_DIR . '/Views';
+        if (!is_dir($view_dir)) {
+            secho("STA", "app目录下不存在Views目录，请创建。");
+            exit();
         }
-    }
-
-
-
-    /**
-     * 解析middleware
-     * @param  string $router
-     * @return middleware or bool
-     */
-    public function dispatchMiddleware($router)
-    {
-        if (!isset($this->middleware[$router])) {
-            return false;
-        }
-        return $this->middleware[$router];
-    }
-
-
-
-
-    /**
-     * route.php
-     * @return routes
-     */
-    protected function registerRoutes()
-    {
-        $files = glob(ROUTE_PATH.DS."*.route.php");
-        foreach ($files as $file) {
-            $routes = is_file($file) ? include_once $file : array();
-            $this->routes = array_merge($this->routes, $routes);
-        }
-        foreach ($this->routes as $value) {
-            if (!is_array($value[0]) && is_array($value[1])) {
-                $this->group($value[0], $value[1]);
-            } else {
-                $this->route($value[0], $value[1], $value[2], $value[3]);
-            }
-        }
-    }
-
-
-
-
-
-    /**
-     * FastRoute addRoute
-     * @param  string $method
-     * @param  string $route
-     * @param  string $handler
-     * @return
-     */
-    protected function route($method, $route, $handler, $routeAlias)
-    {
-        $this->router->addRoute($method, $route, $handler);
-        $this->routeAlias[$routeAlias] = $route;
-        return $this;
-    }
-    /**
-     * FastRoute addRoute
-     * @param  string $method
-     * @param  string $route
-     * @param  string $handler
-     * @return
-     */
-    protected function group($group, $routes)
-    {
-        $this->router->addGroup($group, function (FastRoute\RouteCollector $router) use ($group, $routes) {
-            foreach ($routes as list($method, $route, $handler,$routeAlias)) {
-                $router->addRoute($method, $route, $handler);
-                $this->routeAlias[$routeAlias] = $group.$route;
-            }
-        });
-        return $this;
     }
 
     /**
@@ -228,7 +84,7 @@ abstract class SwooleHttpServer extends SwooleServer
     {
         parent::onSwooleWorkerStart($serv, $workerId);
         $this->setTemplateEngine();
-        $template = $this->loader->view(KERNEL_PATH.DS.'Views'.DS.'error_404');
+        $template = $this->loader->view('server::error_404');
         $this->cache404 = $template->render();
     }
 
@@ -238,6 +94,8 @@ abstract class SwooleHttpServer extends SwooleServer
     public function setTemplateEngine()
     {
         $this->templateEngine = new Engine();
+        $this->templateEngine->addFolder('server', SERVER_DIR . '/Views');
+        $this->templateEngine->addFolder('app', APP_DIR . '/Views');
     }
 
     /**
@@ -247,13 +105,16 @@ abstract class SwooleHttpServer extends SwooleServer
      */
     public function onSwooleRequest($request, $response)
     {
-        //规整 URL 数据
-        $request = $this->beforeSwooleHttpRequest($request);
-        $server_port = $this->getServerPort($request->fd);
+        if (Start::$testUnity) {
+            $server_port = $request->server_port;
+        } else {
+            $server_port = $this->getServerPort($request->fd);
+        }
+
         Coroutine::startCoroutine(function () use ($request, $response, $server_port) {
             $middleware_names = $this->portManager->getMiddlewares($server_port);
             $context = [];
-            $path = $request->server['request_uri'];
+            $path = $request->server['path_info'];
             $middlewares = $this->middlewareManager->create($middleware_names, $context, [$request, $response], true);
             //before
             try {
@@ -288,36 +149,10 @@ abstract class SwooleHttpServer extends SwooleServer
             } catch (\Exception $e) {
             }
             $this->middlewareManager->destory($middlewares);
+            if (Start::getDebug()) {
+                secho("DEBUG", $context);
+            }
             unset($context);
         });
-    }
-
-
-
-    /**
-     * 规整数据
-     * @param  SwooleHttpRequest $swooleHttpRequest
-     * @return
-     */
-    private function beforeSwooleHttpRequest($swooleHttpRequest)
-    {
-        $request_uri = $swooleHttpRequest->server['request_uri'];
-        $path_info = $swooleHttpRequest->server['path_info'];
-        $request_uri = preg_replace('/\/{2,}/', '/', $request_uri);
-        $path_info = preg_replace('/\/{2,}/', '/', $path_info);
-        $request_uri = preg_replace('#/$#', '', $request_uri);
-        $path_info = preg_replace('#/$#', '', $path_info);
-        if (empty($request_uri)) {
-            $request_uri = '/';
-        }
-        if (empty($path_info)) {
-            $path_info = '/';
-        }
-        $swooleHttpRequest->server['request_uri'] = $request_uri;
-        $swooleHttpRequest->server['path_info'] = $path_info;
-        //记录客户端的 ID
-        $client_id = $swooleHttpRequest->cookie['client_id']??create_uuid();
-        $swooleHttpRequest->cookie['client_id'] = $client_id;
-        return $swooleHttpRequest;
     }
 }

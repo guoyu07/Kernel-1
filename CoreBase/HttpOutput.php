@@ -92,15 +92,6 @@ class HttpOutput
         return $this;
     }
 
-
-    public function setHeaders(array $headers)
-    {
-        foreach ($headers as $key => $value) {
-            $this->setHeader($key, $value);
-        }
-        return $this;
-    }
-
     /**
      * 发送
      * @param string $output
@@ -146,17 +137,6 @@ class HttpOutput
     public function setCookie(string $key, string $value = '', int $expire = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httponly = false)
     {
         $this->response->cookie($key, $value, $expire, $path, $domain, $secure, $httponly);
-    }
-
-
-
-    public function setCookies(array $cookie)
-    {
-        foreach ($cookie as $k => $v) {
-            list($key, $value, $expire, $path , $domain , $secure, $httponly) = $v;
-            $this->setCookie($key, $value, $expire, $path, $domain, $secure, $httponly);
-        }
-        return $this;
     }
 
     /**

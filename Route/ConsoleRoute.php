@@ -8,6 +8,7 @@
 
 namespace Kernel\Route;
 
+use Kernel\Components\Backstage\Console;
 use Kernel\CoreBase\SwooleException;
 
 class ConsoleRoute implements IRoute
@@ -50,7 +51,7 @@ class ConsoleRoute implements IRoute
      */
     public function getControllerName()
     {
-        return ;
+        return Console::class;
     }
 
     /**

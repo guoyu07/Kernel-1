@@ -66,7 +66,14 @@ class Loader implements ILoader
         if (class_exists($task)) {
             $task_class = $task;
         } else {
-            throw new SwooleException("class task_class not exists");
+            $task = str_replace('/', '\\', $task);
+            $task_class = "app\\Tasks\\" . $task;
+            if (!class_exists($task_class)) {
+                $task_class = "Kernel\\Tasks\\" . $task;
+                if (!class_exists($task_class)) {
+                    throw new SwooleException("class task_class not exists");
+                }
+            }
         }
         if (!getInstance()->server->taskworker) {//工作进程返回taskproxy
             $this->_task_proxy->core_name = $task_class;
@@ -83,7 +90,7 @@ class Loader implements ILoader
     /**
      * view 返回一个模板
      * @param $template
-     * @return
+     * @return \League\Plates\Template\Template
      */
     public function view($template)
     {

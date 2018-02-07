@@ -11,7 +11,6 @@ namespace Kernel\Components\SDHelp;
 use Kernel\Components\Consul\ConsulLeader;
 use Kernel\Components\Process\Process;
 use Kernel\Components\Reload\InotifyReload;
-use Kernel\Components\Reload\Restart;
 use Kernel\Components\TimerTask\TimerTask;
 
 class SDHelpProcess extends Process
@@ -25,11 +24,8 @@ class SDHelpProcess extends Process
         if (getInstance()->config->get('consul.enable', false)) {
             new ConsulLeader();
         }
-        if (getInstance()->config->get('auto_reload_enable', false)) {//代表启动单独进程进行reload管理,代码更新时候自动重启
+        if (getInstance()->config->get('auto_reload_enable', false)) {//代表启动单独进程进行reload管理
             new InotifyReload();
-        }
-        if (getInstance()->config->get('auto_restart_enable', false)) {//定时重启服务
-            new Restart();
         }
     }
 

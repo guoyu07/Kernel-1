@@ -8,8 +8,6 @@
 
 namespace Kernel\CoreBase;
 
-use Kernel\Components\Session\Session;
-
 class HttpInput
 {
     /**
@@ -18,15 +16,12 @@ class HttpInput
      */
     public $request;
 
-    public $session;
-
     /**
      * @param $request
      */
     public function set($request)
     {
         $this->request = $request;
-        $this->session = new Session($this->request->cookie['client_id']);
     }
 
     /**
@@ -43,11 +38,11 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function postGet($index, $default = null)
+    public function postGet($index, $xss_clean = true)
     {
         return isset($this->request->post[$index])
-            ? $this->post($index, $default)
-            : $this->get($index, $default);
+            ? $this->post($index, $xss_clean)
+            : $this->get($index, $xss_clean);
     }
 
     /**
@@ -56,9 +51,13 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function post($index, $default = null)
+    public function post($index, $xss_clean = true)
     {
-        return $this->request->post[$index]??$default;
+        if ($xss_clean) {
+            return XssClean::getXssClean()->xss_clean($this->request->post[$index]??'');
+        } else {
+            return $this->request->post[$index]??'';
+        }
     }
 
     /**
@@ -67,9 +66,13 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function get($index, $default = null)
+    public function get($index, $xss_clean = true)
     {
-        return $this->request->get[$index]??$default;
+        if ($xss_clean) {
+            return XssClean::getXssClean()->xss_clean($this->request->get[$index]??'');
+        } else {
+            return $this->request->get[$index]??'';
+        }
     }
 
     /**
@@ -78,11 +81,11 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function getPost($index, $default = null)
+    public function getPost($index, $xss_clean = true)
     {
         return isset($this->request->get[$index])
-            ? $this->get($index, $default)
-            : $this->post($index, $default);
+            ? $this->get($index, $xss_clean)
+            : $this->post($index, $xss_clean);
     }
 
     /**
@@ -113,9 +116,13 @@ class HttpInput
      * @param bool $xss_clean
      * @return array|bool|string
      */
-    public function header($index, $default = null)
+    public function header($index, $xss_clean = true)
     {
-        return $this->request->header[$index]??$default;
+        if ($xss_clean) {
+            return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
+        } else {
+            return $this->request->header[$index]??'';
+        }
     }
 
     /**
@@ -142,9 +149,13 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function cookie($index, $default = null)
+    public function cookie($index, $xss_clean = true)
     {
-        return $this->request->cookie[$index]??$default;
+        if ($xss_clean) {
+            return XssClean::getXssClean()->xss_clean($this->request->cookie[$index]??'');
+        } else {
+            return $this->request->cookie[$index]??'';
+        }
     }
 
     /**
@@ -153,9 +164,13 @@ class HttpInput
      * @param $xss_clean
      * @return string
      */
-    public function getRequestHeader($index, $default = null)
+    public function getRequestHeader($index, $xss_clean = true)
     {
-        return $this->request->header[$index]??$default;
+        if ($xss_clean) {
+            return XssClean::getXssClean()->xss_clean($this->request->header[$index]??'');
+        } else {
+            return $this->request->header[$index]??'';
+        }
     }
 
     /**
@@ -164,9 +179,13 @@ class HttpInput
      * @param bool $xss_clean
      * @return array|bool|string
      */
-    public function server($index, $default = null)
+    public function server($index, $xss_clean = true)
     {
-        return $this->request->server[$index]??$default;
+        if ($xss_clean) {
+            return XssClean::getXssClean()->xss_clean($this->request->server[$index]??'');
+        } else {
+            return $this->request->server[$index]??'';
+        }
     }
 
     /**
@@ -194,7 +213,7 @@ class HttpInput
      */
     public function getPathInfo()
     {
-        return $this->request->server['request_uri'];
+        return $this->request->server['path_info'];
     }
 
     /**

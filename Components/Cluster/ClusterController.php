@@ -11,6 +11,7 @@ namespace Kernel\Components\Cluster;
 use Kernel\Components\Event\EventDispatcher;
 use Kernel\Components\Process\ProcessManager;
 use Kernel\Components\SDHelp\SDHelpProcess;
+use Kernel\CoreBase\Actor;
 use Kernel\CoreBase\Child;
 use Kernel\Start;
 
@@ -24,12 +25,13 @@ class ClusterController extends Child
     /**
      * 同步数据
      * @param $node_name
-     * @param $uids
+     * @param $datas
+     * @param $type
      */
-    public function syncNodeData($node_name, $uids)
+    public function syncNodeData($node_name, $datas, $type)
     {
-        $uids = array_values($uids);
-        ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->th_syncData($node_name, $uids);
+        $datas = array_values($datas);
+        ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->th_syncData($node_name, $datas, $type);
     }
 
     /**
@@ -80,6 +82,11 @@ class ClusterController extends Child
     public function dispatchEvent($type, $data)
     {
         EventDispatcher::getInstance()->dispatch($type, $data, false, true);
+    }
+
+    public function setDebug($bool)
+    {
+        Start::setDebug($bool);
     }
 
     public function reload()
@@ -157,5 +164,42 @@ class ClusterController extends Child
     {
         $result = yield ProcessManager::getInstance()->getRpcCall(ClusterProcess::class)->th_getUidTopics($uid);
         return $result;
+    }
+
+    /**
+     * @param $node_name
+     * @param $actor
+     */
+    public function addNodeActor($node_name, $actor)
+    {
+        ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->th_addActor($node_name, $actor);
+    }
+
+    /**
+     * @param $node_name
+     * @param $actor
+     */
+    public function removeNodeActor($node_name, $actor)
+    {
+        ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->th_removeActor($node_name, $actor);
+    }
+
+    /**
+     * @param $actor
+     * @param $data
+     */
+    public function callActor($actor, $data)
+    {
+        EventDispatcher::getInstance()->dispatch(Actor::SAVE_NAME . $actor, $data, false, true);
+    }
+
+    /**
+     * @param $workerId
+     * @param $token
+     * @param $result
+     */
+    public function callActorBack($workerId, $token, $result)
+    {
+        EventDispatcher::getInstance()->dispathToWorkerId($workerId, $token, $result);
     }
 }

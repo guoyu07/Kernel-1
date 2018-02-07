@@ -2,14 +2,14 @@
 
 namespace Kernel;
 
-use Monolog\ErrorHandler;
-use Monolog\Handler\MongoDBHandler;
-use DateTimeZone;
-use MongoDB\Client;
+use Gelf\Publisher;
+use Monolog\Handler\GelfHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Noodlehaus\Config;
+use Kernel\Components\Backstage\BackstageHelp;
 use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\GrayLog\UdpTransport;
 use Kernel\Components\Middleware\MiddlewareManager;
 use Kernel\Components\Process\ProcessRPC;
 use Kernel\CoreBase\ControllerFactory;
@@ -17,8 +17,6 @@ use Kernel\CoreBase\ILoader;
 use Kernel\CoreBase\Loader;
 use Kernel\CoreBase\PortManager;
 use Kernel\Coroutine\Coroutine;
-use Kernel\Container\Container;
-use Kernel\Components\Backstage\BackstageHelp;
 
 /**
  * Created by PhpStorm.
@@ -28,11 +26,15 @@ use Kernel\Components\Backstage\BackstageHelp;
  */
 abstract class SwooleServer extends ProcessRPC
 {
+    /**
+     * 配置文件版本
+     */
+    const config_version = 2;
 
     /**
      * 版本
      */
-    const version = "v1";
+    const version = "2.7.7";
 
     /**
      * server name
@@ -118,69 +120,27 @@ abstract class SwooleServer extends ProcessRPC
      */
     protected $max_connection;
 
-
-
-    /**
-     * PID文件路径
-     * @var string
-     */
-    public $pidFilePath;
-    /**
-     * 主进程进程号
-     * @var integer
-     */
-    public $masterPid = 0;
-    /**
-     * 管理进程号
-     * @var integer
-     */
-    public $managerPid = 0;
-
-    /**
-     * 监控
-     * @var monitor
-     */
-    public $monitor;
-
-
-    /**
-     * 容器
-     * @var  obj
-     */
-    public $container;
-
     /**
      * 设置monolog的loghandler
      */
     public function setLogHandler()
     {
-        $logHandle = new Logger($this->config->get('log.log_name', 'SD'));
-        $logHandle->setTimezone(new DateTimeZone($this->config->get('common.timezone', 'PRC')));
-        switch ($this->config->get('log.active', 'file')) {
-            case 'file':
-                $logHandle->pushHandler(new RotatingFileHandler(
-                    STORAGE_LOG_PATH . DS . $this->name .getNodeName(). '.log',
-                    $this->config->get('log.file.log_max_files', 15),
-                    $this->config->get('log.log_level', \Monolog\Logger::DEBUG)
+        $this->log = new Logger($this->config->get('log.log_name', 'SD'));
+        switch ($this->config['log']['active']) {
+            case "graylog":
+                $this->log->setHandlers([new GelfHandler(
+                    new Publisher(new UdpTransport($this->config['log']['graylog']['ip'], $this->config['log']['graylog']['port'])),
+                    $this->config['log']['log_level']
+                )]);
+                break;
+            case "file":
+                $this->log->pushHandler(new RotatingFileHandler(
+                    LOG_DIR . "/" . $this->name . '.log',
+                    $this->config['log']['file']['log_max_files'],
+                    $this->config['log']['log_level']
                 ));
                 break;
-            case 'mongodb':
-                $uri = 'mongodb://'.implode($this->config->get('log.mongodb.host'), ',').'/';
-                $client = new Client(
-                    $uri,
-                    $this->config->get('log.mongodb.uriOptions'),
-                    $this->config->get('log.mongodb.driverOptions')
-                );
-                $mongodb = new MongoDBHandler(
-                    $client,
-                    $this->config->get('log.mongodb.database'),
-                    $this->config->get('log.mongodb.collection', 'logger')
-                );
-                $logHandle->pushHandler($mongodb);
-                break;
         }
-        ErrorHandler::register($logHandle);
-        $this->log = $logHandle;
     }
 
     /**
@@ -189,7 +149,6 @@ abstract class SwooleServer extends ProcessRPC
     public function __construct()
     {
         $this->onErrorHandel = [$this, 'onErrorHandel'];
-        Start::initServer($this);
         $this->setConfig();
         $this->middlewareManager = new MiddlewareManager();
         $this->user = $this->config->get('server.set.user', '');
@@ -197,18 +156,6 @@ abstract class SwooleServer extends ProcessRPC
         register_shutdown_function(array($this, 'checkErrors'));
         set_error_handler(array($this, 'displayErrorHandler'));
         $this->portManager = new PortManager($this->config['ports']);
-
-
-        $this->pidFilePath = $this->config->get('server.set.pid_file').getNodeName().'.pid';
-        $this->masterPid = ServerPid::getMasterPid($this->pidFilePath);
-        $this->managerPid = ServerPid::getManagerPid($this->pidFilePath);
-        ServerPid::init($this->pidFilePath);
-        $this->monitor = new Monitor(getServerName().":", $this->pidFilePath);
-
-        $this->container = new Container;
-
-
-
         if ($this->loader == null) {
             $this->loader = new Loader();
         }
@@ -245,14 +192,8 @@ abstract class SwooleServer extends ProcessRPC
         $this->worker_num = $set['worker_num'];
         $this->task_num = $set['task_worker_num'];
         $set['daemonize'] = Start::getDaemonize();
-        $set['pid_file'] = $set['pid_file'].getNodeName().'.pid';
-        $set['log_file'] = $set['log_file'].getNodeName().'.log';
-
         $this->server->set($set);
-
         swoole_async_set([
-            'aio_mode' => SWOOLE_AIO_BASE,
-            'thread_num' => 100,
             'socket_buffer_size' => 128 * 1024 * 1024
         ]);
     }
@@ -332,10 +273,10 @@ abstract class SwooleServer extends ProcessRPC
     public function onSwooleStart($serv)
     {
         setTimezone();
-        $processName = Start::setProcessTitle(getServerName() . ':master');
-        //刷新进程文件
-        $pidList = ServerPid::makePidList('master', $serv->master_pid, $processName);
-        $this->putPidList($pidList);
+        Start::setProcessTitle(getServerName() . '-Master');
+        if (Start::getDebug()) {
+            secho("SYS", "工作在DEBUG模式");
+        }
     }
 
     /**
@@ -356,22 +297,14 @@ abstract class SwooleServer extends ProcessRPC
         }
         // 重新加载配置
         $this->config = $this->config->load(getConfigDir());
-        // $this->container = new Container;
         if (!$serv->taskworker) {//worker进程
             if ($this->needCoroutine) {//启动协程调度器
                 Coroutine::init();
             }
-            $workerProcessName = ":work-num-:{$serv->worker_id}";
-            $processName = Start::setProcessTitle(getServerName() . $workerProcessName);
-            $pidList = ServerPid::makePidList('work', $serv->worker_pid, $processName);
+            Start::setProcessTitle(getServerName() . "-Worker");
         } else {
-            $taskId = $serv->worker_id - $this->worker_num;
-            $taskProcessName = ":task-num-:{$taskId}";
-
-            $processName = Start::setProcessTitle(getServerName() . $taskProcessName);
-            $pidList = ServerPid::makePidList('task', $serv->worker_pid, $processName);
+            Start::setProcessTitle(getServerName() . "-Tasker");
         }
-        $this->putPidList($pidList);
     }
 
     /**
@@ -395,10 +328,13 @@ abstract class SwooleServer extends ProcessRPC
      */
     public function onSwooleReceive($serv, $fd, $from_id, $data, $server_port = null)
     {
-
-        $server_port = $this->getServerPort($fd);
-        $uid = $this->getUidFromFd($fd);
-
+        if (!Start::$testUnity) {
+            $server_port = $this->getServerPort($fd);
+            $uid = $this->getUidFromFd($fd);
+        } else {
+            $fd = 'self';
+            $uid = $fd;
+        }
         $pack = $this->portManager->getPack($server_port);
         //反序列化，出现异常断开连接
         try {
@@ -438,7 +374,9 @@ abstract class SwooleServer extends ProcessRPC
             } catch (\Exception $e) {
             }
             $this->middlewareManager->destory($middlewares);
-
+            if (Start::getDebug()) {
+                secho("DEBUG", $context);
+            }
             unset($context);
         });
     }
@@ -554,10 +492,7 @@ abstract class SwooleServer extends ProcessRPC
      */
     public function onSwooleManagerStart($serv)
     {
-        setTimezone();
-        $processName = Start::setProcessTitle(getServerName() . ':manager');
-        $pidList = ServerPid::makePidList('manager', $serv->manager_pid, $processName);
-        $this->putPidList($pidList);
+        Start::setProcessTitle(getServerName() . '-Manager');
     }
 
     /**
@@ -768,7 +703,6 @@ abstract class SwooleServer extends ProcessRPC
     {
         secho("ERROR", $msg);
         secho("ERROR", $log);
-        $this->log->error($log);
     }
 
     /**
@@ -817,57 +751,5 @@ abstract class SwooleServer extends ProcessRPC
     public function getUidFromFd($fd)
     {
         return $this->fd_uid_table->get($fd, 'uid');
-    }
-
-    /**
-     * 输入 Pid
-     * @param  array $pidList
-     * @return void
-     */
-    public function putPidList($pidList)
-    {
-        $pidList = empty($pidList)?[]:$pidList;
-        ServerPid::putPidList($pidList);
-    }
-
-
-
-    public function settle()
-    {
-        setTimezone();
-        $ps_name =  getServerName();
-        exec("ps -ef | grep $ps_name | grep -v 'grep' | awk '{print $2,$8}'", $pidList);
-        $data = [];
-        foreach ($pidList as $key => $item) {
-            $tmp = explode(" ", $item);
-            if (strpos($tmp[1], 'work') !== false) {
-                $data['work'][$tmp[1]] = [
-                    'pid' => $tmp[0],
-                    'datetime' => date('Y-m-d H:i:s'),
-                ];
-            } elseif (strpos($tmp[1], 'master') !== false) {
-                $data['master'][$tmp[1]] = [
-                    'pid' => $tmp[0],
-                    'datetime' => date('Y-m-d H:i:s'),
-                ];
-            } elseif (strpos($tmp[1], 'task') !== false) {
-                $data['task'][$tmp[1]] = [
-                    'pid' => $tmp[0],
-                    'datetime' => date('Y-m-d H:i:s'),
-                ];
-            } elseif (strpos($tmp[1], 'manager') !== false) {
-                $data['manager'][$tmp[1]] = [
-                    'pid' => $tmp[0],
-                    'datetime' => date('Y-m-d H:i:s'),
-                ];
-            } else {
-            }
-        }
-        $this->reSavePid($data);
-    }
-
-    public function reSavePid($data)
-    {
-        ServerPid::reSavePid($data);
     }
 }

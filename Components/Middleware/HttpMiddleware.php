@@ -31,9 +31,9 @@ abstract class HttpMiddleware extends Middleware
             $root_path = $this->config['http']['root']['default']['root'] ?? '';
         }
         if (!empty($root_path)) {
-            $root_path = HTDOCS_PATH . "/$root_path/";
+            $root_path = WWW_DIR . "/$root_path/";
         } else {
-            $root_path = HTDOCS_PATH . "/";
+            $root_path = WWW_DIR . "/";
         }
         return $root_path;
     }

@@ -8,7 +8,7 @@
 
 namespace Kernel\CoreBase;
 
-use Kernel\Xss\AntiXSS;
+use voku\helper\AntiXSS;
 
 class XssClean
 {

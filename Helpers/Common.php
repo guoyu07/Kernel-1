@@ -129,12 +129,12 @@ function checkExtension()
         $check = false;
     }
 
-    // if (SWOOLE_VERSION[0] == 2) {
-    //     secho("STA", "[版本错误]不支持2.0版本swoole，请安装1.9版本");
-    //     $check = false;
-    // }
+    if (SWOOLE_VERSION[0] == 2) {
+        secho("STA", "[版本错误]不支持2.0版本swoole，请安装1.9版本");
+        $check = false;
+    }
     if (!class_exists('swoole_redis')) {
-        secho("STA", "[编译错误]swoole编译缺少--enable-async-redis");
+        secho("STA", "[编译错误]swoole编译缺少--enable-async-redis,具体参见文档http://docs.sder.xin/%E7%8E%AF%E5%A2%83%E8%A6%81%E6%B1%82.html");
         $check = false;
     }
     if (!extension_loaded('redis')) {
@@ -158,14 +158,9 @@ function checkExtension()
         secho("STA", "dispatch_heart_time配置已被弃用，请换成['dispatch']['heart_time']");
         $check = false;
     }
-
-
-    $dispatch_enable = getInstance()->config->get('dispatch.enable', false);
-    if ($dispatch_enable) {
-        if (!getInstance()->config->get('redis.enable', true)) {
-            secho("STA", "开启dispatch，就必须启动redis的配置");
-            $check = false;
-        }
+    if (getInstance()->config->get('config_version', '') != \Kernel\SwooleServer::config_version) {
+        secho("STA", "配置文件有不兼容的可能，请将vendor/tmtbe/swooledistributed/src/config目录替换src/config目录，然后重新配置");
+        $check = false;
     }
     return $check;
 }
@@ -190,9 +185,7 @@ function isDarwin()
  */
 function sleepCoroutine($time)
 {
-    return \Kernel\Memory\Pool::getInstance()
-    ->get(\Kernel\CoreBase\SleepCoroutine::class)
-    ->init()->setTimeout($time);
+    return \Kernel\Memory\Pool::getInstance()->get(\Kernel\CoreBase\SleepCoroutine::class)->init()->setTimeout($time);
 }
 
 /**
@@ -217,10 +210,10 @@ function getBindIp()
  */
 function getNodeName()
 {
-    // global $node_name;
-    // if (!empty($node_name)) {
-    //     return $node_name;
-    // }
+    global $node_name;
+    if (!empty($node_name)) {
+        return $node_name;
+    }
     $env_SD_NODE_NAME = getenv("SD_NODE_NAME");
     if (!empty($env_SD_NODE_NAME)) {
         $node_name = $env_SD_NODE_NAME;
@@ -248,7 +241,17 @@ function getServerName()
  */
 function getConfigDir()
 {
-    return CONFIG_PATH.DS.ENV;
+    $env_SD_CONFIG_DIR = getenv("SD_CONFIG_DIR");
+    if (!empty($env_SD_CONFIG_DIR)) {
+        $dir = CONFIG_DIR . '/' . $env_SD_CONFIG_DIR;
+        if (!is_dir($dir)) {
+            secho("STA", "$dir 目录不存在\n");
+            exit();
+        }
+        return $dir;
+    } else {
+        return CONFIG_DIR;
+    }
 }
 
 /**
@@ -258,7 +261,6 @@ function getConfigDir()
 function create_uuid($prefix = "")
 {
     //可以指定前缀
-    mt_srand();
     $str = md5(uniqid(mt_rand(), true));
     $uuid = substr($str, 0, 8) . '-';
     $uuid .= substr($str, 8, 4) . '-';
@@ -286,23 +288,33 @@ function secho($tile, $message)
     print_r($message);
     $content = ob_get_contents();
     ob_end_clean();
-
-    $could = true;
-
+    $could = false;
+    if (empty(\Kernel\Start::getDebugFilter())) {
+        $could = true;
+    } else {
+        foreach (\Kernel\Start::getDebugFilter() as $filter) {
+            if (strpos($tile, $filter) !== false || strpos($content, $filter) !== false) {
+                $could = true;
+                break;
+            }
+        }
+    }
 
     $content = explode("\n", $content);
     $send = "";
     foreach ($content as $value) {
         if (!empty($value)) {
-            $echo = "[$tile]\t$value\n";
+            $echo = "[$tile] $value";
             $send = $send . $echo;
             if ($could) {
-                echo $echo;
+                echo " > $echo.\n";
             }
         }
     }
     try {
-        getInstance()->pub('$SYS/' . getNodeName() . "/echo", $send);
+        if (getInstance() != null) {
+            getInstance()->pub('$SYS/' . getNodeName() . "/echo", $send);
+        }
     } catch (Exception $e) {
     }
 }

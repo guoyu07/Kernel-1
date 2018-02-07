@@ -5,10 +5,9 @@ namespace Kernel;
 use Kernel\Asyn\MQTT\Utility;
 use Kernel\Asyn\Mysql\Miner;
 use Kernel\Asyn\Mysql\MysqlAsynPool;
-use Kernel\Asyn\Mysql\MysqlProxy;
 use Kernel\Asyn\Redis\RedisAsynPool;
-use Kernel\Asyn\Redis\RedisProxy;
-// use Kernel\Asyn\Redis\RedisLuaManager;
+use Kernel\Asyn\Redis\RedisLuaManager;
+use Kernel\Components\Backstage\BackstageProcess;
 use Kernel\Components\CatCache\CatCacheProcess;
 use Kernel\Components\CatCache\TimerCallBack;
 use Kernel\Components\Cluster\ClusterHelp;
@@ -16,16 +15,18 @@ use Kernel\Components\Cluster\ClusterProcess;
 use Kernel\Components\Consul\ConsulHelp;
 use Kernel\Components\Consul\ConsulProcess;
 use Kernel\Components\Event\EventDispatcher;
+use Kernel\Components\GrayLog\GrayLogHelp;
 use Kernel\Components\Process\ProcessManager;
 use Kernel\Components\SDHelp\SDHelpProcess;
 use Kernel\Components\TimerTask\Timer;
 use Kernel\Components\TimerTask\TimerTask;
+use Kernel\CoreBase\Actor;
 use Kernel\CoreBase\ControllerFactory;
 use Kernel\CoreBase\ModelFactory;
 use Kernel\CoreBase\SwooleException;
 use Kernel\Coroutine\Coroutine;
 use Kernel\Memory\Pool;
-use Kernel\Components\Backstage\BackstageProcess;
+use Kernel\Test\TestModule;
 
 /**
  * Created by PhpStorm.
@@ -36,20 +37,19 @@ use Kernel\Components\Backstage\BackstageProcess;
 abstract class SwooleDistributedServer extends SwooleWebSocketServer
 {
     const SERVER_NAME = "SERVER";
-
     /**
      * 实例
      * @var SwooleServer
      */
-    protected static $instance;
+    private static $instance;
     /**
      * @var RedisAsynPool
      */
-    // public $redis_pool;
+    public $redis_pool;
     /**
      * @var MysqlAsynPool
      */
-    // public $mysql_pool;
+    public $mysql_pool;
     /**
      * 404缓存
      * @var string
@@ -103,17 +103,11 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      */
     private $bind_ip;
 
-
-
     /**
-     * @var array Redis代理管理器
+     * 重载锁
+     * @var array
      */
-    protected $redisProxyManager = [];
-
-    /**
-     * @var array Mysql代理管理器
-     */
-    protected $mysqlProxyManager = [];
+    private $reloadLockMap = [];
 
     /**
      * SwooleDistributedServer constructor.
@@ -140,19 +134,19 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
 
     public function start()
     {
-        // if ($this->config->get('redis.enable', true)) {
-        //     //加载redis的lua脚本
-        //     $redis_pool = new RedisAsynPool($this->config, $this->config->get('redis.active'));
-        //     // $redisLuaManager = new RedisLuaManager($redis_pool->getSync());
-        //     // $redisLuaManager->registerFile(LUA_DIR);
-        //     $redis_pool->getSync()->close();
-        //     $redis_pool = null;
-        // }
+        if ($this->config->get('redis.enable', true)) {
+            //加载redis的lua脚本
+            $redis_pool = new RedisAsynPool($this->config, $this->config->get('redis.active'));
+            $redisLuaManager = new RedisLuaManager($redis_pool->getSync());
+            $redisLuaManager->registerFile(LUA_DIR);
+            $redis_pool->getSync()->close();
+            $redis_pool = null;
+        }
         //非集群默认是leader
         if (!$this->isCluster()) {
             Start::setLeader(true);
         }
-        return parent::start();
+        parent::start();
     }
 
     /**
@@ -160,10 +154,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      * @return Miner
      * @throws SwooleException
      */
-    public function getMysql($poolKey)
+    public function getMysql()
     {
-        // return $this->mysql_pool->getSync();
-        return $this->asynPools[MysqlAsynPool::AsynName . $poolKey]->getSync();
+        return $this->mysql_pool->getSync();
     }
 
     /**
@@ -184,12 +177,19 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         $this->task_lock = new \swoole_lock(SWOOLE_MUTEX);
         //开启用户进程
         $this->startProcess();
+        //开启一个UDP用于发graylog
+        GrayLogHelp::init();
         //开启Cluster端口
         ClusterHelp::getInstance()->buildPort();
         //Timer
         Timer::init();
         //init锁
         $this->initLock = new \swoole_lock(SWOOLE_RWLOCK);
+        //reload锁
+        for ($i = 0; $i < $this->worker_num; $i++) {
+            $lock = new \swoole_lock(SWOOLE_MUTEX);
+            $this->reloadLockMap[$i] = $lock;
+        }
     }
 
     /**
@@ -282,9 +282,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         $send_data = getInstance()->packServerMessageBody($type, $uns_data, $callStaticFuc);
         if ($this->server->worker_id == $workerId) {
             //自己的进程是收不到消息的所以这里执行下
-            getInstance()->server->defer(function () use ($callStaticFuc, $uns_data) {
-                call_user_func($callStaticFuc, $uns_data);
-            });
+            call_user_func($callStaticFuc, $uns_data);
         } else {
             getInstance()->server->sendMessage($send_data, $workerId);
         }
@@ -335,16 +333,24 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         }
     }
 
+    /**
+     * 是否是重载
+     */
+    protected function isReload()
+    {
+        $lock = $this->reloadLockMap[$this->workerId];
+        $result = $lock->trylock();
+        return !$result;
+    }
 
     /**
      * 获取同步redis
      * @return \Redis
      * @throws SwooleException
      */
-    public function getRedis($poolKey)
+    public function getRedis()
     {
-        // return $this->redis_pool->getSync();
-        return $this->asynPools[RedisAsynPool::AsynName . $poolKey]->getSync();
+        return $this->redis_pool->getSync();
     }
 
     /**
@@ -538,66 +544,29 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
     public function onSwooleWorkerStart($serv, $workerId)
     {
         parent::onSwooleWorkerStart($serv, $workerId);
-        $this->initAsynPools();
-        $this->initRedisProxy();
-        $this->initMysqlProxy();
-        // $this->redis_pool = $this->asynPools['redisPool'] ?? null;
-        // $this->mysql_pool = $this->asynPools['mysqlPool'] ?? null;
+        $this->initAsynPools($workerId);
         //进程锁保证只有一个进程会执行以下的代码,reload也不会执行
         if (!$this->isTaskWorker() && $this->initLock->trylock()) {
             //进程启动后进行开服的初始化
             Coroutine::startCoroutine([$this, 'onOpenServiceInitialization']);
+            if (Start::$testUnity) {
+                new TestModule(Start::$testUnityDir);
+            }
             $this->initLock->lock_read();
         }
         //向SDHelp進程取數據
         if (!$this->isTaskWorker()) {
+            $isReload = $this->isReload();
             ConsulHelp::start();
             TimerTask::start();
             if ($this->config->get('catCache.enable', false)) {
                 TimerCallBack::init();
-                Coroutine::startCoroutine(function () use ($workerId) {
-                    yield EventDispatcher::getInstance()->addOnceCoroutine(CatCacheProcess::READY);
+                Coroutine::startCoroutine(function () use ($workerId, $isReload) {
+                    if (!$isReload) {
+                        yield EventDispatcher::getInstance()->addOnceCoroutine(CatCacheProcess::READY);
+                    }
+                    yield Actor::recovery($workerId);
                 });
-            }
-        }
-    }
-
-    public function initRedisProxy()
-    {
-        if ($this->config->get('redis_proxy.active')) {
-            $activeProxies = $this->config->get('redis_proxy.active');
-            if (is_string($activeProxies)) {
-                $activeProxies = explode(',', $activeProxies);
-            }
-            foreach ($activeProxies as $activeProxy) {
-                $this->redisProxyManager[$activeProxy] = new RedisProxy($this->config['redis_proxy'][$activeProxy]);
-            }
-        }
-    }
-
-    public function getRedisProxy($name)
-    {
-        return $this->redisProxyManager[$name]??null;
-    }
-
-
-    public function getMysqlProxy($name)
-    {
-        return $this->mysqlProxyManager[$name]??null;
-    }
-
-    public function initMysqlProxy()
-    {
-        if ($this->config->get('mysql_proxy.active')) {
-            $activeProxies = $this->config->get('mysql_proxy.active');
-            if (is_string($activeProxies)) {
-                $activeProxies = explode(',', $activeProxies);
-            }
-
-            foreach ($activeProxies as $activeProxy) {
-                $this->mysqlProxyManager[$activeProxy] = new MysqlProxy(
-                    $this->config['mysql_proxy'][$activeProxy]
-                );
             }
         }
     }
@@ -606,53 +575,17 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      * 初始化各种连接池
      * @param $workerId
      */
-    public function initAsynPools()
+    public function initAsynPools($workerId)
     {
-        // $this->asynPools = [];
-        // if ($this->config->get('redis.enable', true)) {
-        //     $this->asynPools['redisPool'] = new RedisAsynPool($this->config, $this->config->get('redis.active'));
-        // }
-        // if ($this->config->get('mysql.enable', true)) {
-        //     $this->asynPools['mysqlPool'] = new MysqlAsynPool($this->config, $this->config->get('mysql.active'));
-        // }
-
-        $asynPools = [];
-        if ($this->config->get('redis.enable', false)) {
-            $activePools = $this->config->get('redis.active');
-            if (is_string($activePools)) {
-                $activePools = explode(',', $activePools);
-            }
-
-            foreach ($activePools as $poolKey) {
-                $asynPools[RedisAsynPool::AsynName . $poolKey] = new RedisAsynPool($this->config, $poolKey);
-            }
+        $this->asynPools = [];
+        if ($this->config->get('redis.enable', true)) {
+            $this->asynPools['redisPool'] = new RedisAsynPool($this->config, $this->config->get('redis.active'));
         }
-
-
-        if ($this->config->get('mysql.enable', false)) {
-            $activePools = $this->config->get('mysql.active');
-            if (is_string($activePools)) {
-                $activePools = explode(',', $activePools);
-            }
-            foreach ($activePools as $poolKey) {
-                $asynPools[MysqlAsynPool::AsynName . $poolKey] = new MysqlAsynPool($this->config, $poolKey);
-            }
+        if ($this->config->get('mysql.enable', true)) {
+            $this->asynPools['mysqlPool'] = new MysqlAsynPool($this->config, $this->config->get('mysql.active'));
         }
-
-
-        $this->asynPools = $asynPools;
-    }
-
-
-    public function getRedisPool($name)
-    {
-        return $this->asynPools[RedisAsynPool::AsynName . $name]??null;
-    }
-
-
-    public function getMysqlPool($name)
-    {
-        return $this->asynPools[MysqlAsynPool::AsynName . $name]??null;
+        $this->redis_pool = $this->asynPools['redisPool'] ?? null;
+        $this->mysql_pool = $this->asynPools['mysqlPool'] ?? null;
     }
 
     /**
@@ -661,20 +594,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
      */
     public function onOpenServiceInitialization()
     {
-
-        if ($this->config->get('mysql.enable', false)) {
-            $activePools = $this->config->get('mysql.active');
-            if (is_string($activePools)) {
-                $activePools = explode(',', $activePools);
-            }
-            foreach ($activePools as $poolKey) {
-                $this->asynPools[MysqlAsynPool::AsynName . $poolKey] = $this->asynPools[MysqlAsynPool::AsynName . $poolKey]->installDbBuilder();
-            }
+        if ($this->mysql_pool != null) {
+            $this->mysql_pool->installDbBuilder();
         }
-
-        // if ($this->mysql_pool != null) {
-        //     $this->mysql_pool->installDbBuilder();
-        // }
     }
 
     /**
@@ -759,13 +681,13 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         if ($isKick) {
             $this->kickUid($uid, false);
         }
+        $this->uid_fd_table->set($uid, ['fd' => $fd]);
+        $this->fd_uid_table->set($fd, ['uid' => $uid]);
         if ($this->isCluster()) {
             ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_addUid($uid);
         } else {
             getInstance()->pub('$SYS/uidcount', count($this->uid_fd_table));
         }
-        $this->uid_fd_table->set($uid, ['fd' => $fd]);
-        $this->fd_uid_table->set($fd, ['uid' => $uid]);
     }
 
     /**
@@ -779,6 +701,9 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         $this->fd_uid_table->del($fd);
         //这里无论是不是集群都需要调用
         ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_removeUid($uid);
+        if (!$this->isCluster()) {
+            getInstance()->pub('$SYS/uidcount', count($this->uid_fd_table));
+        }
     }
 
     /**
@@ -898,6 +823,7 @@ abstract class SwooleDistributedServer extends SwooleWebSocketServer
         }
         $this->lastTime = $now_time;
         $this->lastReqTimes = $status['request_count'];
+        $status['isDebug'] = Start::getDebug();
         $status['isLeader'] = Start::isLeader();
         $status['qps'] = $qps;
         $status['system'] = PHP_OS;

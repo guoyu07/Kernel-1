@@ -9,6 +9,7 @@
 namespace Kernel\CoreBase;
 
 use Kernel\Coroutine\CoroutineBase;
+use Kernel\Memory\Pool;
 
 /**
  * 用于并发选择1个结果，相当于go的select
@@ -32,5 +33,10 @@ class SleepCoroutine extends CoroutineBase
 
     public function send($callback)
     {
+    }
+    public function destroy()
+    {
+        parent::destroy();
+        Pool::getInstance()->push($this);
     }
 }
