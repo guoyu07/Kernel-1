@@ -171,7 +171,6 @@ class TimerTask extends CoreBase
                     $this->updateTimerTask(null);
                 }
                 $index = $data['headers']['x-consul-index'];
-                // $index = $data['headers']['x-consul-index']??0;
                 $this->updateFromConsul($index);
             });
     }

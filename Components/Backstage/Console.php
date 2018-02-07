@@ -47,8 +47,6 @@ class Console extends Controller
     {
         if (getInstance()->isCluster()) {
             ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->my_setDebug($node_name, $bool);
-        } else {
-            Start::setDebug($bool);
         }
         $this->autoSend("ok");
     }
