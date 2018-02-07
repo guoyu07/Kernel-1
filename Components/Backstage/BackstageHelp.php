@@ -16,9 +16,9 @@ class BackstageHelp
 
     public static function init()
     {
-        // if (self::$set) {
-        //     return;
-        // }
+        if (self::$set) {
+            return;
+        }
         if (!getInstance()->config->get('backstage.enable', false)) {
             return;
         }
@@ -47,6 +47,6 @@ class BackstageHelp
             'interval_time' => '1',
         ];
         getInstance()->config->set("timerTask", $timerTask);
-        // self::$set = true;
+        self::$set = true;
     }
 }
