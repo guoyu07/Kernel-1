@@ -28,6 +28,7 @@ class ConsulProcess extends Process
         }
 
         $this->exec(BIN_DIR . "/exec/consul", ['agent', '-ui', '-config-dir', BIN_DIR . '/exec/consul.d/'.getNodeName()]);
+        sleep(5);
     }
 
     /**
@@ -89,7 +90,10 @@ class ConsulProcess extends Process
             }
         }
         // $dir =;
-        @mkdir(BIN_DIR . "/exec/consul.d/".getNodeName(), 0777, true);
+        if (!is_dir(BIN_DIR . "/exec/consul.d/".getNodeName())) {
+            @mkdir(BIN_DIR . "/exec/consul.d/".getNodeName(), 0777, true);
+        }
+
         file_put_contents(BIN_DIR . "/exec/consul.d/".getNodeName()."/consul_config.json", json_encode($newConfig));
     }
 
