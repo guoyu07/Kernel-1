@@ -27,7 +27,7 @@ class ControllerFactory
     public function __construct()
     {
         self::$instance = $this;
-        $this->allow_ServerController = getInstance()->config->get('allow_ServerController', true);
+        $this->allow_ServerController = getInstance()->config->get('allow_ServerController', "true");
     }
 
     /**

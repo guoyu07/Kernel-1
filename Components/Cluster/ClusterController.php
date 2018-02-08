@@ -24,12 +24,13 @@ class ClusterController extends Child
     /**
      * 同步数据
      * @param $node_name
-     * @param $uids
+     * @param $datas
+     * @param $type
      */
-    public function syncNodeData($node_name, $uids)
+    public function syncNodeData($node_name, $datas, $type)
     {
-        $uids = array_values($uids);
-        ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->th_syncData($node_name, $uids);
+        $datas = array_values($datas);
+        ProcessManager::getInstance()->getRpcCall(ClusterProcess::class, true)->th_syncData($node_name, $datas, $type);
     }
 
     /**
@@ -80,6 +81,10 @@ class ClusterController extends Child
     public function dispatchEvent($type, $data)
     {
         EventDispatcher::getInstance()->dispatch($type, $data, false, true);
+    }
+
+    public function setDebug($bool)
+    {
     }
 
     public function reload()

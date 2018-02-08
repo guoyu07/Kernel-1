@@ -9,6 +9,7 @@ use MongoDB\Client;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Noodlehaus\Config;
+use Kernel\Components\Backstage\BackstageHelp;
 use Kernel\Components\Event\EventDispatcher;
 use Kernel\Components\Middleware\MiddlewareManager;
 use Kernel\Components\Process\ProcessRPC;
@@ -18,7 +19,6 @@ use Kernel\CoreBase\Loader;
 use Kernel\CoreBase\PortManager;
 use Kernel\Coroutine\Coroutine;
 use Kernel\Container\Container;
-use Kernel\Components\Backstage\BackstageHelp;
 
 /**
  * Created by PhpStorm.

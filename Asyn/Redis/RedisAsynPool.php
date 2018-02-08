@@ -151,7 +151,6 @@ class RedisAsynPool extends AsynPool
                             $arguments[] = $harray;
                         }
                     }
-                    // var_dump($arguments);
                     break;
                 case 'lpush':
                 case 'srem':

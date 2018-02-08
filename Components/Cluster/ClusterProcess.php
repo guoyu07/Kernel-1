@@ -10,11 +10,14 @@ namespace Kernel\Components\Cluster;
 
 use Ds\Set;
 use Kernel\Asyn\HttpClient\HttpClient;
+use Kernel\Components\Event\EventDispatcher;
 use Kernel\Components\Process\Process;
 use Kernel\Start;
 
 class ClusterProcess extends Process
 {
+    const TYPE_UID = "type_uid";
+
     protected $map = [];
     protected $client = [];
     protected $node_name;
@@ -27,8 +30,8 @@ class ClusterProcess extends Process
 
     public function start($process)
     {
+        $this->node_name = getNodeName();
         if (getInstance()->isCluster()) {
-            $this->node_name = getNodeName();
             $this->map[$this->node_name] = new Set();
             foreach (getInstance()->server->connections as $fd) {
                 $fdinfo = getInstance()->server->connection_info($fd);
@@ -37,13 +40,15 @@ class ClusterProcess extends Process
                     $this->map[$this->node_name]->add($uid);
                 }
             }
-            $this->consul = new HttpClient(null, 'http://0.0.0.0:8500');
+            $this->consul = new HttpClient(null, 'http://127.0.0.1:8500');
             $this->port = $this->config['cluster']['port'];
             swoole_timer_after(1000, function () {
                 $this->updateFromConsul();
             });
         }
     }
+
+
 
     /**
      * 自身增加了一个uid
@@ -71,11 +76,11 @@ class ClusterProcess extends Process
             foreach ($this->client as $client) {
                 $client->removeNodeUid($this->node_name, $uid);
             }
+            if (Start::isLeader()) {
+                getInstance()->pub('$SYS/uidcount', $this->countOnline());
+            }
         }
         $this->my_clearUidSub($uid);
-        if (Start::isLeader()) {
-            getInstance()->pub('$SYS/uidcount', $this->countOnline());
-        }
     }
 
     /**
@@ -171,6 +176,9 @@ class ClusterProcess extends Process
         }
         if (isset($this->subArr[$topic])) {
             $this->subArr[$topic]->remove($uid);
+            if ($this->subArr[$topic]->count()==0) {
+                unset($this->subArr[$topic]);
+            }
         }
     }
 
@@ -324,16 +332,21 @@ class ClusterProcess extends Process
     /**
      * 同步
      * @param $node_name
-     * @param $uids
+     * @param $datas
+     * @param $type
      */
-    public function th_syncData($node_name, $uids)
+    public function th_syncData($node_name, $datas, $type)
     {
-        if (!isset($this->map[$node_name])) {
-            $this->map[$node_name] = new Set($uids);
-        } else {
-            $this->map[$node_name]->add(...$uids);
+        switch ($type) {
+            case ClusterProcess::TYPE_UID:
+                if (!isset($this->map[$node_name])) {
+                    $this->map[$node_name] = new Set($datas);
+                } else {
+                    $this->map[$node_name]->add(...$datas);
+                }
+                secho("CLUSTER", "同步$node_name uid信息");
+                break;
         }
-        secho("CLUSTER", "同步$node_name 信息");
     }
 
     /**
@@ -350,22 +363,19 @@ class ClusterProcess extends Process
                 }
                 $body = json_decode($data['body'], true);
                 //寻找增加的
-                if (is_array($body) && $body) {
-                    foreach ($body as $value) {
-                        $node_name = $value['Node'];
-                        $ips = $value['TaggedAddresses'];
-                        if (!isset($ips['lan'])) {
-                            continue;
-                        }
-                        if ($ips['lan'] == getBindIp()) {
-                            continue;
-                        }
-                        if (!isset($this->client[$node_name])) {
-                            $this->addNode($node_name, $ips['lan']);
-                        }
+                foreach ($body as $value) {
+                    $node_name = $value['Node'];
+                    $ips = $value['TaggedAddresses'];
+                    if (!isset($ips['lan'])) {
+                        continue;
+                    }
+                    if ($ips['lan'] == getBindIp()) {
+                        continue;
+                    }
+                    if (!isset($this->client[$node_name])) {
+                        $this->addNode($node_name, $ips['lan']);
                     }
                 }
-
                 //寻找减少的
                 foreach ($this->client as $node_name => $client) {
                     $find = false;
@@ -380,7 +390,7 @@ class ClusterProcess extends Process
                         $this->removeNode($node_name);
                     }
                 }
-                $index = $data['headers']['x-consul-index']??0;
+                $index = $data['headers']['x-consul-index'];
                 $this->updateFromConsul($index);
             });
     }
@@ -393,21 +403,24 @@ class ClusterProcess extends Process
     protected function addNode($node_name, $ip)
     {
         new ClusterClient($ip, $this->port, function (ClusterClient $client) use ($node_name) {
+            //同步uid
             $content = [];
             foreach ($this->map[$this->node_name] as $value) {
                 $content[] = $value;
                 if (count($content) >= 10000) {
-                    $client->syncNodeData($this->node_name, $content);
+                    $client->syncNodeData($this->node_name, $content, ClusterProcess::TYPE_UID);
                     $content = [];
                 }
             }
             if (count($content) > 0) {
-                $client->syncNodeData($this->node_name, $content);
+                $client->syncNodeData($this->node_name, $content, ClusterProcess::TYPE_UID);
             }
-            $this->client[$node_name] = $client;
+
             if (!isset($this->map[$node_name])) {
                 $this->map[$node_name] = new Set();
             }
+
+            $this->client[$node_name] = $client;
             if (Start::isLeader()) {
                 getInstance()->pub('$SYS/nodes', array_keys($this->map));
             }
@@ -537,6 +550,7 @@ class ClusterProcess extends Process
         }
         return $arr;
     }
+
     /**
      * 获取所有的Sub
      * @return array
@@ -619,6 +633,14 @@ class ClusterProcess extends Process
         return $data;
     }
 
+    /**
+     * 设置debug模式
+     * @param $node_name
+     * @param $bool
+     */
+    public function my_setDebug($node_name, $bool)
+    {
+    }
 
     /**
      * reload

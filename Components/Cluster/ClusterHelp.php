@@ -48,8 +48,6 @@ class ClusterHelp
         if (!getInstance()->isCluster()) {
             return;
         }
-
-        // var_dump($this->pack->getProbufSet());
         //创建dispatch端口用于连接dispatch
         $this->port = getInstance()->server->listen('0.0.0.0', $this->config['cluster']['port'], SWOOLE_SOCK_TCP);
         if ($this->port == false) {
